@@ -1242,7 +1242,7 @@ const StoreView = ({ storeItems, investmentPackages, onPurchase, userBalance }) 
             <div className="bg-gray-800 rounded-lg p-4">
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-gray-400">Lisenziya haqqı:</span>
+                  <span className="text-gray-400">Paket haqqı:</span>
                   <span className="text-white">{selectedItem.price} AZN</span>
                 </div>
                 <div className="flex justify-between">
