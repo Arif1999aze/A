@@ -148,15 +148,22 @@ def test_new_features():
     }
     
     withdraw_response = make_request('POST', '/transactions', withdrawal_low, headers)
-    if withdraw_response and withdraw_response.status_code == 400:
-        error_data = withdraw_response.json()
-        if "500-6500 AZN" in error_data.get('detail', ''):
-            print("✅ Withdrawal limits validation working")
+    if withdraw_response:
+        print(f"   Withdrawal response status: {withdraw_response.status_code}")
+        print(f"   Withdrawal response: {withdraw_response.text}")
+        
+        if withdraw_response.status_code == 400:
+            error_data = withdraw_response.json()
+            if "500-6500 AZN" in error_data.get('detail', ''):
+                print("✅ Withdrawal limits validation working")
+            else:
+                print(f"❌ Unexpected withdrawal error: {error_data}")
+                return False
         else:
-            print(f"❌ Unexpected withdrawal error: {error_data}")
+            print(f"❌ Expected 400 status for invalid withdrawal amount")
             return False
     else:
-        print(f"❌ Withdrawal limits test failed")
+        print(f"❌ Withdrawal limits test failed - no response")
         return False
     
     # 5. Test Admin Stats
