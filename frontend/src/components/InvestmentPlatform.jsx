@@ -4,6 +4,7 @@ import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Badge } from './ui/badge';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { 
   generateRandomTransaction, 
   generateMembershipActivity,
@@ -12,7 +13,7 @@ import {
   companyInfo,
   formatAmount 
 } from '../mock';
-import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe } from 'lucide-react';
+import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe, CreditCard, Upload, Package } from 'lucide-react';
 
 const InvestmentPlatform = () => {
   const [transactions, setTransactions] = useState([]);
@@ -20,9 +21,13 @@ const InvestmentPlatform = () => {
   const [stats, setStats] = useState(initialStats);
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
+  const [withdrawOpen, setWithdrawOpen] = useState(false);
+  const [depositOpen, setDepositOpen] = useState(false);
+  const [packagesOpen, setPackagesOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showBalances, setShowBalances] = useState(true);
   const [user, setUser] = useState(null);
+  const [userInvestments, setUserInvestments] = useState([]);
 
   // Live transaction feed
   useEffect(() => {
@@ -60,15 +65,39 @@ const InvestmentPlatform = () => {
   }, []);
 
   const handleLogin = (email, password) => {
-    setUser({ email, balance: 2500 }); // Demo balance
+    setUser({ 
+      email, 
+      name: email.split('@')[0], 
+      balance: 2500 
+    });
     setIsLoggedIn(true);
     setLoginOpen(false);
   };
 
   const handleRegister = (email, password, name) => {
-    setUser({ email, name, balance: 0 });
+    setUser({ 
+      email, 
+      name, 
+      balance: 0 
+    });
     setIsLoggedIn(true);
     setRegisterOpen(false);
+  };
+
+  const handleWithdraw = (amount, cardName, cardNumber) => {
+    if (amount > user.balance) {
+      alert('Balansınızda kifayət qədər vəsait yoxdur.');
+      return;
+    }
+    
+    setUser(prev => ({ ...prev, balance: prev.balance - amount }));
+    alert(`${formatAmount(amount)} AZN çıxarış sorğusu göndərildi. Kart: ${cardNumber.slice(-4)}`);
+    setWithdrawOpen(false);
+  };
+
+  const handleDeposit = (amount, cardNumber, receipt) => {
+    alert(`${formatAmount(amount)} AZN yatırım sorğusu göndərildi. Təsdiq gözlənilir.`);
+    setDepositOpen(false);
   };
 
   const blurName = (name) => {
@@ -83,6 +112,12 @@ const InvestmentPlatform = () => {
     const pkg = investmentPackages.find(p => p.id === packageId);
     if (user.balance >= pkg.price) {
       setUser(prev => ({ ...prev, balance: prev.balance - pkg.price }));
+      setUserInvestments(prev => [...prev, {
+        id: Date.now(),
+        package: pkg,
+        date: new Date().toISOString(),
+        status: 'active'
+      }]);
       alert(`${pkg.name} paketinə uğurla investisiya etdiniz!`);
     } else {
       alert('Balansınızda kifayət qədər vəsait yoxdur.');
@@ -132,10 +167,64 @@ const InvestmentPlatform = () => {
               </>
             ) : (
               <div className="flex items-center space-x-4">
-                <div className="text-sm">
-                  <div className="text-gray-400">Balans</div>
-                  <div className="font-bold text-yellow-400">{formatAmount(user?.balance || 0)} AZN</div>
+                <div className="flex items-center space-x-4">
+                  <div className="text-sm">
+                    <div className="text-gray-400">Xoş gəlmisiniz</div>
+                    <div className="font-bold text-white">{user.name}</div>
+                    <div className="text-xs text-gray-500">{user.email}</div>
+                  </div>
+                  <div className="text-sm">
+                    <div className="text-gray-400">Balans</div>
+                    <div className="font-bold text-yellow-400">{formatAmount(user?.balance || 0)} AZN</div>
+                  </div>
                 </div>
+
+                {/* Action Buttons */}
+                <div className="flex space-x-2">
+                  <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white">
+                        Çıxarış Et
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-gray-900 border-gray-700">
+                      <DialogHeader>
+                        <DialogTitle className="text-white">Çıxarış Et</DialogTitle>
+                      </DialogHeader>
+                      <WithdrawForm onWithdraw={handleWithdraw} maxAmount={user.balance} />
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={depositOpen} onOpenChange={setDepositOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-green-400 text-green-400 hover:bg-green-400 hover:text-white">
+                        Yatırım Et
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-gray-900 border-gray-700">
+                      <DialogHeader>
+                        <DialogTitle className="text-white">Yatırım Et</DialogTitle>
+                      </DialogHeader>
+                      <DepositForm onDeposit={handleDeposit} />
+                    </DialogContent>
+                  </Dialog>
+
+                  <Dialog open={packagesOpen} onOpenChange={setPackagesOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black">
+                        <Package className="w-4 h-4 mr-1" />
+                        Paketlərim
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle className="text-white">Mənim Paketlərim</DialogTitle>
+                      </DialogHeader>
+                      <MyPackagesView investments={userInvestments} />
+                    </DialogContent>
+                  </Dialog>
+                </div>
+
                 <Button variant="outline" onClick={() => setIsLoggedIn(false)}>
                   Çıxış
                 </Button>
@@ -382,7 +471,7 @@ const InvestmentPlatform = () => {
           <div className="space-y-8">
             <div className="text-center">
               <h1 className="text-4xl font-bold text-yellow-400 mb-4">
-                Xoş gəlmisiniz, {user.name || user.email}!
+                Xoş gəlmisiniz, {user.name}!
               </h1>
               <p className="text-gray-300">İnvestisiya paketinizi seçin və qazanca başlayın</p>
             </div>
@@ -618,6 +707,215 @@ const RegisterForm = ({ onRegister }) => {
         Qeydiyyatdan Keç
       </Button>
     </form>
+  );
+};
+
+// Withdraw Form Component
+const WithdrawForm = ({ onWithdraw, maxAmount }) => {
+  const [amount, setAmount] = useState('');
+  const [cardName, setCardName] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const amountNum = parseFloat(amount);
+    if (amountNum > 0 && amountNum <= maxAmount && cardName && cardNumber.length === 16) {
+      onWithdraw(amountNum, cardName, cardNumber);
+      setAmount('');
+      setCardName('');
+      setCardNumber('');
+    } else {
+      alert('Zəhmət olmasa bütün məlumatları düzgün daxil edin.');
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Çıxarış Məbləği (AZN)</label>
+        <Input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="0.00"
+          max={maxAmount}
+          min="1"
+          step="0.01"
+          required
+        />
+        <div className="text-xs text-gray-400 mt-1">Maksimum: {formatAmount(maxAmount)} AZN</div>
+      </div>
+      
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Kart Üstündə Ad Soyad</label>
+        <Input
+          type="text"
+          value={cardName}
+          onChange={(e) => setCardName(e.target.value)}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="ELVIN MAHMUDOV"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Kart Nömrəsi (16 rəqəm)</label>
+        <Input
+          type="text"
+          value={cardNumber}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 16) {
+              setCardNumber(value);
+            }
+          }}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="1234567890123456"
+          maxLength="16"
+          required
+        />
+        <div className="text-xs text-gray-400 mt-1">{cardNumber.length}/16 rəqəm</div>
+      </div>
+
+      <Button type="submit" className="w-full bg-red-500 text-white hover:bg-red-600">
+        <CreditCard className="w-4 h-4 mr-2" />
+        Çıxarış Et
+      </Button>
+    </form>
+  );
+};
+
+// Deposit Form Component
+const DepositForm = ({ onDeposit }) => {
+  const [amount, setAmount] = useState('');
+  const [cardNumber, setCardNumber] = useState('');
+  const [receipt, setReceipt] = useState(null);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const amountNum = parseFloat(amount);
+    if (amountNum > 0 && cardNumber.length === 16 && receipt) {
+      onDeposit(amountNum, cardNumber, receipt);
+      setAmount('');
+      setCardNumber('');
+      setReceipt(null);
+    } else {
+      alert('Zəhmət olmasa bütün məlumatları daxil edin və dekontu yükləyin.');
+    }
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setReceipt(file);
+    }
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Yatırım Məbləği (AZN)</label>
+        <Input
+          type="number"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="0.00"
+          min="1"
+          step="0.01"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Kart Nömrəsi (16 rəqəm)</label>
+        <Input
+          type="text"
+          value={cardNumber}
+          onChange={(e) => {
+            const value = e.target.value.replace(/\D/g, '');
+            if (value.length <= 16) {
+              setCardNumber(value);
+            }
+          }}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="1234567890123456"
+          maxLength="16"
+          required
+        />
+        <div className="text-xs text-gray-400 mt-1">{cardNumber.length}/16 rəqəm</div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Dekontu Yüklə</label>
+        <div className="border-2 border-dashed border-gray-600 rounded-lg p-4 text-center">
+          <input
+            type="file"
+            onChange={handleFileChange}
+            accept="image/*,.pdf"
+            className="hidden"
+            id="receipt-upload"
+          />
+          <label htmlFor="receipt-upload" className="cursor-pointer">
+            <Upload className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+            <div className="text-sm text-gray-400">
+              {receipt ? receipt.name : 'Fayl seçin (JPG, PNG, PDF)'}
+            </div>
+          </label>
+        </div>
+      </div>
+
+      <Button type="submit" className="w-full bg-green-500 text-white hover:bg-green-600">
+        <DollarSign className="w-4 h-4 mr-2" />
+        Yatır
+      </Button>
+    </form>
+  );
+};
+
+// My Packages View Component
+const MyPackagesView = ({ investments }) => {
+  if (!investments.length) {
+    return (
+      <div className="text-center py-8">
+        <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+        <p className="text-gray-400">Hələ heç bir paketiniz yoxdur.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 max-h-96 overflow-y-auto">
+      {investments.map((investment) => (
+        <Card key={investment.id} className="bg-gray-800 border-gray-700 p-4">
+          <div className="flex justify-between items-start">
+            <div className="flex items-center space-x-3">
+              <div className="text-2xl" style={{ color: investment.package.color }}>
+                {investment.package.icon}
+              </div>
+              <div>
+                <h3 className="font-bold text-white">{investment.package.name}</h3>
+                <div className="text-sm text-gray-400">
+                  {new Date(investment.date).toLocaleDateString()}
+                </div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="font-bold text-white">
+                {formatAmount(investment.package.price)} AZN
+              </div>
+              <div className="text-sm text-green-400">
+                +{investment.package.dailyProfit}% gündəlik
+              </div>
+              <Badge className="mt-1 bg-green-600">
+                {investment.status === 'active' ? 'Aktiv' : 'Bitib'}
+              </Badge>
+            </div>
+          </div>
+        </Card>
+      ))}
+    </div>
   );
 };
 
