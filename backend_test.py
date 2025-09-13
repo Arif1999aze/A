@@ -833,7 +833,7 @@ def test_updated_withdrawal_limits():
             print(f"❌ Unexpected error for min withdrawal: {error_data}")
             return False
     else:
-        print(f"❌ Minimum withdrawal limit test failed")
+        print(f"❌ Minimum withdrawal limit test failed - Status: {response_low.status_code if response_low else 'No response'}")
         return False
     
     # Test above maximum (should fail)
@@ -854,7 +854,7 @@ def test_updated_withdrawal_limits():
             print(f"❌ Unexpected error for max withdrawal: {error_data}")
             return False
     else:
-        print(f"❌ Maximum withdrawal limit test failed")
+        print(f"❌ Maximum withdrawal limit test failed - Status: {response_high.status_code if response_high else 'No response'}")
         return False
 
 def test_admin_search_by_az_code():
