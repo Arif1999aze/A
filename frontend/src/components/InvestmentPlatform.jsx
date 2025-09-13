@@ -28,7 +28,7 @@ const InvestmentPlatform = () => {
   const [depositOpen, setDepositOpen] = useState(false);
   const [packageConfirmOpen, setPackageConfirmOpen] = useState(false);
   const [pendingOpen, setPendingOpen] = useState(false);
-  const [supportOpen, setSupportOpen] = useState(false);
+  const [supportOpen, setSupportOpen] = useState(false);  
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState(null);
@@ -43,12 +43,13 @@ const InvestmentPlatform = () => {
   const [packages, setPackages] = useState([]);
   const [messages, setMessages] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [websocket, setWebsocket] = useState(null);
 
   // Package definitions
   const packageDefinitions = {
-    platinum: { name: 'Platinum Paket', minAmount: 50, maxAmount: 250, multiplier: 3, duration: 30, color: '#C0C0C0', icon: '💎' },
-    titanium: { name: 'Titanium Paket', minAmount: 250, maxAmount: 500, multiplier: 4, duration: 45, color: '#434B52', icon: '🛡️' },
-    gold: { name: 'Gold Paket', minAmount: 500, maxAmount: 1000, multiplier: 4.5, duration: 60, color: '#FFD700', icon: '👑' }
+    platinum: { name: 'Platinum Paket', minAmount: 50, maxAmount: 2500, multiplier: 3, duration: 30, color: '#C0C0C0', icon: '💎' },
+    titanium: { name: 'Titanium Paket', minAmount: 50, maxAmount: 2500, multiplier: 4, duration: 45, color: '#434B52', icon: '🛡️' },
+    gold: { name: 'Gold Paket', minAmount: 50, maxAmount: 2500, multiplier: 4.5, duration: 60, color: '#FFD700', icon: '👑' }
   };
 
   useEffect(() => {
@@ -58,8 +59,67 @@ const InvestmentPlatform = () => {
       fetchUserPackages();
       fetchUserTransactions();
       fetchUserMessages();
+      setupWebSocket();
     }
   }, [token]);
+
+  // Setup WebSocket for real-time updates
+  const setupWebSocket = () => {
+    if (!user?.id) return;
+    
+    const wsUrl = `${API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/user/${user.id}`;
+    const ws = new WebSocket(wsUrl);
+    
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      handleWebSocketMessage(data);
+    };
+    
+    ws.onerror = (error) => {
+      console.log('WebSocket error:', error);
+    };
+    
+    setWebsocket(ws);
+    
+    return () => {
+      if (ws) ws.close();
+    };
+  };
+
+  const handleWebSocketMessage = (data) => {
+    switch (data.type) {
+      case 'balance_update':
+      case 'admin_balance_update':
+      case 'deposit_approved':
+      case 'withdrawal_rejected':
+        setUser(prev => ({ ...prev, balance: data.new_balance }));
+        if (data.type === 'deposit_approved') {
+          alert(`✅ Depozitiniz təsdiqləndi! ${formatAmount(data.amount)} AZN balansınıza əlavə edildi.`);
+        } else if (data.type === 'withdrawal_rejected') {
+          alert(`❌ Çıxarış təsdiq edilmədi: ${data.reason}. Məbləğ geri qaytarıldı.`);
+        } else if (data.type === 'admin_balance_update') {
+          alert(`💰 Admin tərəfindən balansınız yeniləndi: ${formatAmount(data.new_balance)} AZN`);
+        }
+        break;
+      case 'withdrawal_approved':
+        alert(`✅ Çıxarışınız təsdiqləndi! ${formatAmount(data.amount)} AZN ödəniş işlənir.`);
+        break;
+      case 'earnings_update':
+        setUserPackages(prev => prev.map(pkg => 
+          pkg.id === data.package_id 
+            ? { ...pkg, accumulated_earnings: data.accumulated_earnings }
+            : pkg
+        ));
+        break;
+      case 'earnings_collected':
+        setUser(prev => ({ ...prev, balance: data.new_balance }));
+        break;
+      case 'admin_reply':
+        fetchUserMessages();
+        alert('📧 Dəstək komandası cavab göndərdi!');
+        break;
+    }
+  };
 
   // Live transaction feed
   useEffect(() => {
@@ -198,6 +258,9 @@ const InvestmentPlatform = () => {
   };
 
   const handleLogout = () => {
+    if (websocket) {
+      websocket.close();
+    }
     localStorage.removeItem('token');
     setToken(null);
     setIsLoggedIn(false);
@@ -385,9 +448,17 @@ const InvestmentPlatform = () => {
                 <div className="flex items-center space-x-2 sm:space-x-4">
                   <div className="text-xs sm:text-sm">
                     <div className="text-gray-400 hidden sm:block">Xoş gəlmisiniz</div>
-                    <div className="font-bold text-white">{user?.name}</div>
+                    <div className="font-bold text-white">
+                      {hasActivePackage ? (
+                        <span className="inline-flex items-center px-3 py-1 rounded-full bg-yellow-400 text-black font-bold">
+                          {user?.name}
+                        </span>
+                      ) : (
+                        user?.name
+                      )}
+                    </div>
                     {hasActivePackage && userPackages[0] && (
-                      <div className="flex items-center text-yellow-400 text-xs">
+                      <div className="flex items-center text-yellow-400 text-xs mt-1">
                         <span className="mr-1">{packageDefinitions[userPackages[0].package_type]?.icon}</span>
                         {packageDefinitions[userPackages[0].package_type]?.name}
                       </div>
@@ -396,6 +467,9 @@ const InvestmentPlatform = () => {
                   <div className="text-xs sm:text-sm">
                     <div className="text-gray-400">Balans</div>
                     <div className="font-bold text-yellow-400">{formatAmount(user?.balance || 0)} AZN</div>
+                    {user?.user_code && (
+                      <div className="text-xs text-gray-500">Kod: {user.user_code}</div>
+                    )}
                   </div>
                 </div>
 
@@ -411,7 +485,12 @@ const InvestmentPlatform = () => {
                   </Button>
 
                   {menuOpen && (
-                    <div className="absolute right-0 top-12 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-2 w-48 z-50">
+                    <div className="absolute right-0 top-12 bg-gray-800 border border-gray-700 rounded-lg shadow-lg py-2 w-56 z-50">
+                      <div className="px-4 py-2 border-b border-gray-700">
+                        <div className="text-xs text-gray-400">İstifadəçi Kodu</div>
+                        <div className="text-sm text-yellow-400 font-bold">{user?.user_code}</div>
+                      </div>
+                      
                       <button
                         onClick={() => {
                           setSupportOpen(true);
@@ -717,7 +796,7 @@ const InvestmentPlatform = () => {
                 <h2 className="text-2xl font-bold text-yellow-400 text-center">İnvestisiya Paketləri</h2>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   {Object.entries(packageDefinitions).map(([key, pkg]) => (
-                    <PackageCard 
+                    <NewPackageCard 
                       key={key}
                       packageKey={key}
                       package={pkg}
@@ -788,6 +867,96 @@ const InvestmentPlatform = () => {
                       </Card>
                     );
                   })}
+                </div>
+
+                {/* Live Activities for logged in users with active packages */}
+                <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
+                  {/* Live Transactions */}
+                  <Card className="bg-gray-900 border-gray-800 p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-base sm:text-lg font-bold text-yellow-400">Canlı Əməliyyatlar</h3>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                        <span className="text-xs text-green-400">CANLI</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 max-h-80 sm:max-h-96 overflow-y-auto">
+                      {transactions.map((txn) => (
+                        <div key={txn.id} className="bg-gray-800 rounded-lg p-3 slide-up border-l-4 border-l-yellow-400">
+                          <div className="flex justify-between items-start">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2">
+                                <span className="font-medium text-white text-xs sm:text-sm">
+                                  {showBalances ? txn.name : blurName(txn.name)}
+                                </span>
+                                <Badge className={`text-xs ${txn.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'}`}>
+                                  {txn.type === 'deposit' ? 'Yatırım' : 'Çıxarış'}
+                                </Badge>
+                              </div>
+                              <div className="text-xs text-gray-400 mt-1">
+                                {txn.bank}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className={`font-bold text-xs sm:text-sm ${txn.type === 'deposit' ? 'text-green-400' : 'text-red-400'}`}>
+                                {txn.type === 'deposit' ? '+' : '-'}{formatAmount(txn.amount)} AZN
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {new Date(txn.timestamp).toLocaleTimeString()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="mt-4 flex justify-center">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setShowBalances(!showBalances)}
+                        className="border-gray-600 text-gray-400 hover:text-white text-xs"
+                      >
+                        {showBalances ? <EyeOff className="w-3 h-3 sm:w-4 sm:h-4 mr-1" /> : <Eye className="w-3 h-3 sm:w-4 sm:h-4 mr-1" />}
+                        {showBalances ? 'Adları Gizlə' : 'Adları Göstər'}
+                      </Button>
+                    </div>
+                  </Card>
+
+                  {/* Live Memberships */}
+                  <Card className="bg-gray-900 border-gray-800 p-4 sm:p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <h3 className="text-base sm:text-lg font-bold text-yellow-400">Yeni Üzvlər</h3>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                        <span className="text-xs text-purple-400">CANLI</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3 max-h-80 sm:max-h-96 overflow-y-auto">
+                      {membershipActivities.map((member) => (
+                        <div key={member.id} className="bg-gray-800 rounded-lg p-3 slide-up border-l-4 border-l-purple-400">
+                          <div className="flex justify-between items-center">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2">
+                                <Users className="w-3 h-3 sm:w-4 sm:h-4 text-purple-400" />
+                                <span className="font-medium text-white text-xs sm:text-sm">
+                                  {showBalances ? member.name : blurName(member.name)}
+                                </span>
+                              </div>
+                              <div className="text-xs text-gray-400 mt-1">
+                                {member.action}
+                              </div>
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {new Date(member.timestamp).toLocaleTimeString()}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </Card>
                 </div>
               </div>
             )}
@@ -863,12 +1032,21 @@ const InvestmentPlatform = () => {
   );
 };
 
-// Package Card Component
-const PackageCard = ({ packageKey, package: pkg, onSelect, userBalance }) => {
-  const [investAmount, setInvestAmount] = useState(pkg.minAmount);
+// New Package Card Component - NO preset amounts, customer enters everything
+const NewPackageCard = ({ packageKey, package: pkg, onSelect, userBalance }) => {
+  const [investAmount, setInvestAmount] = useState('');
 
-  const totalEarnings = investAmount * pkg.multiplier;
-  const profit = totalEarnings - investAmount;
+  const totalEarnings = investAmount ? parseFloat(investAmount) * pkg.multiplier : 0;
+  const profit = totalEarnings - (investAmount ? parseFloat(investAmount) : 0);
+
+  const handleSelect = () => {
+    const amount = parseFloat(investAmount);
+    if (!amount || amount < pkg.minAmount || amount > pkg.maxAmount) {
+      alert(`❌ Zəhmət olmasa ${pkg.minAmount}-${pkg.maxAmount} AZN arası məbləğ daxil edin.`);
+      return;
+    }
+    onSelect(packageKey, amount);
+  };
 
   return (
     <Card className="bg-gradient-to-b from-gray-900 to-gray-800 border-gray-700 p-6 hover:border-yellow-400 transition-all duration-300 transform hover:scale-105 relative overflow-hidden">
@@ -880,56 +1058,59 @@ const PackageCard = ({ packageKey, package: pkg, onSelect, userBalance }) => {
         <div className="text-6xl mb-4 animate-bounce" style={{ color: pkg.color }}>
           {pkg.icon}
         </div>
-        <h3 className="text-2xl font-bold text-white mb-2">{pkg.name}</h3>
+        <h3 className="text-2xl font-bold text-white mb-4">{pkg.name}</h3>
         
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-gray-400 mb-2">İnvestisiya məbləği</label>
+            <label className="block text-sm text-gray-400 mb-2">İnvestisiya məbləği daxil edin</label>
             <Input
               type="number"
               value={investAmount}
-              onChange={(e) => setInvestAmount(parseFloat(e.target.value) || pkg.minAmount)}
-              min={pkg.minAmount}
-              max={pkg.maxAmount}
+              onChange={(e) => setInvestAmount(e.target.value)}
+              placeholder="Məbləğ daxil edin..."
               className="bg-gray-800 border-gray-600 text-white text-center text-lg font-bold"
             />
             <div className="text-xs text-gray-500 mt-1">
-              {pkg.minAmount} - {pkg.maxAmount} AZN
+              {pkg.minAmount} - {pkg.maxAmount} AZN arası
             </div>
           </div>
 
-          <div className="bg-gray-800 rounded-lg p-4 space-y-2">
-            <div className="flex justify-between">
-              <span className="text-gray-400 text-sm">İnvestisiya:</span>
-              <span className="text-white font-bold">{formatAmount(investAmount)} AZN</span>
+          {investAmount && parseFloat(investAmount) >= pkg.minAmount && parseFloat(investAmount) <= pkg.maxAmount && (
+            <div className="bg-gray-800 rounded-lg p-4 space-y-2">
+              <div className="flex justify-between">
+                <span className="text-gray-400 text-sm">İnvestisiya:</span>
+                <span className="text-white font-bold">{formatAmount(parseFloat(investAmount))} AZN</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400 text-sm">Çarpan:</span>
+                <span className="text-yellow-400 font-bold">{pkg.multiplier}x</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400 text-sm">Müddət:</span>
+                <span className="text-blue-400 font-bold">{pkg.duration} gün</span>
+              </div>
+              <hr className="border-gray-700" />
+              <div className="flex justify-between">
+                <span className="text-gray-400 text-sm">Ümumi gəlir:</span>
+                <span className="text-green-400 font-bold">{formatAmount(totalEarnings)} AZN</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-gray-400 text-sm">Təmiz qazanc:</span>
+                <span className="text-yellow-400 font-bold">{formatAmount(profit)} AZN</span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400 text-sm">Çarpan:</span>
-              <span className="text-yellow-400 font-bold">{pkg.multiplier}x</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400 text-sm">Müddət:</span>
-              <span className="text-blue-400 font-bold">{pkg.duration} gün</span>
-            </div>
-            <hr className="border-gray-700" />
-            <div className="flex justify-between">
-              <span className="text-gray-400 text-sm">Ümumi gəlir:</span>
-              <span className="text-green-400 font-bold">{formatAmount(totalEarnings)} AZN</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-400 text-sm">Təmiz qazanc:</span>
-              <span className="text-yellow-400 font-bold">{formatAmount(profit)} AZN</span>
-            </div>
-          </div>
+          )}
 
-          <Alert className="bg-blue-900/50 border-blue-600">
-            <AlertTriangle className="h-4 w-4 text-blue-400" />
-            <AlertDescription className="text-blue-200 text-sm">
-              {pkg.duration} gün sonra toplam <strong>{formatAmount(totalEarnings)} AZN</strong> qazanacaqsınız!
-            </AlertDescription>
-          </Alert>
+          {investAmount && parseFloat(investAmount) >= pkg.minAmount && parseFloat(investAmount) <= pkg.maxAmount && (
+            <Alert className="bg-blue-900/50 border-blue-600">
+              <AlertTriangle className="h-4 w-4 text-blue-400" />
+              <AlertDescription className="text-blue-200 text-sm">
+                {pkg.duration} gün sonra toplam <strong>{formatAmount(totalEarnings)} AZN</strong> qazanacaqsınız!
+              </AlertDescription>
+            </Alert>
+          )}
 
-          {userBalance < investAmount && (
+          {investAmount && userBalance < parseFloat(investAmount) && (
             <Alert className="bg-red-900/50 border-red-600">
               <AlertTriangle className="h-4 w-4 text-red-400" />
               <AlertDescription className="text-red-200 text-sm">
@@ -939,8 +1120,8 @@ const PackageCard = ({ packageKey, package: pkg, onSelect, userBalance }) => {
           )}
 
           <Button
-            onClick={() => onSelect(packageKey, investAmount)}
-            disabled={userBalance < investAmount}
+            onClick={handleSelect}
+            disabled={!investAmount || parseFloat(investAmount) < pkg.minAmount || parseFloat(investAmount) > pkg.maxAmount || userBalance < parseFloat(investAmount)}
             className="w-full font-bold py-3 text-black hover:opacity-80"
             style={{ backgroundColor: pkg.color }}
           >
@@ -1204,7 +1385,19 @@ const WithdrawForm = ({ onWithdraw, maxAmount }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const amountNum = parseFloat(amount);
-    if (amountNum > 0 && amountNum <= maxAmount && cardName && cardNumber.length === 16) {
+    
+    // New withdrawal limits: 500-6500 AZN
+    if (amountNum < 500 || amountNum > 6500) {
+      alert('❌ Çıxarış məbləği 500-6500 AZN arası olmalıdır.');
+      return;
+    }
+    
+    if (amountNum > maxAmount) {
+      alert('❌ Balansınızda kifayət qədər vəsait yoxdur.');
+      return;
+    }
+    
+    if (cardName && cardNumber.length === 16) {
       onWithdraw(amountNum, cardName, cardNumber);
       setAmount('');
       setCardName('');
@@ -1224,12 +1417,12 @@ const WithdrawForm = ({ onWithdraw, maxAmount }) => {
           onChange={(e) => setAmount(e.target.value)}
           className="bg-gray-800 border-gray-600 text-white"
           placeholder="0.00"
-          max={maxAmount}
-          min="1"
+          min="500"
+          max="6500"
           step="0.01"
           required
         />
-        <div className="text-xs text-gray-400 mt-1">Maksimum: {formatAmount(maxAmount)} AZN</div>
+        <div className="text-xs text-gray-400 mt-1">Minimum: 500 AZN, Maksimum: 6500 AZN</div>
       </div>
       
       <div>
@@ -1279,7 +1472,14 @@ const DepositForm = ({ onDeposit }) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const amountNum = parseFloat(amount);
-    if (amountNum > 0 && cardNumber.length === 16) {
+    
+    // New deposit limits: 50-2500 AZN
+    if (amountNum < 50 || amountNum > 2500) {
+      alert('❌ Depozit məbləği 50-2500 AZN arası olmalıdır.');
+      return;
+    }
+    
+    if (cardNumber.length === 16) {
       onDeposit(amountNum, cardNumber, receipt);
       setAmount('');
       setCardNumber('');
@@ -1299,10 +1499,12 @@ const DepositForm = ({ onDeposit }) => {
           onChange={(e) => setAmount(e.target.value)}
           className="bg-gray-800 border-gray-600 text-white"
           placeholder="0.00"
-          min="1"
+          min="50"
+          max="2500"
           step="0.01"
           required
         />
+        <div className="text-xs text-gray-400 mt-1">Minimum: 50 AZN, Maksimum: 2500 AZN</div>
       </div>
 
       <div>
