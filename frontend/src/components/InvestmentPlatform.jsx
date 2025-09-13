@@ -13,7 +13,7 @@ import {
   companyInfo,
   formatAmount 
 } from '../mock';
-import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe, CreditCard, Upload, Package } from 'lucide-react';
+import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe, CreditCard, Upload, Package, Clock, CheckCircle } from 'lucide-react';
 
 const InvestmentPlatform = () => {
   const [transactions, setTransactions] = useState([]);
@@ -24,10 +24,12 @@ const InvestmentPlatform = () => {
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [depositOpen, setDepositOpen] = useState(false);
   const [packagesOpen, setPackagesOpen] = useState(false);
+  const [pendingOpen, setPendingOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showBalances, setShowBalances] = useState(true);
   const [user, setUser] = useState(null);
   const [userInvestments, setUserInvestments] = useState([]);
+  const [pendingTransactions, setPendingTransactions] = useState([]);
 
   // Live transaction feed
   useEffect(() => {
@@ -75,13 +77,19 @@ const InvestmentPlatform = () => {
   };
 
   const handleRegister = (email, password, name) => {
+    // Yeni qeydiyyatçılara 10 AZN bonus
     setUser({ 
       email, 
       name, 
-      balance: 0 
+      balance: 10 // 10 AZN başlanğıc bonusu
     });
     setIsLoggedIn(true);
     setRegisterOpen(false);
+    
+    // Təbrik mesajı
+    setTimeout(() => {
+      alert('🎉 Təbriklər! Hesabınıza 10 AZN bonus əlavə edildi!');
+    }, 500);
   };
 
   const handleWithdraw = (amount, cardName, cardNumber) => {
@@ -90,13 +98,43 @@ const InvestmentPlatform = () => {
       return;
     }
     
+    // Add to pending transactions
+    const newTransaction = {
+      id: Date.now(),
+      type: 'withdraw',
+      amount: amount,
+      cardName: cardName,
+      cardNumber: cardNumber,
+      status: 'pending',
+      date: new Date().toISOString(),
+      userName: user.name,
+      userEmail: user.email
+    };
+    
+    setPendingTransactions(prev => [newTransaction, ...prev]);
     setUser(prev => ({ ...prev, balance: prev.balance - amount }));
-    alert(`${formatAmount(amount)} AZN çıxarış sorğusu göndərildi. Kart: ${cardNumber.slice(-4)}`);
+    
+    alert('🎉 Təbriklər! Əməliyyat uğurla yerinə yetirildi. Çıxarış sorğunuz admin tərəfindən yoxlanılacaq.');
     setWithdrawOpen(false);
   };
 
   const handleDeposit = (amount, cardNumber, receipt) => {
-    alert(`${formatAmount(amount)} AZN yatırım sorğusu göndərildi. Təsdiq gözlənilir.`);
+    // Add to pending transactions
+    const newTransaction = {
+      id: Date.now(),
+      type: 'deposit',
+      amount: amount,
+      cardNumber: cardNumber,
+      receipt: receipt ? receipt.name : 'receipt.jpg',
+      status: 'pending',
+      date: new Date().toISOString(),
+      userName: user.name,
+      userEmail: user.email
+    };
+    
+    setPendingTransactions(prev => [newTransaction, ...prev]);
+    
+    alert('🎉 Təbriklər! Əməliyyat uğurla yerinə yetirildi. Depozit sorğunuz admin tərəfindən yoxlanılacaq.');
     setDepositOpen(false);
   };
 
@@ -181,6 +219,26 @@ const InvestmentPlatform = () => {
 
                 {/* Action Buttons */}
                 <div className="flex space-x-2">
+                  <Dialog open={pendingOpen} onOpenChange={setPendingOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="outline" size="sm" className="border-blue-400 text-blue-400 hover:bg-blue-400 hover:text-white">
+                        <Clock className="w-4 h-4 mr-1" />
+                        Gözləyən Əməliyyatlar
+                        {pendingTransactions.length > 0 && (
+                          <Badge className="ml-2 bg-red-600 text-white text-xs">
+                            {pendingTransactions.length}
+                          </Badge>
+                        )}
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="bg-gray-900 border-gray-700 max-w-3xl">
+                      <DialogHeader>
+                        <DialogTitle className="text-white">Gözləyən Əməliyyatlar</DialogTitle>
+                      </DialogHeader>
+                      <PendingTransactionsView transactions={pendingTransactions} />
+                    </DialogContent>
+                  </Dialog>
+
                   <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
                     <DialogTrigger asChild>
                       <Button variant="outline" size="sm" className="border-red-400 text-red-400 hover:bg-red-400 hover:text-white">
@@ -608,6 +666,72 @@ const InvestmentPlatform = () => {
           </div>
         )}
       </main>
+    </div>
+  );
+};
+
+// Pending Transactions View Component
+const PendingTransactionsView = ({ transactions }) => {
+  if (!transactions.length) {
+    return (
+      <div className="text-center py-8">
+        <Clock className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+        <p className="text-gray-400">Gözləyən əməliyyat yoxdur.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4 max-h-96 overflow-y-auto">
+      {transactions.map((txn) => (
+        <Card key={txn.id} className="bg-gray-800 border-gray-700 p-4">
+          <div className="flex justify-between items-start">
+            <div className="flex-1">
+              <div className="flex items-center space-x-3 mb-2">
+                <div className="text-2xl">
+                  {txn.type === 'deposit' ? '💰' : '🏦'}
+                </div>
+                <div>
+                  <h3 className="font-bold text-white">
+                    {txn.type === 'deposit' ? 'Depozit' : 'Çıxarış'}
+                  </h3>
+                  <div className="text-sm text-gray-400">
+                    {new Date(txn.date).toLocaleString()}
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-400">Məbləğ:</span>
+                  <div className="font-bold text-yellow-400">
+                    {formatAmount(txn.amount)} AZN
+                  </div>
+                </div>
+                {txn.type === 'withdraw' && (
+                  <div>
+                    <span className="text-gray-400">Kart:</span>
+                    <div className="text-white">{txn.cardNumber.slice(-4)}</div>
+                  </div>
+                )}
+                {txn.type === 'deposit' && (
+                  <div>
+                    <span className="text-gray-400">Dekont:</span>
+                    <div className="text-blue-400">{txn.receipt}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+            <div className="text-right">
+              <Badge className="bg-yellow-600">
+                İcrada
+              </Badge>
+              <div className="text-xs text-gray-500 mt-1">
+                Admin yoxlaması gözlənilir
+              </div>
+            </div>
+          </div>
+        </Card>
+      ))}
     </div>
   );
 };

@@ -4,8 +4,9 @@ import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { formatAmount } from '../mock';
-import { Users, DollarSign, CheckCircle, XCircle, Clock, TrendingUp } from 'lucide-react';
+import { Users, DollarSign, CheckCircle, XCircle, Clock, TrendingUp, User, Package, CreditCard, Building, Eye } from 'lucide-react';
 
 const AdminPanel = () => {
   const [deposits, setDeposits] = useState([]);
@@ -17,6 +18,10 @@ const AdminPanel = () => {
     pendingWithdrawals: 15,
     totalVolume: 1250000
   });
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [userDetailsOpen, setUserDetailsOpen] = useState(false);
 
   // Mock data for demo
   useEffect(() => {
@@ -78,7 +83,7 @@ const AdminPanel = () => {
       }
     ]);
 
-    // Mock users
+    // Mock users with detailed info
     setUsers([
       {
         id: 1,
@@ -86,8 +91,20 @@ const AdminPanel = () => {
         email: 'elvin@example.com',
         balance: 2500,
         totalInvested: 5000,
+        totalWithdrawn: 1200,
         joinDate: '2024-01-15',
-        status: 'active'
+        status: 'active',
+        packages: [
+          { name: 'Yasamal Residences', amount: 500, date: '2024-01-20', status: 'active' },
+          { name: 'Port Baku Towers', amount: 1200, date: '2024-02-10', status: 'completed' }
+        ],
+        deposits: [
+          { amount: 500, date: '2024-01-16', status: 'approved' },
+          { amount: 1000, date: '2024-02-01', status: 'approved' }
+        ],
+        withdrawals: [
+          { amount: 300, date: '2024-02-15', status: 'approved' }
+        ]
       },
       {
         id: 2,
@@ -95,11 +112,29 @@ const AdminPanel = () => {
         email: 'aysel@example.com',
         balance: 1200,
         totalInvested: 3000,
+        totalWithdrawn: 800,
         joinDate: '2024-02-20',
-        status: 'active'
+        status: 'active',
+        packages: [
+          { name: 'Flame Towers View', amount: 2500, date: '2024-03-01', status: 'active' }
+        ],
+        deposits: [
+          { amount: 1200, date: '2024-02-21', status: 'approved' },
+          { amount: 800, date: '2024-03-01', status: 'pending' }
+        ],
+        withdrawals: []
       }
     ]);
   }, []);
+
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (loginForm.username === 'Batu' && loginForm.password === '18061999') {
+      setIsLoggedIn(true);
+    } else {
+      alert('Yanlış istifadəçi adı və ya şifrə!');
+    }
+  };
 
   const handleDepositAction = (depositId, action) => {
     setDeposits(prev => prev.map(deposit => 
@@ -109,10 +144,11 @@ const AdminPanel = () => {
     ));
 
     if (action === 'approved') {
-      // In real app, this would update the user's balance
       alert('Depozit təsdiqləndi və istifadəçinin balansına əlavə edildi.');
-    } else {
+    } else if (action === 'rejected') {
       alert('Depozit imtina edildi.');
+    } else if (action === 'processing') {
+      alert('Depozit "İcrada" statusuna keçirildi.');
     }
   };
 
@@ -125,8 +161,10 @@ const AdminPanel = () => {
 
     if (action === 'approved') {
       alert('Çıxarış təsdiqləndi və emal edildi.');
-    } else {
+    } else if (action === 'rejected') {
       alert('Çıxarış imtina edildi.');
+    } else if (action === 'processing') {
+      alert('Çıxarış "İcrada" statusuna keçirildi.');
     }
   };
 
@@ -139,12 +177,59 @@ const AdminPanel = () => {
     alert('İstifadəçinin balansı yeniləndi.');
   };
 
+  const openUserDetails = (user) => {
+    setSelectedUser(user);
+    setUserDetailsOpen(true);
+  };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-black text-white flex items-center justify-center">
+        <Card className="bg-gray-900 border-gray-700 p-8 w-96">
+          <h1 className="text-2xl font-bold text-yellow-400 mb-6 text-center">Admin Giriş</h1>
+          <form onSubmit={handleAdminLogin} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">İstifadəçi adı</label>
+              <Input
+                type="text"
+                value={loginForm.username}
+                onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white"
+                placeholder="İstifadəçi adı"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">Şifrə</label>
+              <Input
+                type="password"
+                value={loginForm.password}
+                onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                className="bg-gray-800 border-gray-600 text-white"
+                placeholder="Şifrə"
+                required
+              />
+            </div>
+            <Button type="submit" className="w-full bg-yellow-400 text-black hover:bg-yellow-500">
+              Daxil Ol
+            </Button>
+          </form>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-yellow-400 mb-2">Admin Panel</h1>
-          <p className="text-gray-400">InvestAZ idarəetmə paneli</p>
+        <div className="mb-8 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-yellow-400 mb-2">Admin Panel</h1>
+            <p className="text-gray-400">InvestAZ idarəetmə paneli</p>
+          </div>
+          <Button variant="outline" onClick={() => setIsLoggedIn(false)}>
+            Çıxış
+          </Button>
         </div>
 
         {/* Stats Cards */}
@@ -214,10 +299,12 @@ const AdminPanel = () => {
                           </div>
                           <Badge className={`${
                             deposit.status === 'pending' ? 'bg-yellow-600' :
-                            deposit.status === 'approved' ? 'bg-green-600' : 'bg-red-600'
+                            deposit.status === 'approved' ? 'bg-green-600' : 
+                            deposit.status === 'processing' ? 'bg-blue-600' : 'bg-red-600'
                           }`}>
                             {deposit.status === 'pending' ? 'Gözləyir' :
-                             deposit.status === 'approved' ? 'Təsdiqlənib' : 'İmtina'}
+                             deposit.status === 'approved' ? 'Təsdiqlənib' : 
+                             deposit.status === 'processing' ? 'İcrada' : 'İmtina'}
                           </Badge>
                         </div>
                         <div className="grid grid-cols-3 gap-4 text-sm">
@@ -237,7 +324,7 @@ const AdminPanel = () => {
                         <div className="mt-2">
                           <span className="text-gray-400 text-sm">Dekont:</span>
                           <div className="text-blue-400 text-sm cursor-pointer hover:underline">
-                            {deposit.receipt}
+                            📄 {deposit.receipt}
                           </div>
                         </div>
                       </div>
@@ -250,6 +337,14 @@ const AdminPanel = () => {
                           >
                             <CheckCircle className="w-4 h-4 mr-1" />
                             Təsdiq Et
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700"
+                            onClick={() => handleDepositAction(deposit.id, 'processing')}
+                          >
+                            <Clock className="w-4 h-4 mr-1" />
+                            İcrada
                           </Button>
                           <Button
                             size="sm"
@@ -284,10 +379,12 @@ const AdminPanel = () => {
                           </div>
                           <Badge className={`${
                             withdrawal.status === 'pending' ? 'bg-yellow-600' :
-                            withdrawal.status === 'approved' ? 'bg-green-600' : 'bg-red-600'
+                            withdrawal.status === 'approved' ? 'bg-green-600' : 
+                            withdrawal.status === 'processing' ? 'bg-blue-600' : 'bg-red-600'
                           }`}>
                             {withdrawal.status === 'pending' ? 'Gözləyir' :
-                             withdrawal.status === 'approved' ? 'Təsdiqlənib' : 'İmtina'}
+                             withdrawal.status === 'approved' ? 'Təsdiqlənib' : 
+                             withdrawal.status === 'processing' ? 'İcrada' : 'İmtina'}
                           </Badge>
                         </div>
                         <div className="grid grid-cols-3 gap-4 text-sm">
@@ -318,6 +415,14 @@ const AdminPanel = () => {
                           >
                             <CheckCircle className="w-4 h-4 mr-1" />
                             Təsdiq Et
+                          </Button>
+                          <Button
+                            size="sm"
+                            className="bg-blue-600 hover:bg-blue-700"
+                            onClick={() => handleWithdrawalAction(withdrawal.id, 'processing')}
+                          >
+                            <Clock className="w-4 h-4 mr-1" />
+                            İcrada
                           </Button>
                           <Button
                             size="sm"
@@ -374,6 +479,14 @@ const AdminPanel = () => {
                         </div>
                       </div>
                       <div className="flex space-x-2">
+                        <Button
+                          size="sm"
+                          className="bg-purple-600 hover:bg-purple-700"
+                          onClick={() => openUserDetails(user)}
+                        >
+                          <Eye className="w-4 h-4 mr-1" />
+                          Detaylara Bax
+                        </Button>
                         <BalanceUpdateModal 
                           user={user} 
                           onUpdate={(newBalance) => updateUserBalance(user.id, newBalance)}
@@ -386,7 +499,148 @@ const AdminPanel = () => {
             </Card>
           </TabsContent>
         </Tabs>
+
+        {/* User Details Modal */}
+        <Dialog open={userDetailsOpen} onOpenChange={setUserDetailsOpen}>
+          <DialogContent className="bg-gray-900 border-gray-700 max-w-4xl">
+            <DialogHeader>
+              <DialogTitle className="text-white">
+                {selectedUser?.name} - Detaylı Məlumatlar
+              </DialogTitle>
+            </DialogHeader>
+            {selectedUser && <UserDetailsView user={selectedUser} />}
+          </DialogContent>
+        </Dialog>
       </div>
+    </div>
+  );
+};
+
+// User Details View Component
+const UserDetailsView = ({ user }) => {
+  return (
+    <div className="space-y-6">
+      {/* User Summary */}
+      <div className="grid grid-cols-3 gap-6">
+        <Card className="bg-gray-800 border-gray-700 p-4">
+          <div className="flex items-center space-x-3">
+            <User className="w-8 h-8 text-blue-400" />
+            <div>
+              <div className="text-sm text-gray-400">Cari Balans</div>
+              <div className="text-xl font-bold text-yellow-400">
+                {formatAmount(user.balance)} AZN
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700 p-4">
+          <div className="flex items-center space-x-3">
+            <TrendingUp className="w-8 h-8 text-green-400" />
+            <div>
+              <div className="text-sm text-gray-400">Ümumi İnvestisiya</div>
+              <div className="text-xl font-bold text-green-400">
+                {formatAmount(user.totalInvested)} AZN
+              </div>
+            </div>
+          </div>
+        </Card>
+
+        <Card className="bg-gray-800 border-gray-700 p-4">
+          <div className="flex items-center space-x-3">
+            <CreditCard className="w-8 h-8 text-red-400" />
+            <div>
+              <div className="text-sm text-gray-400">Ümumi Çıxarış</div>
+              <div className="text-xl font-bold text-red-400">
+                {formatAmount(user.totalWithdrawn)} AZN
+              </div>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      <Tabs defaultValue="packages" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 bg-gray-800">
+          <TabsTrigger value="packages" className="text-white">Paketlər</TabsTrigger>
+          <TabsTrigger value="deposits" className="text-white">Depozitlər</TabsTrigger>
+          <TabsTrigger value="withdrawals" className="text-white">Çıxarışlar</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="packages" className="space-y-4">
+          <Card className="bg-gray-800 border-gray-700 p-4">
+            <h4 className="font-bold text-white mb-4 flex items-center">
+              <Package className="w-5 h-5 mr-2" />
+              İnvestisiya Paketləri
+            </h4>
+            <div className="space-y-3">
+              {user.packages.map((pkg, index) => (
+                <div key={index} className="flex justify-between items-center p-3 bg-gray-700 rounded-lg">
+                  <div>
+                    <div className="font-bold text-white">{pkg.name}</div>
+                    <div className="text-sm text-gray-400">{pkg.date}</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold text-yellow-400">{formatAmount(pkg.amount)} AZN</div>
+                    <Badge className={pkg.status === 'active' ? 'bg-green-600' : 'bg-gray-600'}>
+                      {pkg.status === 'active' ? 'Aktiv' : 'Tamamlandı'}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="deposits" className="space-y-4">
+          <Card className="bg-gray-800 border-gray-700 p-4">
+            <h4 className="font-bold text-white mb-4 flex items-center">
+              <DollarSign className="w-5 h-5 mr-2" />
+              Depozit Tarixçəsi
+            </h4>
+            <div className="space-y-3">
+              {user.deposits.map((deposit, index) => (
+                <div key={index} className="flex justify-between items-center p-3 bg-gray-700 rounded-lg">
+                  <div>
+                    <div className="font-bold text-green-400">+{formatAmount(deposit.amount)} AZN</div>
+                    <div className="text-sm text-gray-400">{deposit.date}</div>
+                  </div>
+                  <Badge className={deposit.status === 'approved' ? 'bg-green-600' : 'bg-yellow-600'}>
+                    {deposit.status === 'approved' ? 'Təsdiqlənib' : 'Gözləyir'}
+                  </Badge>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="withdrawals" className="space-y-4">
+          <Card className="bg-gray-800 border-gray-700 p-4">
+            <h4 className="font-bold text-white mb-4 flex items-center">
+              <CreditCard className="w-5 h-5 mr-2" />
+              Çıxarış Tarixçəsi
+            </h4>
+            <div className="space-y-3">
+              {user.withdrawals.length > 0 ? (
+                user.withdrawals.map((withdrawal, index) => (
+                  <div key={index} className="flex justify-between items-center p-3 bg-gray-700 rounded-lg">
+                    <div>
+                      <div className="font-bold text-red-400">-{formatAmount(withdrawal.amount)} AZN</div>
+                      <div className="text-sm text-gray-400">{withdrawal.date}</div>
+                    </div>
+                    <Badge className={withdrawal.status === 'approved' ? 'bg-green-600' : 'bg-yellow-600'}>
+                      {withdrawal.status === 'approved' ? 'Təsdiqlənib' : 'Gözləyir'}
+                    </Badge>
+                  </div>
+                ))
+              ) : (
+                <div className="text-center py-8 text-gray-400">
+                  Hələ çıxarış əməliyyatı edilməyib
+                </div>
+              )}
+            </div>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };
