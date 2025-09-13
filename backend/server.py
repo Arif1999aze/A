@@ -1,5 +1,6 @@
-from fastapi import FastAPI, HTTPException, Depends, APIRouter, WebSocket, WebSocketDisconnect, UploadFile, File, Form
+from fastapi import FastAPI, HTTPException, Depends, APIRouter, WebSocket, WebSocketDisconnect, UploadFile, File, Form, Query
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import FileResponse
 from fastapi.websockets import WebSocketState
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -16,6 +17,7 @@ from passlib.context import CryptContext
 import json
 import asyncio
 from enum import Enum
+import random
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -43,25 +45,33 @@ api_router = APIRouter(prefix="/api")
 # WebSocket connection manager
 class ConnectionManager:
     def __init__(self):
-        self.active_connections: List[WebSocket] = []
+        self.active_connections: Dict[str, WebSocket] = {}
         self.admin_connections: List[WebSocket] = []
 
-    async def connect(self, websocket: WebSocket, is_admin: bool = False):
+    async def connect_user(self, websocket: WebSocket, user_id: str):
         await websocket.accept()
-        if is_admin:
-            self.admin_connections.append(websocket)
-        else:
-            self.active_connections.append(websocket)
+        self.active_connections[user_id] = websocket
 
-    def disconnect(self, websocket: WebSocket, is_admin: bool = False):
-        if is_admin and websocket in self.admin_connections:
+    async def connect_admin(self, websocket: WebSocket):
+        await websocket.accept()
+        self.admin_connections.append(websocket)
+
+    def disconnect_user(self, user_id: str):
+        if user_id in self.active_connections:
+            del self.active_connections[user_id]
+
+    def disconnect_admin(self, websocket: WebSocket):
+        if websocket in self.admin_connections:
             self.admin_connections.remove(websocket)
-        elif not is_admin and websocket in self.active_connections:
-            self.active_connections.remove(websocket)
 
-    async def send_personal_message(self, message: str, websocket: WebSocket):
-        if websocket.client_state == WebSocketState.CONNECTED:
-            await websocket.send_text(message)
+    async def send_to_user(self, user_id: str, message: str):
+        if user_id in self.active_connections:
+            websocket = self.active_connections[user_id]
+            try:
+                if websocket.client_state == WebSocketState.CONNECTED:
+                    await websocket.send_text(message)
+            except:
+                self.disconnect_user(user_id)
 
     async def broadcast_to_admins(self, message: str):
         dead_connections = []
@@ -76,20 +86,6 @@ class ConnectionManager:
         
         for dead_conn in dead_connections:
             self.admin_connections.remove(dead_conn)
-
-    async def broadcast_to_users(self, message: str):
-        dead_connections = []
-        for connection in self.active_connections:
-            try:
-                if connection.client_state == WebSocketState.CONNECTED:
-                    await connection.send_text(message)
-                else:
-                    dead_connections.append(connection)
-            except:
-                dead_connections.append(connection)
-        
-        for dead_conn in dead_connections:
-            self.active_connections.remove(dead_conn)
 
 manager = ConnectionManager()
 
@@ -113,12 +109,21 @@ class User(BaseModel):
     email: str
     name: str
     password_hash: str
+    user_code: str = Field(default_factory=lambda: generate_user_code())
     balance: float = 10.0  # 10 AZN registration bonus
     total_invested: float = 0.0
     total_earned: float = 0.0
     is_admin: bool = False
     join_date: datetime = Field(default_factory=datetime.utcnow)
     has_seen_welcome: bool = False
+
+def generate_user_code():
+    """Generate unique user code starting with AZ"""
+    # Get next sequential number
+    import time
+    timestamp = int(time.time())
+    random_part = random.randint(100, 999)
+    return f"AZ{timestamp % 100000}{random_part}"
 
 class UserCreate(BaseModel):
     email: str
@@ -133,6 +138,7 @@ class UserResponse(BaseModel):
     id: str
     email: str
     name: str
+    user_code: str
     balance: float
     total_invested: float
     total_earned: float
@@ -196,6 +202,18 @@ class AdminApproveTransaction(BaseModel):
     approve: bool
     admin_notes: Optional[str] = None
 
+class AdminUpdateBalance(BaseModel):
+    user_id: str
+    new_balance: float
+    notes: Optional[str] = None
+
+class AdminStats(BaseModel):
+    total_users: int
+    active_packages: int
+    total_deposits: float
+    total_withdrawals: float
+    pending_transactions: int
+
 # Utility functions
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -238,11 +256,11 @@ async def get_current_admin(current_user: User = Depends(get_current_user)):
         raise HTTPException(status_code=403, detail="Admin access required")
     return current_user
 
-# Package definitions
+# Package definitions - Updated limits
 PACKAGE_DEFINITIONS = {
-    "platinum": {"name": "Platinum Paket", "min_amount": 50, "max_amount": 250, "multiplier": 3.0, "duration": 30},
-    "titanium": {"name": "Titanium Paket", "min_amount": 250, "max_amount": 500, "multiplier": 4.0, "duration": 45},
-    "gold": {"name": "Gold Paket", "min_amount": 500, "max_amount": 1000, "multiplier": 4.5, "duration": 60}
+    "platinum": {"name": "Platinum Paket", "min_amount": 50, "max_amount": 2500, "multiplier": 3.0, "duration": 30},
+    "titanium": {"name": "Titanium Paket", "min_amount": 50, "max_amount": 2500, "multiplier": 4.0, "duration": 45},
+    "gold": {"name": "Gold Paket", "min_amount": 50, "max_amount": 2500, "multiplier": 4.5, "duration": 60}
 }
 
 # Authentication endpoints
@@ -253,12 +271,20 @@ async def register_user(user_data: UserCreate):
     if existing_user:
         raise HTTPException(status_code=400, detail="Email already registered")
     
+    # Generate unique user code
+    user_code = generate_user_code()
+    
+    # Ensure code is unique
+    while await db.users.find_one({"user_code": user_code}):
+        user_code = generate_user_code()
+    
     # Create new user
     hashed_password = get_password_hash(user_data.password)
     user = User(
         email=user_data.email,
         name=user_data.name,
-        password_hash=hashed_password
+        password_hash=hashed_password,
+        user_code=user_code
     )
     
     await db.users.insert_one(user.dict())
@@ -268,6 +294,14 @@ async def register_user(user_data: UserCreate):
     access_token = create_access_token(
         data={"sub": user.id}, expires_delta=access_token_expires
     )
+    
+    # Notify admins
+    await manager.broadcast_to_admins(json.dumps({
+        "type": "new_user_registration",
+        "user_name": user.name,
+        "user_code": user.user_code,
+        "email": user.email
+    }))
     
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -338,12 +372,19 @@ async def purchase_package(
         {"$set": {"balance": new_balance, "total_invested": new_total_invested}}
     )
     
-    # Notify admins
+    # Notify admins and user
     await manager.broadcast_to_admins(json.dumps({
         "type": "package_purchase",
         "user_name": current_user.name,
+        "user_code": current_user.user_code,
         "package_type": package_data.package_type,
         "amount": package_data.invested_amount
+    }))
+    
+    # Send real-time balance update to user
+    await manager.send_to_user(current_user.id, json.dumps({
+        "type": "balance_update",
+        "new_balance": new_balance
     }))
     
     return investment_package
@@ -376,7 +417,18 @@ async def collect_earnings(package_id: str, current_user: User = Depends(get_cur
         {"$set": {"accumulated_earnings": 0.0}}
     )
     
-    return {"collected_amount": earnings, "message": "Earnings collected successfully"}
+    # Get updated balance
+    user_doc = await db.users.find_one({"id": current_user.id})
+    new_balance = user_doc["balance"]
+    
+    # Send real-time update to user
+    await manager.send_to_user(current_user.id, json.dumps({
+        "type": "earnings_collected",
+        "collected_amount": earnings,
+        "new_balance": new_balance
+    }))
+    
+    return {"collected_amount": earnings, "new_balance": new_balance, "message": "Earnings collected successfully"}
 
 # Transaction endpoints
 @api_router.post("/transactions", response_model=Transaction)
@@ -384,7 +436,11 @@ async def create_transaction(
     transaction_data: TransactionCreate,
     current_user: User = Depends(get_current_user)
 ):
+    # Validate withdrawal amount limits
     if transaction_data.type == TransactionType.WITHDRAW:
+        if transaction_data.amount < 500 or transaction_data.amount > 6500:
+            raise HTTPException(status_code=400, detail="Withdrawal amount must be between 500-6500 AZN")
+        
         if current_user.balance < transaction_data.amount:
             raise HTTPException(status_code=400, detail="Insufficient balance")
         
@@ -393,6 +449,11 @@ async def create_transaction(
             {"id": current_user.id},
             {"$inc": {"balance": -transaction_data.amount}}
         )
+    
+    # Validate deposit amount limits
+    if transaction_data.type == TransactionType.DEPOSIT:
+        if transaction_data.amount < 50 or transaction_data.amount > 2500:
+            raise HTTPException(status_code=400, detail="Deposit amount must be between 50-2500 AZN")
     
     transaction = Transaction(
         user_id=current_user.id,
@@ -409,9 +470,18 @@ async def create_transaction(
         "type": "new_transaction",
         "transaction_type": transaction_data.type,
         "user_name": current_user.name,
+        "user_code": current_user.user_code,
         "amount": transaction_data.amount,
         "transaction_id": transaction.id
     }))
+    
+    # Send real-time update to user if balance changed
+    if transaction_data.type == TransactionType.WITHDRAW:
+        user_doc = await db.users.find_one({"id": current_user.id})
+        await manager.send_to_user(current_user.id, json.dumps({
+            "type": "balance_update",
+            "new_balance": user_doc["balance"]
+        }))
     
     return transaction
 
@@ -451,6 +521,7 @@ async def upload_receipt(
         "type": "receipt_uploaded",
         "transaction_id": transaction_id,
         "user_name": current_user.name,
+        "user_code": current_user.user_code,
         "filename": filename
     }))
     
@@ -480,6 +551,7 @@ async def send_message(
     await manager.broadcast_to_admins(json.dumps({
         "type": "new_message",
         "user_name": current_user.name,
+        "user_code": current_user.user_code,
         "user_id": current_user.id,
         "content": message_data.content,
         "message_id": message.id
@@ -493,10 +565,90 @@ async def get_my_messages(current_user: User = Depends(get_current_user)):
     return [Message(**msg) for msg in messages]
 
 # Admin endpoints
+@api_router.get("/admin/stats", response_model=AdminStats)
+async def get_admin_stats(current_admin: User = Depends(get_current_admin)):
+    total_users = await db.users.count_documents({"is_admin": False})
+    active_packages = await db.investment_packages.count_documents({"is_active": True})
+    
+    # Get transaction stats
+    approved_deposits = await db.transactions.find({"type": "deposit", "status": "approved"}).to_list(None)
+    approved_withdrawals = await db.transactions.find({"type": "withdraw", "status": "approved"}).to_list(None)
+    pending_transactions = await db.transactions.count_documents({"status": "pending"})
+    
+    total_deposits = sum(t["amount"] for t in approved_deposits)
+    total_withdrawals = sum(t["amount"] for t in approved_withdrawals)
+    
+    return AdminStats(
+        total_users=total_users,
+        active_packages=active_packages,
+        total_deposits=total_deposits,
+        total_withdrawals=total_withdrawals,
+        pending_transactions=pending_transactions
+    )
+
 @api_router.get("/admin/users", response_model=List[UserResponse])
 async def get_all_users(current_admin: User = Depends(get_current_admin)):
     users = await db.users.find({"is_admin": False}).to_list(1000)
     return [UserResponse(**user) for user in users]
+
+@api_router.get("/admin/users/search")
+async def search_users(
+    query: str = Query(..., description="Search by user code (AZ prefix) or name"),
+    current_admin: User = Depends(get_current_admin)
+):
+    # Search by user code or name
+    users = await db.users.find({
+        "$or": [
+            {"user_code": {"$regex": query, "$options": "i"}},
+            {"name": {"$regex": query, "$options": "i"}}
+        ],
+        "is_admin": False
+    }).to_list(50)
+    
+    result = []
+    for user in users:
+        # Get user's active package
+        active_package = await db.investment_packages.find_one({
+            "user_id": user["id"], 
+            "is_active": True
+        })
+        
+        # Get user's recent transactions
+        recent_transactions = await db.transactions.find({
+            "user_id": user["id"]
+        }).sort("created_date", -1).limit(5).to_list(5)
+        
+        user_info = {
+            **UserResponse(**user).dict(),
+            "active_package": active_package,
+            "recent_transactions": recent_transactions
+        }
+        result.append(user_info)
+    
+    return result
+
+@api_router.post("/admin/users/update-balance")
+async def update_user_balance(
+    update_data: AdminUpdateBalance,
+    current_admin: User = Depends(get_current_admin)
+):
+    # Update user balance
+    result = await db.users.update_one(
+        {"id": update_data.user_id},
+        {"$set": {"balance": update_data.new_balance}}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Send real-time update to user
+    await manager.send_to_user(update_data.user_id, json.dumps({
+        "type": "admin_balance_update",
+        "new_balance": update_data.new_balance,
+        "notes": update_data.notes or "Admin balance adjustment"
+    }))
+    
+    return {"message": "Balance updated successfully"}
 
 @api_router.get("/admin/transactions", response_model=List[Transaction])
 async def get_all_transactions(current_admin: User = Depends(get_current_admin)):
@@ -529,19 +681,55 @@ async def approve_transaction(
     
     # If deposit approved, add to user balance
     if approval_data.approve and transaction["type"] == "deposit":
-        await db.users.update_one(
+        result = await db.users.update_one(
             {"id": transaction["user_id"]},
             {"$inc": {"balance": transaction["amount"]}}
         )
+        
+        # Get updated balance and send real-time update
+        user_doc = await db.users.find_one({"id": transaction["user_id"]})
+        await manager.send_to_user(transaction["user_id"], json.dumps({
+            "type": "deposit_approved",
+            "amount": transaction["amount"],
+            "new_balance": user_doc["balance"]
+        }))
     
     # If withdrawal rejected, refund the balance
     if not approval_data.approve and transaction["type"] == "withdraw":
-        await db.users.update_one(
+        result = await db.users.update_one(
             {"id": transaction["user_id"]},
             {"$inc": {"balance": transaction["amount"]}}
         )
+        
+        # Get updated balance and send real-time update
+        user_doc = await db.users.find_one({"id": transaction["user_id"]})
+        await manager.send_to_user(transaction["user_id"], json.dumps({
+            "type": "withdrawal_rejected",
+            "amount": transaction["amount"],
+            "new_balance": user_doc["balance"],
+            "reason": approval_data.admin_notes
+        }))
+    
+    # If withdrawal approved, send notification
+    if approval_data.approve and transaction["type"] == "withdraw":
+        await manager.send_to_user(transaction["user_id"], json.dumps({
+            "type": "withdrawal_approved",
+            "amount": transaction["amount"]
+        }))
     
     return {"message": "Transaction processed successfully"}
+
+@api_router.get("/admin/receipts/{filename}")
+async def get_receipt(filename: str, current_admin: User = Depends(get_current_admin)):
+    file_path = Path(f"/app/uploads/{filename}")
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Receipt not found")
+    
+    return FileResponse(
+        path=file_path,
+        media_type='application/octet-stream',
+        filename=filename
+    )
 
 @api_router.post("/admin/messages/{message_id}/reply", response_model=Message)
 async def reply_to_message(
@@ -563,7 +751,25 @@ async def reply_to_message(
     
     await db.messages.insert_one(reply_message.dict())
     
+    # Send real-time update to user
+    await manager.send_to_user(original_message["user_id"], json.dumps({
+        "type": "admin_reply",
+        "message": reply_content["content"],
+        "message_id": reply_message.id
+    }))
+    
     return reply_message
+
+@api_router.delete("/admin/messages/{message_id}")
+async def delete_message(
+    message_id: str,
+    current_admin: User = Depends(get_current_admin)
+):
+    result = await db.messages.delete_one({"id": message_id})
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+    
+    return {"message": "Message deleted successfully"}
 
 @api_router.get("/admin/messages", response_model=List[Message])
 async def get_all_messages(current_admin: User = Depends(get_current_admin)):
@@ -571,27 +777,27 @@ async def get_all_messages(current_admin: User = Depends(get_current_admin)):
     return [Message(**msg) for msg in messages]
 
 # WebSocket endpoints
-@app.websocket("/ws/{user_id}")
-async def websocket_endpoint(websocket: WebSocket, user_id: str):
-    await manager.connect(websocket)
+@app.websocket("/ws/user/{user_id}")
+async def user_websocket_endpoint(websocket: WebSocket, user_id: str):
+    await manager.connect_user(websocket, user_id)
     try:
         while True:
             data = await websocket.receive_text()
-            # Handle real-time updates for users
-            await manager.send_personal_message(f"Echo: {data}", websocket)
+            # Echo received data (for testing)
+            await manager.send_to_user(user_id, f"Echo: {data}")
     except WebSocketDisconnect:
-        manager.disconnect(websocket)
+        manager.disconnect_user(user_id)
 
-@app.websocket("/ws/admin/{admin_id}")
-async def admin_websocket_endpoint(websocket: WebSocket, admin_id: str):
-    await manager.connect(websocket, is_admin=True)
+@app.websocket("/ws/admin")
+async def admin_websocket_endpoint(websocket: WebSocket):
+    await manager.connect_admin(websocket)
     try:
         while True:
             data = await websocket.receive_text()
-            # Handle admin real-time updates
-            await manager.send_personal_message(f"Admin Echo: {data}", websocket)
+            # Echo received data (for testing)
+            await websocket.send_text(f"Admin Echo: {data}")
     except WebSocketDisconnect:
-        manager.disconnect(websocket, is_admin=True)
+        manager.disconnect_admin(websocket)
 
 # Background task for updating package earnings
 async def update_package_earnings():
@@ -616,12 +822,20 @@ async def update_package_earnings():
                     total_earnings - package["invested_amount"]
                 )
                 
-                await db.investment_packages.update_one(
-                    {"id": package["id"]},
-                    {"$set": {"accumulated_earnings": max(0, new_accumulated)}}
-                )
+                if new_accumulated != package["accumulated_earnings"]:
+                    await db.investment_packages.update_one(
+                        {"id": package["id"]},
+                        {"$set": {"accumulated_earnings": max(0, new_accumulated)}}
+                    )
+                    
+                    # Send real-time earnings update to user
+                    await manager.send_to_user(package["user_id"], json.dumps({
+                        "type": "earnings_update",
+                        "package_id": package["id"],
+                        "accumulated_earnings": max(0, new_accumulated)
+                    }))
             
-            await asyncio.sleep(1)  # Update every second
+            await asyncio.sleep(10)  # Update every 10 seconds for better performance
             
         except Exception as e:
             print(f"Error updating package earnings: {e}")
@@ -654,6 +868,7 @@ async def startup_event():
             email="admin@investaz.com",
             name="Batu",
             password_hash=get_password_hash("18061999"),
+            user_code="AZ000000",  # Special admin code
             is_admin=True,
             balance=0
         )
@@ -666,12 +881,3 @@ async def startup_event():
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
-
-# Add uploads directory endpoint
-@api_router.get("/uploads/{filename}")
-async def get_upload(filename: str):
-    file_path = Path(f"/app/uploads/{filename}")
-    if not file_path.exists():
-        raise HTTPException(status_code=404, detail="File not found")
-    
-    return {"message": "File found", "filename": filename}
