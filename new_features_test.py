@@ -25,10 +25,12 @@ print(f"Testing NEW FEATURES at: {API_URL}")
 print("=" * 60)
 
 # Test data
+import random
+random_num = random.randint(1000, 9999)
 test_user_data = {
-    "email": "newuser@investaz.com",
-    "name": "Yeni İstifadəçi",
-    "password": "yeniparol123"
+    "email": f"testuser{random_num}@investaz.com",
+    "name": "Test User",
+    "password": "testpass123"
 }
 
 admin_credentials = {
