@@ -1,13 +1,23 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend API Tests for InvestAZ Platform
-Tests all authentication, package, transaction, messaging, and admin endpoints
+Comprehensive Backend API Tests for InvestAZ Platform - NEW FEATURES TESTING
+Tests all NEW features including:
+1. User Code Generation System (AZ codes)
+2. Updated Investment/Withdrawal Limits (50-2500 AZN investment, 500-6500 AZN withdrawal)
+3. Real-time WebSocket System
+4. Admin Balance Management
+5. Enhanced Admin Search
+6. File Upload & Receipt System
+7. Message Management
+8. Package Earnings System
 """
 
 import requests
 import json
 import os
 import time
+import websocket
+import threading
 from datetime import datetime
 from pathlib import Path
 
