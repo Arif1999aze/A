@@ -15,7 +15,8 @@ import {
   formatAmount,
   calculatePackageEarnings
 } from '../mock';
-import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe, CreditCard, Upload, Package, Clock, CheckCircle, MoreVertical, ShoppingCart, Gift, AlertTriangle, Sparkles } from 'lucide-react';
+import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe, CreditCard, Upload, Package, Clock, CheckCircle, MoreVertical, ShoppingCart, Gift, AlertTriangle, Sparkles, MessageCircle, Bell } from 'lucide-react';
+import axios from 'axios';
 
 const InvestmentPlatform = () => {
   const [transactions, setTransactions] = useState([]);
