@@ -12,7 +12,7 @@ import {
   companyInfo,
   formatAmount
 } from '../mock';
-import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe, CreditCard, Upload, Package, Clock, CheckCircle, MoreVertical, ShoppingCart, Gift, AlertTriangle, Sparkles, MessageCircle, Bell } from 'lucide-react';
+import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe, CreditCard, Upload, Package, Clock, CheckCircle, MoreVertical, ShoppingCart, Gift, AlertTriangle, Sparkles, MessageCircle, Bell, Timer } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
@@ -44,6 +44,8 @@ const InvestmentPlatform = () => {
   const [messages, setMessages] = useState([]);
   const [notifications, setNotifications] = useState([]);
   const [websocket, setWebsocket] = useState(null);
+  const [collectionStatus, setCollectionStatus] = useState({});
+  const [countdownTimers, setCountdownTimers] = useState({});
 
   // Package definitions
   const packageDefinitions = {
@@ -63,6 +65,20 @@ const InvestmentPlatform = () => {
     }
   }, [token]);
 
+  // Auto-refresh data every 10 seconds when logged in
+  useEffect(() => {
+    if (isLoggedIn && token) {
+      const interval = setInterval(() => {
+        fetchUserData();
+        fetchUserPackages();
+        fetchUserTransactions();
+        fetchUserMessages();
+      }, 10000); // 10 seconds
+      
+      return () => clearInterval(interval);
+    }
+  }, [isLoggedIn, token]);
+
   // Setup WebSocket for real-time updates
   const setupWebSocket = () => {
     if (!user?.id) return;
@@ -71,12 +87,21 @@ const InvestmentPlatform = () => {
     const ws = new WebSocket(wsUrl);
     
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      handleWebSocketMessage(data);
+      try {
+        const data = JSON.parse(event.data);
+        handleWebSocketMessage(data);
+      } catch (e) {
+        console.log('WebSocket message:', event.data);
+      }
     };
     
     ws.onerror = (error) => {
       console.log('WebSocket error:', error);
+    };
+    
+    ws.onclose = () => {
+      // Reconnect after 5 seconds
+      setTimeout(() => setupWebSocket(), 5000);
     };
     
     setWebsocket(ws);
@@ -113,6 +138,9 @@ const InvestmentPlatform = () => {
         break;
       case 'earnings_collected':
         setUser(prev => ({ ...prev, balance: data.new_balance }));
+        if (data.next_collection_time) {
+          startCountdownTimer(data.package_id, data.next_collection_time);
+        }
         break;
       case 'admin_reply':
         fetchUserMessages();
@@ -120,6 +148,72 @@ const InvestmentPlatform = () => {
         break;
     }
   };
+
+  // Countdown timer for collection cooldown
+  const startCountdownTimer = (packageId, nextCollectionTime) => {
+    const endTime = new Date(nextCollectionTime).getTime();
+    
+    const updateTimer = () => {
+      const now = Date.now();
+      const timeLeft = Math.max(0, endTime - now);
+      
+      if (timeLeft <= 0) {
+        setCountdownTimers(prev => {
+          const newTimers = { ...prev };
+          delete newTimers[packageId];
+          return newTimers;
+        });
+        fetchCollectionStatus(packageId);
+        return;
+      }
+      
+      const minutes = Math.floor(timeLeft / (1000 * 60));
+      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+      
+      setCountdownTimers(prev => ({
+        ...prev,
+        [packageId]: { minutes, seconds, timeLeft }
+      }));
+    };
+    
+    updateTimer();
+    const interval = setInterval(updateTimer, 1000);
+    
+    setTimeout(() => {
+      clearInterval(interval);
+    }, endTime - Date.now());
+  };
+
+  // Fetch collection status for packages
+  const fetchCollectionStatus = async (packageId) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/packages/${packageId}/collection-status`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      setCollectionStatus(prev => ({
+        ...prev,
+        [packageId]: response.data
+      }));
+      
+      if (!response.data.can_collect && response.data.cooldown_remaining_seconds > 0) {
+        // Start countdown if in cooldown
+        const nextTime = new Date(Date.now() + response.data.cooldown_remaining_seconds * 1000);
+        startCountdownTimer(packageId, nextTime.toISOString());
+      }
+    } catch (error) {
+      console.error('Error fetching collection status:', error);
+    }
+  };
+
+  // Check collection status for all user packages
+  useEffect(() => {
+    if (userPackages.length > 0) {
+      userPackages.forEach(pkg => {
+        fetchCollectionStatus(pkg.id);
+      });
+    }
+  }, [userPackages]);
 
   // Live transaction feed
   useEffect(() => {
@@ -268,6 +362,8 @@ const InvestmentPlatform = () => {
     setUserPackages([]);
     setPendingTransactions([]);
     setMessages([]);
+    setCollectionStatus({});
+    setCountdownTimers({});
     setMenuOpen(false);
   };
 
@@ -365,11 +461,22 @@ const InvestmentPlatform = () => {
       });
       
       alert(`🎉 ${formatAmount(response.data.collected_amount)} AZN balansınıza əlavə edildi!`);
+      
+      // Start countdown timer for next collection
+      if (response.data.next_collection_time) {
+        startCountdownTimer(packageId, response.data.next_collection_time);
+      }
+      
       fetchUserData();
       fetchUserPackages();
       
     } catch (error) {
-      alert('❌ ' + (error.response?.data?.detail || 'Qazanc toplanırken xəta baş verdi.'));
+      const errorMessage = error.response?.data?.detail || 'Qazanc toplanırken xəta baş verdi.';
+      if (errorMessage.includes('Cooldown active')) {
+        alert(`⏰ ${errorMessage}`);
+      } else {
+        alert('❌ ' + errorMessage);
+      }
     }
   };
 
@@ -808,7 +915,7 @@ const InvestmentPlatform = () => {
               </div>
             )}
 
-            {/* Show active packages */}
+            {/* Show active packages with 30-minute collection system */}
             {hasActivePackage && (
               <div className="space-y-6">
                 <h2 className="text-2xl font-bold text-yellow-400 text-center">Aktiv Paketiniz</h2>
@@ -817,6 +924,8 @@ const InvestmentPlatform = () => {
                     const pkg = packageDefinitions[userPkg.package_type];
                     const totalEarnings = userPkg.invested_amount * pkg.multiplier;
                     const progressPercentage = ((userPkg.accumulated_earnings / (totalEarnings - userPkg.invested_amount)) * 100).toFixed(1);
+                    const canCollect = collectionStatus[userPkg.id]?.can_collect ?? true;
+                    const countdown = countdownTimers[userPkg.id];
                     
                     return (
                       <Card key={userPkg.id} className="bg-gradient-to-r from-gray-900 to-gray-800 border-yellow-400 p-6">
@@ -854,14 +963,38 @@ const InvestmentPlatform = () => {
                               </div>
                             </div>
                             
-                            <Button
-                              onClick={() => collectEarnings(userPkg.id)}
-                              disabled={(userPkg.accumulated_earnings || 0) < 0.01}
-                              className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-lg py-3"
-                            >
-                              <Gift className="w-5 h-5 mr-2" />
-                              Qazancı Götür
-                            </Button>
+                            {/* Collection Button with Countdown */}
+                            {canCollect ? (
+                              <Button
+                                onClick={() => collectEarnings(userPkg.id)}
+                                disabled={(userPkg.accumulated_earnings || 0) < 0.01}
+                                className="w-full bg-gradient-to-r from-green-600 to-green-500 hover:from-green-700 hover:to-green-600 disabled:opacity-50 disabled:cursor-not-allowed text-lg py-3"
+                              >
+                                <Gift className="w-5 h-5 mr-2" />
+                                Qazancı Götür
+                              </Button>
+                            ) : (
+                              <div className="w-full">
+                                <Button
+                                  disabled={true}
+                                  className="w-full bg-gray-600 opacity-50 cursor-not-allowed text-lg py-3 mb-2"
+                                >
+                                  <Timer className="w-5 h-5 mr-2" />
+                                  Gözləmə Vaxtı
+                                </Button>
+                                {countdown && (
+                                  <div className="text-center">
+                                    <div className="text-sm text-gray-400">Növbəti toplama:</div>
+                                    <div className="text-lg font-bold text-yellow-400">
+                                      {countdown.minutes}:{String(countdown.seconds).padStart(2, '0')}
+                                    </div>
+                                    <div className="text-xs text-gray-500">
+                                      (30 dəqiqə arayla)
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
                       </Card>
@@ -1176,7 +1309,7 @@ const PackageConfirmation = ({ package: pkg, amount, expectedProfit, onConfirm, 
       <Alert className="bg-green-900/50 border-green-600">
         <CheckCircle className="h-4 w-4 text-green-400" />
         <AlertDescription className="text-green-200">
-          Bu paketi təsdiqləsəniz, {pkg.duration} gün ərzində gəliriniz toplanacaq və istədiyiniz vaxt çıxara bilərsiniz.
+          Bu paketi təsdiqləsəniz, {pkg.duration} gün ərzində gəliriniz toplanacaq və hər 30 dəqiqədə bir çıxara bilərsiniz.
         </AlertDescription>
       </Alert>
 
