@@ -6,7 +6,7 @@ import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { formatAmount } from '../mock';
-import { Users, DollarSign, MessageCircle, CheckCircle, XCircle, Clock, Eye, FileText } from 'lucide-react';
+import { Users, DollarSign, MessageCircle, CheckCircle, XCircle, Clock, Eye, FileText, Search, Edit, Trash2 } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
@@ -20,26 +20,76 @@ const AdminPanel = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [replyMessage, setReplyMessage] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+  const [balanceEditUser, setBalanceEditUser] = useState(null);
+  const [newBalance, setNewBalance] = useState('');
+  const [websocket, setWebsocket] = useState(null);
   const [stats, setStats] = useState({
     totalUsers: 0,
     pendingTransactions: 0,
     totalDeposits: 0,
-    totalWithdrawals: 0
+    totalWithdrawals: 0,
+    activePackages: 0
   });
 
   useEffect(() => {
     if (token) {
       setIsLoggedIn(true);
       fetchData();
-      // Auto-refresh data every 5 seconds
-      const interval = setInterval(fetchData, 5000);
+      setupAdminWebSocket();
+      // Auto-refresh data every 10 seconds
+      const interval = setInterval(fetchData, 10000);
       return () => clearInterval(interval);
     }
   }, [token]);
 
+  // Setup WebSocket for admin real-time updates
+  const setupAdminWebSocket = () => {
+    const wsUrl = `${API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/admin`;
+    const ws = new WebSocket(wsUrl);
+    
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      handleAdminWebSocketMessage(data);
+    };
+    
+    ws.onerror = (error) => {
+      console.log('Admin WebSocket error:', error);
+    };
+    
+    setWebsocket(ws);
+    
+    return () => {
+      if (ws) ws.close();
+    };
+  };
+
+  const handleAdminWebSocketMessage = (data) => {
+    // Handle real-time admin notifications
+    switch (data.type) {
+      case 'new_user_registration':
+        fetchUsers();
+        break;
+      case 'package_purchase':
+      case 'new_transaction':
+      case 'receipt_uploaded':
+        fetchTransactions();
+        break;
+      case 'new_message':
+        fetchMessages();
+        break;
+      default:
+        // Refresh all data for unknown message types
+        fetchData();
+        break;
+    }
+  };
+
   const fetchData = async () => {
     try {
       await Promise.all([
+        fetchStats(),
         fetchUsers(),
         fetchTransactions(),
         fetchMessages()
@@ -49,13 +99,23 @@ const AdminPanel = () => {
     }
   };
 
+  const fetchStats = async () => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/admin/stats`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setStats(response.data);
+    } catch (error) {
+      console.error('Error fetching stats:', error);
+    }
+  };
+
   const fetchUsers = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/admin/users`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(response.data);
-      setStats(prev => ({ ...prev, totalUsers: response.data.length }));
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -68,16 +128,6 @@ const AdminPanel = () => {
       });
       const pending = response.data.filter(t => t.status === 'pending');
       setPendingTransactions(pending);
-      
-      const deposits = response.data.filter(t => t.type === 'deposit' && t.status === 'approved');
-      const withdrawals = response.data.filter(t => t.type === 'withdraw' && t.status === 'approved');
-      
-      setStats(prev => ({
-        ...prev,
-        pendingTransactions: pending.length,
-        totalDeposits: deposits.reduce((sum, t) => sum + t.amount, 0),
-        totalWithdrawals: withdrawals.reduce((sum, t) => sum + t.amount, 0)
-      }));
     } catch (error) {
       console.error('Error fetching transactions:', error);
     }
@@ -111,6 +161,9 @@ const AdminPanel = () => {
   };
 
   const handleLogout = () => {
+    if (websocket) {
+      websocket.close();
+    }
     localStorage.removeItem('admin_token');
     setToken(null);
     setIsLoggedIn(false);
@@ -128,6 +181,7 @@ const AdminPanel = () => {
       
       alert(approve ? '✅ Əməliyyat təsdiqləndi.' : '❌ Əməliyyat rədd edildi.');
       fetchTransactions();
+      fetchStats();
       setSelectedTransaction(null);
     } catch (error) {
       alert('❌ Əməliyyat zamanı xəta baş verdi.');
@@ -149,6 +203,83 @@ const AdminPanel = () => {
       fetchMessages();
     } catch (error) {
       alert('❌ Mesaj göndərilmədi.');
+    }
+  };
+
+  const deleteMessage = async (messageId) => {
+    if (!confirm('Bu mesajı silmək istədiyinizdən əminsiniz?')) return;
+
+    try {
+      await axios.delete(`${API_BASE_URL}/api/admin/messages/${messageId}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      alert('✅ Mesaj silindi.');
+      fetchMessages();
+    } catch (error) {
+      alert('❌ Mesaj silinmədi.');
+    }
+  };
+
+  const searchUsers = async () => {
+    if (!searchQuery.trim()) {
+      setSearchResults([]);
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/admin/users/search?query=${encodeURIComponent(searchQuery)}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error('Error searching users:', error);
+      alert('❌ Axtarış zamanı xəta baş verdi.');
+    }
+  };
+
+  const updateUserBalance = async () => {
+    if (!balanceEditUser || !newBalance) return;
+
+    try {
+      await axios.post(`${API_BASE_URL}/api/admin/users/update-balance`, {
+        user_id: balanceEditUser.id,
+        new_balance: parseFloat(newBalance),
+        notes: `Admin tərəfindən balans yeniləndi`
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      alert('✅ İstifadəçi balansı yeniləndi.');
+      setBalanceEditUser(null);
+      setNewBalance('');
+      fetchUsers();
+      // Clear search results to refresh
+      if (searchQuery.trim()) {
+        searchUsers();
+      }
+    } catch (error) {
+      alert('❌ Balans yenilənmədi.');
+    }
+  };
+
+  const viewReceipt = async (filename) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/api/admin/receipts/${filename}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        responseType: 'blob'
+      });
+      
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      alert('❌ Dekont açıla bilmədi.');
     }
   };
 
@@ -183,7 +314,7 @@ const AdminPanel = () => {
 
       <main className="container mx-auto px-4 py-8">
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <Card className="bg-gray-900 border-gray-800 p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -191,6 +322,16 @@ const AdminPanel = () => {
                 <div className="text-gray-400 text-sm">Ümumi İstifadəçilər</div>
               </div>
               <Users className="w-8 h-8 text-blue-400" />
+            </div>
+          </Card>
+
+          <Card className="bg-gray-900 border-gray-800 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <div className="text-2xl font-bold text-purple-400">{stats.activePackages}</div>
+                <div className="text-gray-400 text-sm">Aktiv Paketlər</div>
+              </div>
+              <Clock className="w-8 h-8 text-purple-400" />
             </div>
           </Card>
 
@@ -224,6 +365,39 @@ const AdminPanel = () => {
             </div>
           </Card>
         </div>
+
+        {/* User Search Section */}
+        <Card className="bg-gray-900 border-gray-800 p-6 mb-8">
+          <h2 className="text-xl font-bold text-yellow-400 mb-4">İstifadəçi Axtarışı</h2>
+          <div className="flex space-x-4 mb-4">
+            <Input
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="AZ kodu və ya ad ilə axtarın..."
+              className="bg-gray-800 border-gray-600 text-white flex-1"
+            />
+            <Button onClick={searchUsers} className="bg-blue-600 hover:bg-blue-700">
+              <Search className="w-4 h-4 mr-2" />
+              Axtar
+            </Button>
+          </div>
+
+          {searchResults.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-gray-300">Axtarış Nəticələri:</h3>
+              {searchResults.map((user) => (
+                <UserSearchResult 
+                  key={user.id} 
+                  user={user} 
+                  onEditBalance={(user) => {
+                    setBalanceEditUser(user);
+                    setNewBalance(user.balance.toString());
+                  }}
+                />
+              ))}
+            </div>
+          )}
+        </Card>
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="transactions" className="w-full">
@@ -296,7 +470,12 @@ const AdminPanel = () => {
                         <div className="flex items-center space-x-2">
                           <FileText className="w-4 h-4 text-blue-400" />
                           <span className="text-blue-400">{txn.receipt_filename}</span>
-                          <Button size="sm" variant="outline" className="text-xs">
+                          <Button 
+                            size="sm" 
+                            variant="outline" 
+                            className="text-xs"
+                            onClick={() => viewReceipt(txn.receipt_filename)}
+                          >
                             <Eye className="w-3 h-3 mr-1" />
                             Bax
                           </Button>
@@ -344,6 +523,7 @@ const AdminPanel = () => {
                     <div>
                       <h3 className="font-bold text-white">{user.name}</h3>
                       <p className="text-gray-400 text-sm">{user.email}</p>
+                      <p className="text-yellow-400 text-sm font-bold">Kod: {user.user_code}</p>
                       <div className="flex space-x-4 mt-2 text-sm">
                         <span className="text-green-400">
                           Balans: {formatAmount(user.balance)} AZN
@@ -356,14 +536,27 @@ const AdminPanel = () => {
                         </span>
                       </div>
                     </div>
-                    <Button
-                      onClick={() => setSelectedUser(user)}
-                      size="sm"
-                      variant="outline"
-                    >
-                      <Eye className="w-4 h-4 mr-1" />
-                      Detallar
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button
+                        onClick={() => {
+                          setBalanceEditUser(user);
+                          setNewBalance(user.balance.toString());
+                        }}
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700"
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Balans
+                      </Button>
+                      <Button
+                        onClick={() => setSelectedUser(user)}
+                        size="sm"
+                        variant="outline"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        Detallar
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
@@ -389,6 +582,15 @@ const AdminPanel = () => {
                         {new Date(msg.created_date).toLocaleString()}
                       </div>
                     </div>
+                    <Button
+                      onClick={() => deleteMessage(msg.id)}
+                      size="sm"
+                      variant="destructive"
+                      className="text-xs"
+                    >
+                      <Trash2 className="w-3 h-3 mr-1" />
+                      Sil
+                    </Button>
                   </div>
                   
                   <div className={`p-3 rounded-lg mb-3 ${msg.is_from_admin ? 'bg-blue-900/30 border-l-4 border-blue-400' : 'bg-gray-800 border-l-4 border-yellow-400'}`}>
@@ -434,7 +636,129 @@ const AdminPanel = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Balance Edit Modal */}
+      <Dialog open={!!balanceEditUser} onOpenChange={() => setBalanceEditUser(null)}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white">Balans Yenilə</DialogTitle>
+          </DialogHeader>
+          {balanceEditUser && (
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-gray-400">İstifadəçi:</label>
+                <div className="text-white font-bold">{balanceEditUser.name}</div>
+                <div className="text-yellow-400 text-sm">Kod: {balanceEditUser.user_code}</div>
+              </div>
+              <div>
+                <label className="text-sm text-gray-400">Cari Balans:</label>
+                <div className="text-green-400 font-bold">{formatAmount(balanceEditUser.balance)} AZN</div>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-2">Yeni Balans (AZN):</label>
+                <Input
+                  type="number"
+                  value={newBalance}
+                  onChange={(e) => setNewBalance(e.target.value)}
+                  className="bg-gray-800 border-gray-600 text-white"
+                  step="0.01"
+                />
+              </div>
+              <div className="flex space-x-3">
+                <Button 
+                  onClick={() => setBalanceEditUser(null)} 
+                  variant="outline" 
+                  className="flex-1"
+                >
+                  Ləğv Et
+                </Button>
+                <Button 
+                  onClick={updateUserBalance}
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                >
+                  Yenilə
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+};
+
+// User Search Result Component
+const UserSearchResult = ({ user, onEditBalance }) => {
+  return (
+    <Card className="bg-gray-800 border-gray-600 p-4">
+      <div className="flex justify-between items-start">
+        <div className="flex-1">
+          <div className="flex items-center space-x-3 mb-2">
+            <div>
+              <h3 className="font-bold text-white">{user.name}</h3>
+              <p className="text-gray-400 text-sm">{user.email}</p>
+              <p className="text-yellow-400 text-sm font-bold">Kod: {user.user_code}</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-4 text-sm mb-3">
+            <div>
+              <span className="text-gray-400">Balans:</span>
+              <div className="text-green-400 font-bold">{formatAmount(user.balance)} AZN</div>
+            </div>
+            <div>
+              <span className="text-gray-400">Yatırım:</span>
+              <div className="text-blue-400 font-bold">{formatAmount(user.total_invested)} AZN</div>
+            </div>
+            <div>
+              <span className="text-gray-400">Qazanc:</span>
+              <div className="text-yellow-400 font-bold">{formatAmount(user.total_earned)} AZN</div>
+            </div>
+          </div>
+
+          {user.active_package && (
+            <div className="bg-gray-700 rounded p-3 mb-3">
+              <h4 className="text-sm font-bold text-white mb-2">Aktiv Paket:</h4>
+              <div className="text-sm">
+                <span className="text-gray-400">Paket: </span>
+                <span className="text-white">{user.active_package.package_type}</span>
+                <span className="text-gray-400 ml-4">Məbləğ: </span>
+                <span className="text-green-400">{formatAmount(user.active_package.invested_amount)} AZN</span>
+              </div>
+            </div>
+          )}
+
+          {user.recent_transactions && user.recent_transactions.length > 0 && (
+            <div className="bg-gray-700 rounded p-3">
+              <h4 className="text-sm font-bold text-white mb-2">Son Əməliyyatlar:</h4>
+              <div className="space-y-1">
+                {user.recent_transactions.slice(0, 3).map((txn) => (
+                  <div key={txn.id} className="text-xs flex justify-between">
+                    <span className={txn.type === 'deposit' ? 'text-green-400' : 'text-red-400'}>
+                      {txn.type === 'deposit' ? '↑' : '↓'} {formatAmount(txn.amount)} AZN
+                    </span>
+                    <span className="text-gray-500">
+                      {new Date(txn.created_date).toLocaleDateString()}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="ml-4">
+          <Button
+            onClick={() => onEditBalance(user)}
+            size="sm"
+            className="bg-blue-600 hover:bg-blue-700"
+          >
+            <Edit className="w-4 h-4 mr-1" />
+            Balans Dəyiş
+          </Button>
+        </div>
+      </div>
+    </Card>
   );
 };
 
@@ -491,6 +815,10 @@ const UserDetailsView = ({ user, onClose }) => {
         <div>
           <label className="text-sm text-gray-400">Email</label>
           <div className="text-white font-medium">{user.email}</div>
+        </div>
+        <div>
+          <label className="text-sm text-gray-400">İstifadəçi Kodu</label>
+          <div className="text-yellow-400 font-bold">{user.user_code}</div>
         </div>
         <div>
           <label className="text-sm text-gray-400">Balans</label>
