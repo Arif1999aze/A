@@ -8,8 +8,8 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, Field, BeforeValidator, PlainSerializer, WithJsonSchema
+from typing import List, Optional, Dict, Any, Annotated
 import uuid
 from datetime import datetime, timedelta
 import jwt
@@ -18,6 +18,25 @@ import json
 import asyncio
 from enum import Enum
 import random
+from bson import ObjectId
+
+# Fix MongoDB ObjectId serialization
+def check_object_id(value: ObjectId | str | None) -> ObjectId | None:
+    if value is None:
+        return None
+    if isinstance(value, (ObjectId, str)) and ObjectId.is_valid(value):
+        return ObjectId(value)
+    raise ValueError(f"{value} is not a valid ObjectId")
+
+# Custom ObjectId type for Pydantic
+OID = Annotated[
+    ObjectId | str | None,
+    Field(None),
+    BeforeValidator(check_object_id),
+    PlainSerializer(func=lambda x: None if x is None else str(x), return_type=str | None),
+    WithJsonSchema({"type": "string"}, mode="validation"),
+    WithJsonSchema({"type": "string"}, mode="serialization"),
+]
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
