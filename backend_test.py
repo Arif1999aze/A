@@ -37,11 +37,11 @@ API_URL = f"{BASE_URL}/api"
 print(f"Testing InvestAZ Backend API at: {API_URL}")
 print("=" * 60)
 
-# Test data
+# Test data - Using realistic data as per requirements
 test_user_data = {
-    "email": "testuser@investaz.com",
-    "name": "Test User",
-    "password": "testpassword123"
+    "email": "mehmet.aliyev@gmail.com",
+    "name": "Mehmet Aliyev",
+    "password": "securepass123"
 }
 
 admin_credentials = {
@@ -49,13 +49,15 @@ admin_credentials = {
     "password": "18061999"
 }
 
-# Global variables for tokens
+# Global variables for tokens and test data
 user_token = None
 admin_token = None
 test_user_id = None
+test_user_code = None
 test_package_id = None
 test_transaction_id = None
 test_message_id = None
+websocket_messages = []
 
 def make_request(method, endpoint, data=None, headers=None, files=None):
     """Make HTTP request with error handling"""
