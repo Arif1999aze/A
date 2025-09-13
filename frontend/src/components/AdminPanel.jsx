@@ -6,7 +6,7 @@ import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { formatAmount } from '../mock';
-import { Users, DollarSign, MessageCircle, CheckCircle, XCircle, Clock, Eye, FileText, Search, Edit, Trash2 } from 'lucide-react';
+import { Users, DollarSign, MessageCircle, CheckCircle, XCircle, Clock, Eye, FileText, Search, Edit, Trash2, RefreshCw } from 'lucide-react';
 import axios from 'axios';
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
@@ -25,6 +25,10 @@ const AdminPanel = () => {
   const [balanceEditUser, setBalanceEditUser] = useState(null);
   const [newBalance, setNewBalance] = useState('');
   const [websocket, setWebsocket] = useState(null);
+  const [receiptViewOpen, setReceiptViewOpen] = useState(false);
+  const [currentReceipt, setCurrentReceipt] = useState(null);
+  const [lastRefresh, setLastRefresh] = useState(new Date());
+  const [autoRefresh, setAutoRefresh] = useState(true);
   const [stats, setStats] = useState({
     totalUsers: 0,
     pendingTransactions: 0,
@@ -38,11 +42,20 @@ const AdminPanel = () => {
       setIsLoggedIn(true);
       fetchData();
       setupAdminWebSocket();
-      // Auto-refresh data every 10 seconds
-      const interval = setInterval(fetchData, 10000);
-      return () => clearInterval(interval);
     }
   }, [token]);
+
+  // Auto-refresh data every 5 seconds
+  useEffect(() => {
+    if (isLoggedIn && autoRefresh) {
+      const interval = setInterval(() => {
+        fetchData();
+        setLastRefresh(new Date());
+      }, 5000); // 5 seconds
+      
+      return () => clearInterval(interval);
+    }
+  }, [isLoggedIn, autoRefresh]);
 
   // Setup WebSocket for admin real-time updates
   const setupAdminWebSocket = () => {
@@ -50,12 +63,21 @@ const AdminPanel = () => {
     const ws = new WebSocket(wsUrl);
     
     ws.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      handleAdminWebSocketMessage(data);
+      try {
+        const data = JSON.parse(event.data);
+        handleAdminWebSocketMessage(data);
+      } catch (e) {
+        console.log('Admin WebSocket message:', event.data);
+      }
     };
     
     ws.onerror = (error) => {
       console.log('Admin WebSocket error:', error);
+    };
+    
+    ws.onclose = () => {
+      // Reconnect after 5 seconds
+      setTimeout(() => setupAdminWebSocket(), 5000);
     };
     
     setWebsocket(ws);
@@ -70,14 +92,26 @@ const AdminPanel = () => {
     switch (data.type) {
       case 'new_user_registration':
         fetchUsers();
+        fetchStats();
+        // Show notification
+        showNotification(`🎉 Yeni qeydiyyat: ${data.user_name} (${data.user_code})`);
         break;
       case 'package_purchase':
+        fetchStats();
+        showNotification(`📦 Paket alışı: ${data.user_name} - ${data.package_type} (${formatAmount(data.amount)} AZN)`);
+        break;
       case 'new_transaction':
+        fetchTransactions();
+        fetchStats();
+        showNotification(`💰 Yeni ${data.transaction_type}: ${data.user_name} - ${formatAmount(data.amount)} AZN`);
+        break;
       case 'receipt_uploaded':
         fetchTransactions();
+        showNotification(`📄 Dekont yükləndi: ${data.user_name} - ${data.filename}`);
         break;
       case 'new_message':
         fetchMessages();
+        showNotification(`💬 Yeni mesaj: ${data.user_name} - ${data.content.substring(0, 50)}...`);
         break;
       default:
         // Refresh all data for unknown message types
@@ -85,6 +119,21 @@ const AdminPanel = () => {
         break;
     }
   };
+
+  const showNotification = (message) => {
+    // Create a simple notification system
+    if (Notification.permission === 'granted') {
+      new Notification('InvestAZ Admin', { body: message });
+    }
+    console.log('Admin Notification:', message);
+  };
+
+  // Request notification permission
+  useEffect(() => {
+    if (isLoggedIn && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
+  }, [isLoggedIn]);
 
   const fetchData = async () => {
     try {
@@ -231,7 +280,16 @@ const AdminPanel = () => {
       const response = await axios.get(`${API_BASE_URL}/api/admin/users/search?query=${encodeURIComponent(searchQuery)}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setSearchResults(response.data);
+      
+      console.log('Search response:', response.data);
+      
+      if (response.data.users) {
+        setSearchResults(response.data.users);
+      } else if (Array.isArray(response.data)) {
+        setSearchResults(response.data);
+      } else {
+        setSearchResults([]);
+      }
     } catch (error) {
       console.error('Error searching users:', error);
       alert('❌ Axtarış zamanı xəta baş verdi.');
@@ -265,21 +323,37 @@ const AdminPanel = () => {
 
   const viewReceipt = async (filename) => {
     try {
-      const response = await axios.get(`${API_BASE_URL}/api/admin/receipts/${filename}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        responseType: 'blob'
+      const response = await axios.get(`${API_BASE_URL}/api/admin/receipts/${filename}/base64`, {
+        headers: { Authorization: `Bearer ${token}` }
       });
       
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', filename);
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      window.URL.revokeObjectURL(url);
+      setCurrentReceipt({
+        filename: response.data.filename,
+        dataUrl: response.data.data_url,
+        mediaType: response.data.media_type
+      });
+      setReceiptViewOpen(true);
+      
     } catch (error) {
-      alert('❌ Dekont açıla bilmədi.');
+      console.error('Error viewing receipt:', error);
+      // Fallback to download
+      try {
+        const downloadResponse = await axios.get(`${API_BASE_URL}/api/admin/receipts/${filename}`, {
+          headers: { Authorization: `Bearer ${token}` },
+          responseType: 'blob'
+        });
+        
+        const url = window.URL.createObjectURL(new Blob([downloadResponse.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', filename);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+      } catch (downloadError) {
+        alert('❌ Dekont açıla bilmədi.');
+      }
     }
   };
 
@@ -305,10 +379,24 @@ const AdminPanel = () => {
           <div className="flex items-center space-x-4">
             <h1 className="text-2xl font-bold text-yellow-400">InvestAZ Admin</h1>
             <Badge className="bg-red-600 text-white animate-pulse">Canlı</Badge>
+            <div className="flex items-center space-x-2 text-sm text-gray-400">
+              <RefreshCw className={`w-4 h-4 ${autoRefresh ? 'animate-spin' : ''}`} />
+              <span>Son yeniləmə: {lastRefresh.toLocaleTimeString()}</span>
+            </div>
           </div>
-          <Button onClick={handleLogout} variant="outline" className="border-red-400 text-red-400">
-            Çıxış
-          </Button>
+          <div className="flex items-center space-x-4">
+            <Button
+              onClick={() => setAutoRefresh(!autoRefresh)}
+              variant="outline"
+              size="sm"
+              className={autoRefresh ? 'border-green-400 text-green-400' : 'border-gray-400 text-gray-400'}
+             >
+              {autoRefresh ? 'Avtomatik Yeniləmə: ON' : 'Avtomatik Yeniləmə: OFF'}
+            </Button>
+            <Button onClick={handleLogout} variant="outline" className="border-red-400 text-red-400">
+              Çıxış
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -373,8 +461,9 @@ const AdminPanel = () => {
             <Input
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="AZ kodu və ya ad ilə axtarın..."
+              placeholder="AZ kodu və ya ad ilə axtarın... (məsələn: AZ123456)"
               className="bg-gray-800 border-gray-600 text-white flex-1"
+              onKeyPress={(e) => e.key === 'Enter' && searchUsers()}
             />
             <Button onClick={searchUsers} className="bg-blue-600 hover:bg-blue-700">
               <Search className="w-4 h-4 mr-2" />
@@ -384,7 +473,7 @@ const AdminPanel = () => {
 
           {searchResults.length > 0 && (
             <div className="space-y-4">
-              <h3 className="text-lg font-bold text-gray-300">Axtarış Nəticələri:</h3>
+              <h3 className="text-lg font-bold text-gray-300">Axtarış Nəticələri ({searchResults.length}):</h3>
               {searchResults.map((user) => (
                 <UserSearchResult 
                   key={user.id} 
@@ -677,6 +766,59 @@ const AdminPanel = () => {
                   className="flex-1 bg-green-600 hover:bg-green-700"
                 >
                   Yenilə
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Receipt View Modal */}
+      <Dialog open={receiptViewOpen} onOpenChange={setReceiptViewOpen}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-4xl max-h-[90vh] overflow-auto">
+          <DialogHeader>
+            <DialogTitle className="text-white">Dekont Görüntüləmə</DialogTitle>
+          </DialogHeader>
+          {currentReceipt && (
+            <div className="space-y-4">
+              <div className="text-center">
+                <h3 className="text-lg text-yellow-400 mb-4">{currentReceipt.filename}</h3>
+                {currentReceipt.mediaType?.startsWith('image/') ? (
+                  <img 
+                    src={currentReceipt.dataUrl} 
+                    alt="Receipt" 
+                    className="max-w-full max-h-96 mx-auto rounded-lg shadow-lg"
+                    style={{ objectFit: 'contain' }}
+                  />
+                ) : currentReceipt.mediaType === 'application/pdf' ? (
+                  <div className="bg-gray-800 p-4 rounded-lg">
+                    <p className="text-white mb-4">PDF faylı:</p>
+                    <iframe 
+                      src={currentReceipt.dataUrl} 
+                      className="w-full h-96 rounded"
+                      title="PDF Viewer"
+                    />
+                  </div>
+                ) : (
+                  <div className="bg-gray-800 p-4 rounded-lg">
+                    <p className="text-gray-400">Bu fayl növü burada göstərilə bilməz.</p>
+                    <Button 
+                      onClick={() => {
+                        const link = document.createElement('a');
+                        link.href = currentReceipt.dataUrl;
+                        link.download = currentReceipt.filename;
+                        link.click();
+                      }}
+                      className="mt-4"
+                    >
+                      Faylı Yüklə
+                    </Button>
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-center">
+                <Button onClick={() => setReceiptViewOpen(false)} className="px-8">
+                  Bağla
                 </Button>
               </div>
             </div>
