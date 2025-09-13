@@ -189,6 +189,90 @@
         - agent: "testing"
         - comment: "✅ Deposit/withdrawal with admin approval workflow fully functional"
 
+  - task: "User Code Generation System (AZ codes)"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ NEW FEATURE: User registration creates unique codes starting with AZ (e.g., AZ6370545). Code uniqueness validation working correctly."
+
+  - task: "Updated Investment/Withdrawal Limits"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ NEW FEATURE: Investment limits updated to 50-2500 AZN (was 50-1000 AZN). Withdrawal limits set to 500-6500 AZN. Validation working correctly."
+
+  - task: "Admin Balance Management System"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ NEW FEATURE: Admin balance update endpoint working. Real-time balance updates to users confirmed. POST /api/admin/users/update-balance functional."
+
+  - task: "Enhanced Admin Search by AZ Code"
+    implemented: true
+    working: false
+    file: "server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: false
+        - agent: "testing"
+        - comment: "❌ NEW FEATURE: Admin search by AZ code has MongoDB ObjectId serialization errors (500 status). GET /api/admin/users/search endpoint needs ObjectId handling fix."
+
+  - task: "Admin Stats Endpoint"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ NEW FEATURE: Admin stats endpoint working perfectly. Returns total_users, active_packages, total_deposits, total_withdrawals, pending_transactions."
+
+  - task: "Message Deletion System"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ NEW FEATURE: Admin message deletion working. DELETE /api/admin/messages/{id} endpoint functional."
+
+  - task: "Real-time Package Earnings System"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ NEW FEATURE: Real-time earnings calculation working. Updates every 10 seconds, earnings collection updates balance immediately, WebSocket earnings updates confirmed."
+
 ## frontend:
   - task: "Remove 'lisenziya' word from frontend"
     implemented: false
