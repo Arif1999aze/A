@@ -1215,7 +1215,7 @@ const StoreView = ({ storeItems, investmentPackages, onPurchase, userBalance }) 
                 </div>
                 <div className="text-right">
                   <div className="font-bold text-yellow-400">{item.price} AZN</div>
-                  <div className="text-xs text-gray-500">Lisenziya haqqı</div>
+                  <div className="text-xs text-gray-500">Paket haqqı</div>
                 </div>
               </div>
             </Card>
