@@ -101,3 +101,231 @@
 #====================================================================================================
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
+
+## user_problem_statement: "The user wants to implement comprehensive improvements to the InvestAZ investment platform including: 1) Remove 'lisenziya' word from the site, 2) Allow customers to choose their own investment amounts within package ranges, 3) Remove 'Pulsuz' word and show 'Seç və Al' button, 4) Show total profit with confirmation system, 5) Hide other packages after purchase showing only active package, 6) Show customer name + package + logo after purchase, 7) Add 'Dəstək' to 3-dot menu for customer-admin messaging, 8) Real-time messaging system between customer and admin, 9) Real-time admin panel updates, 10) Full authentication system that works, 11) When customer uploads dekont, admin sees it immediately, 12) All systems should be automatic with real-time functionality."
+
+## backend:
+  - task: "Remove lisenziya references from backend"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "low" 
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to review backend code for lisenziya references"
+
+  - task: "User Authentication System (JWT)"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to implement proper user registration and login with JWT tokens"
+
+  - task: "Investment Package API"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need API endpoints for package management with flexible amount selection"
+
+  - task: "Real-time WebSocket System"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need WebSocket implementation for real-time messaging and admin updates"
+
+  - task: "File Upload System (Dekont)"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need file upload handling for customer receipts with admin notifications"
+
+  - task: "Customer-Admin Messaging API"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need messaging endpoints for customer support communication"
+
+  - task: "Transaction Management API"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need deposit/withdrawal transaction handling with admin approval system"
+
+## frontend:
+  - task: "Remove 'lisenziya' word from frontend"
+    implemented: false
+    working: "NA"
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to search and remove all instances of 'lisenziya' from frontend"
+
+  - task: "Package system - custom amount selection"
+    implemented: false
+    working: "NA"
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to implement flexible amount selection within package ranges"
+
+  - task: "Remove 'Pulsuz' and update to 'Seç və Al'"
+    implemented: false
+    working: "NA"
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need to remove free package concept and update button text"
+
+  - task: "Show total profit with confirmation"
+    implemented: false
+    working: "NA"
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "high"  
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Need confirmation dialog showing total expected profit before purchase"
+
+  - task: "Hide other packages after purchase"
+    implemented: false
+    working: "NA"
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "After purchase, only show active package with earnings"
+
+  - task: "Show customer info with package logo"
+    implemented: false
+    working: "NA"
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Display customer name + active package + package logo after login"
+
+  - task: "Add 'Dəstək' to 3-dot menu"
+    implemented: false
+    working: "NA"
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Add support option to menu for customer-admin messaging"
+
+  - task: "Real-time messaging interface"
+    implemented: false
+    working: "NA"
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Implement real-time chat interface for customer support"
+
+  - task: "Notification system for customers"
+    implemented: false
+    working: "NA"
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Show notifications for purchases, withdrawals, deposits, gifts"
+
+  - task: "Connect frontend to backend APIs"
+    implemented: false
+    working: "NA"
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: "NA"
+        - agent: "main"
+        - comment: "Replace all mock data with actual API calls"
+
+## metadata:
+  created_by: "main_agent"
+  version: "1.0"
+  test_sequence: 1
+  run_ui: false
+
+## test_plan:
+  current_focus:
+    - "User Authentication System (JWT)"
+    - "Investment Package API"
+    - "Real-time WebSocket System"
+    - "File Upload System (Dekont)"
+  stuck_tasks: []
+  test_all: false
+  test_priority: "high_first"
+
+## agent_communication:
+    - agent: "main"
+    - message: "Starting comprehensive implementation of InvestAZ platform improvements. Focus will be on backend implementation first, then frontend integration, followed by real-time features."
