@@ -83,9 +83,9 @@ def make_request(method, endpoint, data=None, headers=None, files=None):
         return None
 
 def test_user_registration():
-    """Test 1: User Registration API"""
-    global user_token, test_user_id
-    print("\n1. Testing User Registration...")
+    """Test 1: User Registration API with AZ Code Generation"""
+    global user_token, test_user_id, test_user_code
+    print("\n1. Testing User Registration with AZ Code Generation...")
     
     response = make_request('POST', '/auth/register', test_user_data)
     if not response:
@@ -96,8 +96,27 @@ def test_user_registration():
             data = response.json()
             if 'access_token' in data:
                 user_token = data['access_token']
-                print(f"✅ User registration successful - Token received")
-                return True
+                
+                # Get user profile to check AZ code
+                headers = {"Authorization": f"Bearer {user_token}"}
+                profile_response = make_request('GET', '/auth/me', headers=headers)
+                
+                if profile_response and profile_response.status_code == 200:
+                    profile_data = profile_response.json()
+                    test_user_id = profile_data['id']
+                    test_user_code = profile_data['user_code']
+                    
+                    # Verify AZ code format
+                    if test_user_code.startswith('AZ') and len(test_user_code) >= 8:
+                        print(f"✅ User registration successful - AZ Code: {test_user_code}")
+                        print(f"   Registration bonus: {profile_data['balance']} AZN")
+                        return True
+                    else:
+                        print(f"❌ Invalid AZ code format: {test_user_code}")
+                        return False
+                else:
+                    print(f"❌ Could not retrieve user profile after registration")
+                    return False
             else:
                 print(f"❌ Registration response missing access_token: {data}")
                 return False
