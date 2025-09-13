@@ -1182,7 +1182,7 @@ const StoreView = ({ storeItems, investmentPackages, onPurchase, userBalance }) 
       <Alert className="bg-blue-900/50 border-blue-600">
         <AlertTriangle className="h-4 w-4 text-blue-400" />
         <AlertDescription className="text-blue-200">
-          Yeni paket almaq üçün əvvəlcə mağazadan paket lisenziyası almalısınız.
+          Yeni paket almaq üçün əvvəlcə mağazadan paket almalısınız.
           <br />
           <strong>Cari balansınız:</strong> {formatAmount(userBalance)} AZN
         </AlertDescription>
