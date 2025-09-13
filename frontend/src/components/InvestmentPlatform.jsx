@@ -4,17 +4,19 @@ import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog';
 import { Badge } from './ui/badge';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
 import { 
   generateRandomTransaction, 
+  generateMembershipActivity,
   initialStats,
   investmentPackages,
+  companyInfo,
   formatAmount 
 } from '../mock';
-import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff } from 'lucide-react';
+import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe } from 'lucide-react';
 
 const InvestmentPlatform = () => {
   const [transactions, setTransactions] = useState([]);
+  const [membershipActivities, setMembershipActivities] = useState([]);
   const [stats, setStats] = useState(initialStats);
   const [loginOpen, setLoginOpen] = useState(false);
   const [registerOpen, setRegisterOpen] = useState(false);
@@ -26,8 +28,18 @@ const InvestmentPlatform = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       const newTransaction = generateRandomTransaction();
-      setTransactions(prev => [newTransaction, ...prev.slice(0, 19)]); // Keep last 20 transactions
-    }, 3000 + Math.random() * 2000); // Random interval between 3-5 seconds
+      setTransactions(prev => [newTransaction, ...prev.slice(0, 19)]);
+    }, 3000 + Math.random() * 2000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // Live membership activities
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const newMember = generateMembershipActivity();
+      setMembershipActivities(prev => [newMember, ...prev.slice(0, 9)]);
+    }, 4000 + Math.random() * 3000);
 
     return () => clearInterval(interval);
   }, []);
@@ -37,24 +49,23 @@ const InvestmentPlatform = () => {
     const interval = setInterval(() => {
       setStats(prev => ({
         ...prev,
-        totalUsers: prev.totalUsers + Math.floor(Math.random() * 6) + 1, // 1-6 users per minute
+        totalUsers: prev.totalUsers + Math.floor(Math.random() * 6) + 1,
         activeUsers: prev.activeUsers + Math.floor(Math.random() * 3),
-        dailyTransactions: prev.dailyTransactions + Math.floor(Math.random() * 5) + 1
+        dailyTransactions: prev.dailyTransactions + Math.floor(Math.random() * 5) + 1,
+        newMembers: prev.newMembers + Math.floor(Math.random() * 2) + 1
       }));
-    }, 10000); // Every 10 seconds
+    }, 8000);
 
     return () => clearInterval(interval);
   }, []);
 
   const handleLogin = (email, password) => {
-    // Mock login
-    setUser({ email, balance: 0 });
+    setUser({ email, balance: 2500 }); // Demo balance
     setIsLoggedIn(true);
     setLoginOpen(false);
   };
 
   const handleRegister = (email, password, name) => {
-    // Mock registration
     setUser({ email, name, balance: 0 });
     setIsLoggedIn(true);
     setRegisterOpen(false);
@@ -68,6 +79,16 @@ const InvestmentPlatform = () => {
     return `${name.charAt(0)}***`;
   };
 
+  const handleInvestment = (packageId) => {
+    const pkg = investmentPackages.find(p => p.id === packageId);
+    if (user.balance >= pkg.price) {
+      setUser(prev => ({ ...prev, balance: prev.balance - pkg.price }));
+      alert(`${pkg.name} paketinə uğurla investisiya etdiniz!`);
+    } else {
+      alert('Balansınızda kifayət qədər vəsait yoxdur.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
@@ -75,7 +96,7 @@ const InvestmentPlatform = () => {
         <div className="container mx-auto px-6 py-4 flex justify-between items-center">
           <div className="flex items-center space-x-4">
             <div className="text-2xl font-bold text-yellow-400">InvestAZ</div>
-            <Badge className="bg-green-600 text-white">Canlı</Badge>
+            <Badge className="bg-green-600 text-white animate-pulse">Canlı</Badge>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -126,75 +147,259 @@ const InvestmentPlatform = () => {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          
-          {/* Left Column - Stats & Packages */}
-          <div className="lg:col-span-2 space-y-8">
-            
-            {/* Stats Cards */}
-            <div className="grid md:grid-cols-3 gap-6">
-              <Card className="bg-gray-900 border-gray-800 p-6 glow">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-400 text-sm">Ümumi İstifadəçi</p>
-                    <p className="text-2xl font-bold text-white count-up">
-                      {stats.totalUsers.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center text-green-400">
-                    <ArrowUp className="w-4 h-4 mr-1" />
-                    <Users className="w-8 h-8 opacity-50" />
-                  </div>
+        {!isLoggedIn ? (
+          // Landing Page
+          <div className="space-y-12">
+            {/* Hero Section */}
+            <div className="text-center py-16">
+              <h1 className="text-6xl font-bold mb-6">
+                <span className="text-white">Invest</span>
+                <span className="text-yellow-400">AZ</span>
+              </h1>
+              <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto">
+                Azərbaycanın ən etibarlı investisiya platforması. 15 illik təcrübə ilə maliyyə azadlığınıza giden yol.
+              </p>
+              <div className="flex justify-center space-x-4">
+                <Button onClick={() => setRegisterOpen(true)} className="bg-yellow-400 text-black hover:bg-yellow-500 px-8 py-3 text-lg">
+                  İndi Başla
+                </Button>
+                <Button variant="outline" onClick={() => setLoginOpen(true)} className="border-yellow-400 text-yellow-400 px-8 py-3 text-lg">
+                  Hesaba Giriş
+                </Button>
+              </div>
+            </div>
+
+            {/* Stats Section */}
+            <div className="grid md:grid-cols-4 gap-6 mb-12">
+              <Card className="bg-gray-900 border-gray-800 p-6 text-center">
+                <div className="text-3xl font-bold text-yellow-400 count-up">
+                  {stats.totalUsers.toLocaleString()}
+                </div>
+                <div className="text-gray-400 mt-2">Ümumi İstifadəçi</div>
+                <div className="flex items-center justify-center text-green-400 mt-2">
+                  <ArrowUp className="w-4 h-4 mr-1" />
+                  <span className="text-sm">Artır</span>
                 </div>
               </Card>
 
-              <Card className="bg-gray-900 border-gray-800 p-6 glow-green">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-400 text-sm">Aktiv İstifadəçi</p>
-                    <p className="text-2xl font-bold text-white count-up">
-                      {stats.activeUsers.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center text-green-400">
-                    <ArrowUp className="w-4 h-4 mr-1" />
-                    <Activity className="w-8 h-8 opacity-50" />
-                  </div>
+              <Card className="bg-gray-900 border-gray-800 p-6 text-center">
+                <div className="text-3xl font-bold text-green-400 count-up">
+                  {stats.activeUsers.toLocaleString()}
+                </div>
+                <div className="text-gray-400 mt-2">Aktiv İstifadəçi</div>
+                <div className="flex items-center justify-center text-green-400 mt-2">
+                  <ArrowUp className="w-4 h-4 mr-1" />
+                  <span className="text-sm">Artır</span>
                 </div>
               </Card>
 
-              <Card className="bg-gray-900 border-gray-800 p-6 glow-red">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-gray-400 text-sm">Gündəlik Əməliyyat</p>
-                    <p className="text-2xl font-bold text-white count-up">
-                      {stats.dailyTransactions.toLocaleString()}
-                    </p>
-                  </div>
-                  <div className="flex items-center text-green-400">
-                    <ArrowUp className="w-4 h-4 mr-1" />
-                    <TrendingUp className="w-8 h-8 opacity-50" />
-                  </div>
+              <Card className="bg-gray-900 border-gray-800 p-6 text-center">
+                <div className="text-3xl font-bold text-blue-400 count-up">
+                  {stats.dailyTransactions.toLocaleString()}
+                </div>
+                <div className="text-gray-400 mt-2">Gündəlik Əməliyyat</div>
+                <div className="flex items-center justify-center text-green-400 mt-2">
+                  <ArrowUp className="w-4 h-4 mr-1" />
+                  <span className="text-sm">Artır</span>
+                </div>
+              </Card>
+
+              <Card className="bg-gray-900 border-gray-800 p-6 text-center">
+                <div className="text-3xl font-bold text-purple-400 count-up">
+                  {stats.newMembers.toLocaleString()}
+                </div>
+                <div className="text-gray-400 mt-2">Yeni Üzvlər (Bu gün)</div>
+                <div className="flex items-center justify-center text-green-400 mt-2">
+                  <ArrowUp className="w-4 h-4 mr-1" />
+                  <span className="text-sm">Artır</span>
                 </div>
               </Card>
             </div>
 
             {/* Investment Packages */}
-            <Card className="bg-gray-900 border-gray-800 p-6">
-              <h2 className="text-xl font-bold text-yellow-400 mb-6">İnvestisiya Paketləri</h2>
-              <div className="grid md:grid-cols-2 gap-4">
+            <div className="mb-12">
+              <h2 className="text-3xl font-bold text-center mb-8 text-yellow-400">İnvestisiya Paketləri</h2>
+              <div className="grid md:grid-cols-5 gap-6">
                 {investmentPackages.map((pkg) => (
-                  <div key={pkg.id} className="bg-gray-800 border border-gray-700 rounded-lg p-4 hover:border-yellow-400 transition-colors">
+                  <Card key={pkg.id} className="bg-gray-900 border-gray-800 p-6 hover:border-yellow-400 transition-all duration-300 transform hover:scale-105">
+                    <div className="text-center">
+                      <div className="text-4xl mb-4" style={{ color: pkg.color }}>
+                        {pkg.icon}
+                      </div>
+                      <h3 className="font-bold text-lg text-white mb-2">{pkg.name}</h3>
+                      <div className="text-2xl font-bold mb-4" style={{ color: pkg.color }}>
+                        {formatAmount(pkg.price)} AZN
+                      </div>
+                      <div className="space-y-2 text-sm mb-4">
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Gündəlik Gəlir</span>
+                          <span className="text-green-400">{pkg.dailyProfit}%</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span className="text-gray-400">Müddət</span>
+                          <span className="text-white">{pkg.duration} gün</span>
+                        </div>
+                      </div>
+                      <Button 
+                        className="w-full text-black hover:opacity-80" 
+                        style={{ backgroundColor: pkg.color }}
+                        onClick={() => setRegisterOpen(true)}
+                      >
+                        İnvestisiya Et
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+
+            {/* Live Activities */}
+            <div className="grid lg:grid-cols-2 gap-8">
+              {/* Live Transactions */}
+              <Card className="bg-gray-900 border-gray-800 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-yellow-400">Canlı Əməliyyatlar</h3>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-400">CANLI</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 max-h-80 overflow-y-auto">
+                  {transactions.map((txn) => (
+                    <div key={txn.id} className="bg-gray-800 rounded-lg p-3 slide-up border-l-4 border-l-yellow-400">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-medium text-white text-sm">
+                              {showBalances ? txn.name : blurName(txn.name)}
+                            </span>
+                            <Badge className={`text-xs ${txn.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'}`}>
+                              {txn.type === 'deposit' ? 'Yatırım' : 'Çıxarış'}
+                            </Badge>
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            {txn.bank}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className={`font-bold text-sm ${txn.type === 'deposit' ? 'text-green-400' : 'text-red-400'}`}>
+                            {txn.type === 'deposit' ? '+' : '-'}{formatAmount(txn.amount)} AZN
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(txn.timestamp).toLocaleTimeString()}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+
+              {/* Live Memberships */}
+              <Card className="bg-gray-900 border-gray-800 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-yellow-400">Yeni Üzvlər</h3>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-purple-400">CANLI</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 max-h-80 overflow-y-auto">
+                  {membershipActivities.map((member) => (
+                    <div key={member.id} className="bg-gray-800 rounded-lg p-3 slide-up border-l-4 border-l-purple-400">
+                      <div className="flex justify-between items-center">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <Users className="w-4 h-4 text-purple-400" />
+                            <span className="font-medium text-white text-sm">
+                              {showBalances ? member.name : blurName(member.name)}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            {member.action}
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(member.timestamp).toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
+
+            {/* Company Info */}
+            <Card className="bg-gray-900 border-gray-800 p-8">
+              <h2 className="text-2xl font-bold text-yellow-400 mb-6 text-center">InvestAZ Haqqında</h2>
+              <div className="grid md:grid-cols-2 gap-8">
+                <div>
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Globe className="w-6 h-6 text-yellow-400" />
+                    <div>
+                      <div className="font-bold text-white">{companyInfo.name}</div>
+                      <div className="text-gray-400">{companyInfo.country} şirkəti</div>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Shield className="w-6 h-6 text-green-400" />
+                    <div>
+                      <div className="font-bold text-white">Lisenziya: {companyInfo.license}</div>
+                      <div className="text-gray-400">FCA tərəfindən tənzimlənir</div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-3">
+                    <Building className="w-6 h-6 text-blue-400" />
+                    <div>
+                      <div className="font-bold text-white">{companyInfo.experience}</div>
+                      <div className="text-gray-400">{companyInfo.established}-cu ildən xidmətdə</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h3 className="font-bold text-white mb-4 flex items-center">
+                    <Award className="w-5 h-5 text-yellow-400 mr-2" />
+                    Uğurlarımız
+                  </h3>
+                  <ul className="space-y-2">
+                    {companyInfo.achievements.map((achievement, index) => (
+                      <li key={index} className="text-gray-300 text-sm">
+                        • {achievement}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </Card>
+          </div>
+        ) : (
+          // Logged In Dashboard
+          <div className="space-y-8">
+            <div className="text-center">
+              <h1 className="text-4xl font-bold text-yellow-400 mb-4">
+                Xoş gəlmisiniz, {user.name || user.email}!
+              </h1>
+              <p className="text-gray-300">İnvestisiya paketinizi seçin və qazanca başlayın</p>
+            </div>
+
+            {/* Investment Packages - Enhanced */}
+            <div className="grid md:grid-cols-5 gap-6">
+              {investmentPackages.map((pkg) => (
+                <Card key={pkg.id} className="bg-gray-900 border-gray-800 p-6 hover:border-yellow-400 transition-all duration-300 transform hover:scale-105 glow">
+                  <div className="text-center">
+                    <div className="text-5xl mb-4" style={{ color: pkg.color }}>
+                      {pkg.icon}
+                    </div>
                     <h3 className="font-bold text-lg text-white mb-2">{pkg.name}</h3>
-                    <div className="space-y-2 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Minimum</span>
-                        <span className="text-white">{formatAmount(pkg.minAmount)} AZN</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Maksimum</span>
-                        <span className="text-white">{formatAmount(pkg.maxAmount)} AZN</span>
-                      </div>
+                    <div className="text-2xl font-bold mb-4" style={{ color: pkg.color }}>
+                      {formatAmount(pkg.price)} AZN
+                    </div>
+                    <div className="space-y-2 text-sm mb-4">
                       <div className="flex justify-between">
                         <span className="text-gray-400">Gündəlik Gəlir</span>
                         <span className="text-green-400">{pkg.dailyProfit}%</span>
@@ -203,71 +408,116 @@ const InvestmentPlatform = () => {
                         <span className="text-gray-400">Müddət</span>
                         <span className="text-white">{pkg.duration} gün</span>
                       </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-400">Ümumi Gəlir</span>
+                        <span className="text-yellow-400">
+                          {formatAmount(pkg.price * (pkg.dailyProfit / 100) * pkg.duration)} AZN
+                        </span>
+                      </div>
                     </div>
-                    <Button className="w-full mt-4 bg-yellow-400 text-black hover:bg-yellow-500" disabled={!isLoggedIn}>
-                      {isLoggedIn ? 'İnvestisiya Et' : 'Giriş Tələb Olunur'}
+                    <Button 
+                      className="w-full text-black hover:opacity-80" 
+                      style={{ backgroundColor: pkg.color }}
+                      onClick={() => handleInvestment(pkg.id)}
+                      disabled={user.balance < pkg.price}
+                    >
+                      {user.balance >= pkg.price ? 'İnvestisiya Et' : 'Balans Yoxdur'}
                     </Button>
                   </div>
-                ))}
-              </div>
-            </Card>
-          </div>
+                </Card>
+              ))}
+            </div>
 
-          {/* Right Column - Live Transactions */}
-          <div className="space-y-6">
-            <Card className="bg-gray-900 border-gray-800 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-bold text-yellow-400">Canlı Əməliyyatlar</h3>
-                <div className="flex items-center space-x-2">
-                  <div className="w-2 h-2 bg-green-400 rounded-full pulse"></div>
-                  <span className="text-xs text-green-400">CANLI</span>
+            {/* Live Feed */}
+            <div className="grid lg:grid-cols-2 gap-8">
+              <Card className="bg-gray-900 border-gray-800 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-yellow-400">Canlı Əməliyyatlar</h3>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-green-400">CANLI</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {transactions.map((txn, index) => (
-                  <div key={txn.id} className="bg-gray-800 rounded-lg p-3 slide-up border-l-4 border-l-yellow-400">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2">
-                          <span className="font-medium text-white text-sm">
-                            {showBalances ? txn.name : blurName(txn.name)}
-                          </span>
-                          <Badge className={`text-xs ${txn.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'}`}>
-                            {txn.type === 'deposit' ? 'Yatırım' : 'Çıxarış'}
-                          </Badge>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {transactions.map((txn) => (
+                    <div key={txn.id} className="bg-gray-800 rounded-lg p-3 slide-up border-l-4 border-l-yellow-400">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <span className="font-medium text-white text-sm">
+                              {showBalances ? txn.name : blurName(txn.name)}
+                            </span>
+                            <Badge className={`text-xs ${txn.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'}`}>
+                              {txn.type === 'deposit' ? 'Yatırım' : 'Çıxarış'}
+                            </Badge>
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            {txn.bank}
+                          </div>
                         </div>
-                        <div className="text-xs text-gray-400 mt-1">
-                          {txn.bank}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className={`font-bold text-sm ${txn.type === 'deposit' ? 'text-green-400' : 'text-red-400'}`}>
-                          {txn.type === 'deposit' ? '+' : '-'}{formatAmount(txn.amount)} AZN
-                        </div>
-                        <div className="text-xs text-gray-500">
-                          {new Date(txn.timestamp).toLocaleTimeString()}
+                        <div className="text-right">
+                          <div className={`font-bold text-sm ${txn.type === 'deposit' ? 'text-green-400' : 'text-red-400'}`}>
+                            {txn.type === 'deposit' ? '+' : '-'}{formatAmount(txn.amount)} AZN
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {new Date(txn.timestamp).toLocaleTimeString()}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
 
-              <div className="mt-4 flex justify-center">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setShowBalances(!showBalances)}
-                  className="border-gray-600 text-gray-400 hover:text-white"
-                >
-                  {showBalances ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
-                  {showBalances ? 'Adları Gizlə' : 'Adları Göstər'}
-                </Button>
-              </div>
-            </Card>
+                <div className="mt-4 flex justify-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setShowBalances(!showBalances)}
+                    className="border-gray-600 text-gray-400 hover:text-white"
+                  >
+                    {showBalances ? <EyeOff className="w-4 h-4 mr-2" /> : <Eye className="w-4 h-4 mr-2" />}
+                    {showBalances ? 'Adları Gizlə' : 'Adları Göstər'}
+                  </Button>
+                </div>
+              </Card>
+
+              {/* Live Memberships */}
+              <Card className="bg-gray-900 border-gray-800 p-6">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-bold text-yellow-400">Yeni Üzvlər</h3>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-2 h-2 bg-purple-400 rounded-full animate-pulse"></div>
+                    <span className="text-xs text-purple-400">CANLI</span>
+                  </div>
+                </div>
+
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {membershipActivities.map((member) => (
+                    <div key={member.id} className="bg-gray-800 rounded-lg p-3 slide-up border-l-4 border-l-purple-400">
+                      <div className="flex justify-between items-center">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-2">
+                            <Users className="w-4 h-4 text-purple-400" />
+                            <span className="font-medium text-white text-sm">
+                              {showBalances ? member.name : blurName(member.name)}
+                            </span>
+                          </div>
+                          <div className="text-xs text-gray-400 mt-1">
+                            {member.action}
+                          </div>
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {new Date(member.timestamp).toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </div>
           </div>
-        </div>
+        )}
       </main>
     </div>
   );

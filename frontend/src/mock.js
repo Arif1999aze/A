@@ -1,4 +1,4 @@
-// Yeni Investisiya Platforması - Mock Data
+// InvestAZ - Azərbaycan İnvestisiya Platforması Mock Data
 
 // Azərbaycan adları - kişi
 export const maleNames = [
@@ -37,13 +37,74 @@ export const banks = [
   'LeoBank'
 ];
 
-// İnvestisiya paketləri
+// Yenilenmiş İnvestisiya Paketləri - Binalar
 export const investmentPackages = [
-  { id: 1, name: 'Başlanğic Paket', minAmount: 50, maxAmount: 500, dailyProfit: 2.5, duration: 30 },
-  { id: 2, name: 'Standart Paket', minAmount: 500, maxAmount: 2000, dailyProfit: 3.5, duration: 45 },
-  { id: 3, name: 'Premium Paket', minAmount: 2000, maxAmount: 10000, dailyProfit: 4.5, duration: 60 },
-  { id: 4, name: 'VIP Paket', minAmount: 10000, maxAmount: 50000, dailyProfit: 6.0, duration: 90 }
+  { 
+    id: 1, 
+    name: 'Yasamal Residences', 
+    type: 'building',
+    price: 500, 
+    dailyProfit: 2.8, 
+    duration: 30,
+    color: '#8B4513',
+    icon: '🏢'
+  },
+  { 
+    id: 2, 
+    name: 'Port Baku Towers', 
+    type: 'building',
+    price: 1200, 
+    dailyProfit: 3.5, 
+    duration: 45,
+    color: '#CD853F',
+    icon: '🏬'
+  },
+  { 
+    id: 3, 
+    name: 'Flame Towers View', 
+    type: 'building',
+    price: 2500, 
+    dailyProfit: 4.2, 
+    duration: 60,
+    color: '#DAA520',
+    icon: '🏘️'
+  },
+  { 
+    id: 4, 
+    name: 'White City Premium', 
+    type: 'building',
+    price: 5000, 
+    dailyProfit: 5.5, 
+    duration: 75,
+    color: '#B8860B',
+    icon: '🏙️'
+  },
+  { 
+    id: 5, 
+    name: 'Caspian Gold Plaza', 
+    type: 'building',
+    price: 10000, 
+    dailyProfit: 7.0, 
+    duration: 90,
+    color: '#FFD700',
+    icon: '🏛️'
+  }
 ];
+
+// Şirkət məlumatları
+export const companyInfo = {
+  name: "InvestAZ Limited",
+  country: "Böyük Britanya",
+  established: "2009",
+  license: "FCA 789456123",
+  experience: "15+ il təcrübə",
+  achievements: [
+    "2024-cü ildə 'Ən Yaxşı İnvestisiya Platforması' mükafatı",
+    "500,000+ məmnun müştəri",
+    "Bloomberg və Reuters-də xəbər çıxışları",
+    "ISO 27001 Təhlükəsizlik Sertifikatı"
+  ]
+};
 
 // Utility functions
 export function rnd(min, max) {
@@ -66,7 +127,12 @@ export function generateRandomName() {
 export function generateRandomTransaction() {
   const types = ['deposit', 'withdraw'];
   const type = types[rnd(0, 1)];
-  const amount = rnd(100, 5000);
+  
+  // Yenilenmiş məbləğ aralıqları
+  const amount = type === 'withdraw' 
+    ? rnd(1000, 5000)  // Çıxarış: 1000-5000 AZN
+    : rnd(50, 2000);   // Depozit: 50-2000 AZN
+    
   const bank = banks[rnd(0, banks.length - 1)];
   
   return {
@@ -79,9 +145,21 @@ export function generateRandomTransaction() {
   };
 }
 
+// Generate membership registration
+export function generateMembershipActivity() {
+  return {
+    id: Date.now() + Math.random(),
+    type: 'membership',
+    name: generateRandomName(),
+    action: 'qeydiyyatdan keçdi',
+    timestamp: new Date().toISOString()
+  };
+}
+
 // Initial user stats
 export const initialStats = {
   totalUsers: 2547832,
   activeUsers: 89543,
-  dailyTransactions: 15687
+  dailyTransactions: 15687,
+  newMembers: 324
 };
