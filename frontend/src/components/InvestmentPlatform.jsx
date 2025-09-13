@@ -669,7 +669,7 @@ const InvestmentPlatform = () => {
                   <div className="flex items-center space-x-3 mb-4">
                     <Shield className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
                     <div>
-                      <div className="font-bold text-white">Lisenziya: {companyInfo.license}</div>
+                      <div className="font-bold text-white">Rəqəm: {companyInfo.license}</div>
                       <div className="text-gray-400 text-sm">FCA tərəfindən tənzimlənir</div>
                     </div>
                   </div>
