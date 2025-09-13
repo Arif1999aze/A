@@ -405,7 +405,8 @@
     - "Connect frontend to backend APIs"
     - "Real-time messaging interface"
     - "Package system - custom amount selection"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Enhanced Admin Search by AZ Code"
   test_all: false
   test_priority: "high_first"
 
