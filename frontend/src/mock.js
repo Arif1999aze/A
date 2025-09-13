@@ -1,4 +1,4 @@
-// InvestAZ - Azərbaycan İnvestisiya Platforması Mock Data
+// InvestAZ - Yenilenmiş Mock Data
 
 // Azərbaycan adları - kişi
 export const maleNames = [
@@ -37,57 +37,71 @@ export const banks = [
   'LeoBank'
 ];
 
-// Yenilenmiş İnvestisiya Paketləri - Binalar
+// Yeni İnvestisiya Paketləri
 export const investmentPackages = [
   { 
     id: 1, 
-    name: 'Yasamal Residences', 
-    type: 'building',
-    price: 500, 
-    dailyProfit: 2.8, 
+    name: 'Platinum Paket', 
+    type: 'platinum',
+    minAmount: 50, 
+    maxAmount: 250,
+    multiplier: 3,
     duration: 30,
-    color: '#8B4513',
-    icon: '🏢'
+    color: '#C0C0C0',
+    icon: '💎',
+    description: 'Yeni başlayanlar üçün əla seçim. Güvənli və qərarlı gəlir.'
   },
   { 
     id: 2, 
-    name: 'Port Baku Towers', 
-    type: 'building',
-    price: 1200, 
-    dailyProfit: 3.5, 
+    name: 'Titanium Paket', 
+    type: 'titanium',
+    minAmount: 250, 
+    maxAmount: 500,
+    multiplier: 4,
     duration: 45,
-    color: '#CD853F',
-    icon: '🏬'
+    color: '#434B52',
+    icon: '🛡️',
+    description: 'Orta səviyyə investorlar üçün. Yüksək gəlir potensialı.'
   },
   { 
     id: 3, 
-    name: 'Flame Towers View', 
-    type: 'building',
-    price: 2500, 
-    dailyProfit: 4.2, 
+    name: 'Gold Paket', 
+    type: 'gold',
+    minAmount: 500, 
+    maxAmount: 1000,
+    multiplier: 4.5,
     duration: 60,
-    color: '#DAA520',
-    icon: '🏘️'
-  },
-  { 
-    id: 4, 
-    name: 'White City Premium', 
-    type: 'building',
-    price: 5000, 
-    dailyProfit: 5.5, 
-    duration: 75,
-    color: '#B8860B',
-    icon: '🏙️'
-  },
-  { 
-    id: 5, 
-    name: 'Caspian Gold Plaza', 
-    type: 'building',
-    price: 10000, 
-    dailyProfit: 7.0, 
-    duration: 90,
     color: '#FFD700',
-    icon: '🏛️'
+    icon: '👑',
+    description: 'Premium investorlar üçün. Maksimum gəlir və üstünlük.'
+  }
+];
+
+// Mağaza məhsulları
+export const storeItems = [
+  {
+    id: 1,
+    name: 'Platinum Paket',
+    price: 25,
+    type: 'platinum',
+    description: 'Platinum paket əldə etmək üçün',
+    icon: '💎'
+  },
+  {
+    id: 2,
+    name: 'Titanium Paket',
+    price: 50,
+    type: 'titanium', 
+    description: 'Titanium paket əldə etmək üçün',
+    icon: '🛡️'
+  },
+  {
+    id: 3,
+    name: 'Gold Paket',
+    price: 75,
+    type: 'gold',
+    description: 'Gold paket əldə etmək üçün',
+    icon: '👑'
   }
 ];
 
@@ -154,6 +168,20 @@ export function generateMembershipActivity() {
     action: 'qeydiyyatdan keçdi',
     timestamp: new Date().toISOString()
   };
+}
+
+// Calculate package earnings
+export function calculatePackageEarnings(packageData, investedAmount, startDate) {
+  const now = new Date();
+  const start = new Date(startDate);
+  const daysPassed = Math.floor((now - start) / (1000 * 60 * 60 * 24));
+  
+  if (daysPassed >= packageData.duration) {
+    return investedAmount * packageData.multiplier;
+  }
+  
+  const dailyEarning = (investedAmount * packageData.multiplier - investedAmount) / packageData.duration;
+  return dailyEarning * daysPassed;
 }
 
 // Initial user stats

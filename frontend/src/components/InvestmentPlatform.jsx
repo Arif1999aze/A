@@ -9,10 +9,12 @@ import {
   generateMembershipActivity,
   initialStats,
   investmentPackages,
+  storeItems,
   companyInfo,
-  formatAmount 
+  formatAmount,
+  calculatePackageEarnings
 } from '../mock';
-import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe, CreditCard, Upload, Package, Clock, CheckCircle, MoreVertical } from 'lucide-react';
+import { ArrowUp, TrendingUp, Users, Activity, DollarSign, Eye, EyeOff, Building, Award, Shield, Globe, CreditCard, Upload, Package, Clock, CheckCircle, MoreVertical, ShoppingCart, Gift } from 'lucide-react';
 
 const InvestmentPlatform = () => {
   const [transactions, setTransactions] = useState([]);
@@ -24,20 +26,22 @@ const InvestmentPlatform = () => {
   const [depositOpen, setDepositOpen] = useState(false);
   const [packagesOpen, setPackagesOpen] = useState(false);
   const [pendingOpen, setPendingOpen] = useState(false);
+  const [storeOpen, setStoreOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showBalances, setShowBalances] = useState(true);
   const [user, setUser] = useState(null);
-  const [userInvestments, setUserInvestments] = useState([]);
+  const [userPackages, setUserPackages] = useState([]);
   const [pendingTransactions, setPendingTransactions] = useState([]);
   const [registeredUsers, setRegisteredUsers] = useState([]);
+  const [hasUsedFreePackage, setHasUsedFreePackage] = useState(false);
 
-  // Live transaction feed
+  // Live transaction feed - daha sürətli
   useEffect(() => {
     const interval = setInterval(() => {
       const newTransaction = generateRandomTransaction();
-      setTransactions(prev => [newTransaction, ...prev.slice(0, 19)]);
-    }, 3000 + Math.random() * 2000);
+      setTransactions(prev => [newTransaction, ...prev.slice(0, 29)]); // 30 transaction
+    }, 1500 + Math.random() * 1000); // 1.5-2.5 saniyə
 
     return () => clearInterval(interval);
   }, []);
@@ -47,7 +51,7 @@ const InvestmentPlatform = () => {
     const interval = setInterval(() => {
       const newMember = generateMembershipActivity();
       setMembershipActivities(prev => [newMember, ...prev.slice(0, 9)]);
-    }, 4000 + Math.random() * 3000);
+    }, 3000 + Math.random() * 2000);
 
     return () => clearInterval(interval);
   }, []);
@@ -62,50 +66,68 @@ const InvestmentPlatform = () => {
         dailyTransactions: prev.dailyTransactions + Math.floor(Math.random() * 5) + 1,
         newMembers: prev.newMembers + Math.floor(Math.random() * 2) + 1
       }));
-    }, 8000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, []);
 
+  // Package earnings update every second
+  useEffect(() => {
+    if (userPackages.length > 0) {
+      const interval = setInterval(() => {
+        setUserPackages(prev => prev.map(pkg => ({
+          ...pkg,
+          accumulatedEarnings: calculatePackageEarnings(
+            investmentPackages.find(p => p.id === pkg.packageId),
+            pkg.investedAmount,
+            pkg.startDate
+          )
+        })));
+      }, 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [userPackages]);
+
   const handleLogin = (email, password) => {
-    // Check if user is registered
     const foundUser = registeredUsers.find(u => u.email === email && u.password === password);
     if (!foundUser) {
       alert('Bu email və şifrə ilə qeydiyyatlı istifadəçi tapılmadı. Zəhmət olmasa əvvəlcə qeydiyyatdan keçin.');
       return;
     }
 
-    setUser({ 
-      email: foundUser.email, 
-      name: foundUser.name, 
-      balance: foundUser.balance 
-    });
+    setUser(foundUser);
     setIsLoggedIn(true);
     setLoginOpen(false);
+    
+    // Load user's packages
+    const savedPackages = JSON.parse(localStorage.getItem(`packages_${foundUser.email}`) || '[]');
+    setUserPackages(savedPackages);
+    
+    const savedFreeUsage = localStorage.getItem(`freeUsed_${foundUser.email}`) === 'true';
+    setHasUsedFreePackage(savedFreeUsage);
   };
 
   const handleRegister = (email, password, name) => {
-    // Check if user already exists
     const existingUser = registeredUsers.find(u => u.email === email);
     if (existingUser) {
       alert('Bu email artıq qeydiyyatlıdır. Zəhmət olmasa giriş edin.');
       return;
     }
 
-    // Add new user to registered users
     const newUser = { 
       email, 
       password,
       name, 
-      balance: 10 // 10 AZN başlanğıc bonusu
+      balance: 10,
+      joinDate: new Date().toISOString()
     };
-    setRegisteredUsers(prev => [...prev, newUser]);
     
+    setRegisteredUsers(prev => [...prev, newUser]);
     setUser(newUser);
     setIsLoggedIn(true);
     setRegisterOpen(false);
     
-    // Təbrik mesajı
     setTimeout(() => {
       alert('🎉 Təbriklər! Hesabınıza 10 AZN bonus əlavə edildi!');
     }, 500);
@@ -117,7 +139,6 @@ const InvestmentPlatform = () => {
       return;
     }
     
-    // Add to pending transactions
     const newTransaction = {
       id: Date.now(),
       type: 'withdraw',
@@ -133,13 +154,17 @@ const InvestmentPlatform = () => {
     setPendingTransactions(prev => [newTransaction, ...prev]);
     setUser(prev => ({ ...prev, balance: prev.balance - amount }));
     
+    // Update registered users
+    setRegisteredUsers(prev => prev.map(u => 
+      u.email === user.email ? { ...u, balance: u.balance - amount } : u
+    ));
+    
     alert('🎉 Təbriklər! Əməliyyat uğurla yerinə yetirildi. Çıxarış sorğunuz admin tərəfindən yoxlanılacaq.');
     setWithdrawOpen(false);
     setMenuOpen(false);
   };
 
   const handleDeposit = (amount, cardNumber, receipt) => {
-    // Add to pending transactions
     const newTransaction = {
       id: Date.now(),
       type: 'deposit',
@@ -159,6 +184,85 @@ const InvestmentPlatform = () => {
     setMenuOpen(false);
   };
 
+  const handlePackagePurchase = (packageId, investedAmount, isFree = false) => {
+    const pkg = investmentPackages.find(p => p.id === packageId);
+    
+    if (!isFree && user.balance < investedAmount) {
+      alert('Balansınızda kifayət qədər vəsait yoxdur.');
+      return;
+    }
+
+    if (investedAmount < pkg.minAmount || investedAmount > pkg.maxAmount) {
+      alert(`Bu paket üçün ${pkg.minAmount}-${pkg.maxAmount} AZN arası məbləğ daxil edin.`);
+      return;
+    }
+
+    const newPackage = {
+      id: Date.now(),
+      packageId: packageId,
+      investedAmount: investedAmount,
+      startDate: new Date().toISOString(),
+      accumulatedEarnings: 0,
+      isActive: true
+    };
+
+    setUserPackages([newPackage]);
+    
+    if (!isFree) {
+      setUser(prev => ({ ...prev, balance: prev.balance - investedAmount }));
+      setRegisteredUsers(prev => prev.map(u => 
+        u.email === user.email ? { ...u, balance: u.balance - investedAmount } : u
+      ));
+    } else {
+      setHasUsedFreePackage(true);
+      localStorage.setItem(`freeUsed_${user.email}`, 'true');
+    }
+    
+    // Save to localStorage
+    localStorage.setItem(`packages_${user.email}`, JSON.stringify([newPackage]));
+    
+    alert(`🎉 ${pkg.name} uğurla alındı! Gəliriniz toplanmağa başladı.`);
+  };
+
+  const handlePackageFromStore = (storeItem, packageId, investedAmount) => {
+    if (user.balance < storeItem.price) {
+      alert('Mağazadan paket almaq üçün balansınızda kifayət qədər vəsait yoxdur.');
+      return;
+    }
+
+    // First pay for store item
+    setUser(prev => ({ ...prev, balance: prev.balance - storeItem.price }));
+    setRegisteredUsers(prev => prev.map(u => 
+      u.email === user.email ? { ...u, balance: u.balance - storeItem.price } : u
+    ));
+
+    // Then purchase package
+    handlePackagePurchase(packageId, investedAmount, false);
+    setStoreOpen(false);
+  };
+
+  const collectEarnings = (packageIndex) => {
+    const pkg = userPackages[packageIndex];
+    const earnings = pkg.accumulatedEarnings;
+    
+    setUser(prev => ({ ...prev, balance: prev.balance + earnings }));
+    setRegisteredUsers(prev => prev.map(u => 
+      u.email === user.email ? { ...u, balance: u.balance + earnings } : u
+    ));
+    
+    setUserPackages(prev => prev.map((p, i) => 
+      i === packageIndex ? { ...p, accumulatedEarnings: 0 } : p
+    ));
+    
+    // Update localStorage
+    const updatedPackages = userPackages.map((p, i) => 
+      i === packageIndex ? { ...p, accumulatedEarnings: 0 } : p
+    );
+    localStorage.setItem(`packages_${user.email}`, JSON.stringify(updatedPackages));
+    
+    alert(`🎉 ${formatAmount(earnings)} AZN balansınıza əlavə edildi!`);
+  };
+
   const blurName = (name) => {
     const parts = name.split(' ');
     if (parts.length >= 2) {
@@ -167,21 +271,8 @@ const InvestmentPlatform = () => {
     return `${name.charAt(0)}***`;
   };
 
-  const handleInvestment = (packageId) => {
-    const pkg = investmentPackages.find(p => p.id === packageId);
-    if (user.balance >= pkg.price) {
-      setUser(prev => ({ ...prev, balance: prev.balance - pkg.price }));
-      setUserInvestments(prev => [...prev, {
-        id: Date.now(),
-        package: pkg,
-        date: new Date().toISOString(),
-        status: 'active'
-      }]);
-      alert(`${pkg.name} paketinə uğurla investisiya etdiniz!`);
-    } else {
-      alert('Balansınızda kifayət qədər vəsait yoxdur.');
-    }
-  };
+  // Check if user has active package
+  const hasActivePackage = userPackages.length > 0 && userPackages.some(p => p.isActive);
 
   return (
     <div className="min-h-screen bg-black text-white">
@@ -302,12 +393,24 @@ const InvestmentPlatform = () => {
                         Paketlərim
                       </button>
 
+                      <button
+                        onClick={() => {
+                          setStoreOpen(true);
+                          setMenuOpen(false);
+                        }}
+                        className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center"
+                      >
+                        <ShoppingCart className="w-4 h-4 mr-2" />
+                        Mağaza
+                      </button>
+
                       <hr className="border-gray-700 my-1" />
                       
                       <button
                         onClick={() => {
                           setIsLoggedIn(false);
                           setUser(null);
+                          setUserPackages([]);
                           setMenuOpen(false);
                         }}
                         className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-gray-700"
@@ -525,49 +628,79 @@ const InvestmentPlatform = () => {
               <h1 className="text-3xl sm:text-4xl font-bold text-yellow-400 mb-4">
                 Xoş gəlmisiniz, {user.name}!
               </h1>
-              <p className="text-gray-300">İnvestisiya paketinizi seçin və qazanca başlayın</p>
+              <p className="text-gray-300">İnvestisiya paketinizi seçin və qazanmağa başlayın</p>
             </div>
 
-            {/* Investment Packages - Enhanced */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-6">
-              {investmentPackages.map((pkg) => (
-                <Card key={pkg.id} className="bg-gray-900 border-gray-800 p-4 sm:p-6 hover:border-yellow-400 transition-all duration-300 transform hover:scale-105 glow">
-                  <div className="text-center">
-                    <div className="text-4xl sm:text-5xl mb-4" style={{ color: pkg.color }}>
-                      {pkg.icon}
-                    </div>
-                    <h3 className="font-bold text-base sm:text-lg text-white mb-2">{pkg.name}</h3>
-                    <div className="text-xl sm:text-2xl font-bold mb-4" style={{ color: pkg.color }}>
-                      {formatAmount(pkg.price)} AZN
-                    </div>
-                    <div className="space-y-2 text-xs sm:text-sm mb-4">
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Gündəlik Gəlir</span>
-                        <span className="text-green-400">{pkg.dailyProfit}%</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Müddət</span>
-                        <span className="text-white">{pkg.duration} gün</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <span className="text-gray-400">Ümumi Gəlir</span>
-                        <span className="text-yellow-400">
-                          {formatAmount(pkg.price * (pkg.dailyProfit / 100) * pkg.duration)} AZN
-                        </span>
-                      </div>
-                    </div>
-                    <Button 
-                      className="w-full text-black hover:opacity-80 text-xs sm:text-sm" 
-                      style={{ backgroundColor: pkg.color }}
-                      onClick={() => handleInvestment(pkg.id)}
-                      disabled={user.balance < pkg.price}
-                    >
-                      {user.balance >= pkg.price ? 'İnvestisiya Et' : 'Balans Yoxdur'}
-                    </Button>
-                  </div>
-                </Card>
-              ))}
-            </div>
+            {/* Show packages only if user doesn't have active package */}
+            {!hasActivePackage && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-yellow-400 text-center">İnvestisiya Paketləri</h2>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {investmentPackages.map((pkg) => (
+                    <PackageCard 
+                      key={pkg.id}
+                      package={pkg}
+                      onPurchase={handlePackagePurchase}
+                      canUseFree={!hasUsedFreePackage}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Show active packages */}
+            {hasActivePackage && (
+              <div className="space-y-6">
+                <h2 className="text-2xl font-bold text-yellow-400 text-center">Aktiv Paketləriniz</h2>
+                <div className="grid gap-6">
+                  {userPackages.map((userPkg, index) => {
+                    const pkg = investmentPackages.find(p => p.id === userPkg.packageId);
+                    const totalEarnings = userPkg.investedAmount * pkg.multiplier;
+                    const remainingEarnings = totalEarnings - userPkg.accumulatedEarnings;
+                    
+                    return (
+                      <Card key={userPkg.id} className="bg-gray-900 border-gray-800 p-6">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                          <div className="flex items-center space-x-4 mb-4 sm:mb-0">
+                            <div className="text-4xl" style={{ color: pkg.color }}>
+                              {pkg.icon}
+                            </div>
+                            <div>
+                              <h3 className="text-xl font-bold text-white">{pkg.name}</h3>
+                              <p className="text-gray-400">{pkg.description}</p>
+                              <div className="text-sm text-gray-500 mt-1">
+                                Başlama: {new Date(userPkg.startDate).toLocaleDateString()}
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div className="text-right w-full sm:w-auto">
+                            <div className="bg-gray-800 rounded-lg p-4 mb-4">
+                              <div className="text-sm text-gray-400">Toplanmış Gəlir</div>
+                              <div className="text-2xl font-bold text-green-400">
+                                {formatAmount(userPkg.accumulatedEarnings)} AZN
+                              </div>
+                              <div className="text-sm text-gray-500">
+                                Qalan: {formatAmount(remainingEarnings)} AZN
+                              </div>
+                            </div>
+                            
+                            <Button
+                              onClick={() => collectEarnings(index)}
+                              disabled={userPkg.accumulatedEarnings < 0.01}
+                              className="w-full bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                            >
+                              <Gift className="w-4 h-4 mr-2" />
+                              Topla
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
 
             {/* Live Feed */}
             <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
@@ -694,12 +827,181 @@ const InvestmentPlatform = () => {
           <DialogHeader>
             <DialogTitle className="text-white">Mənim Paketlərim</DialogTitle>
           </DialogHeader>
-          <MyPackagesView investments={userInvestments} />
+          <MyPackagesView packages={userPackages} investmentPackages={investmentPackages} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={storeOpen} onOpenChange={setStoreOpen}>
+        <DialogContent className="bg-gray-900 border-gray-700 mx-4 max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-white">Mağaza</DialogTitle>
+          </DialogHeader>
+          <StoreView 
+            storeItems={storeItems} 
+            investmentPackages={investmentPackages}
+            onPurchase={handlePackageFromStore}
+            userBalance={user?.balance || 0}
+          />
         </DialogContent>
       </Dialog>
     </div>
   );
 };
+
+// Package Card Component
+const PackageCard = ({ package: pkg, onPurchase, canUseFree }) => {
+  const [investAmount, setInvestAmount] = useState(pkg.minAmount);
+  const [showFreeOption, setShowFreeOption] = useState(false);
+
+  const monthlyEarning = (investAmount * pkg.multiplier - investAmount) / (pkg.duration / 30);
+
+  return (
+    <Card className="bg-gray-900 border-gray-800 p-6 hover:border-indigo-500 transition-all duration-300">
+      <div className="text-center">
+        <div className="text-5xl mb-4" style={{ color: pkg.color }}>
+          {pkg.icon}
+        </div>
+        <h3 className="text-xl font-bold text-white mb-2">{pkg.name}</h3>
+        <p className="text-gray-400 text-sm mb-4">{pkg.description}</p>
+        
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm text-gray-400 mb-2">İnvestisiya məbləği</label>
+            <Input
+              type="number"
+              value={investAmount}
+              onChange={(e) => setInvestAmount(parseFloat(e.target.value))}
+              min={pkg.minAmount}
+              max={pkg.maxAmount}
+              className="bg-gray-800 border-gray-600 text-white text-center"
+            />
+            <div className="text-xs text-gray-500 mt-1">
+              {pkg.minAmount} - {pkg.maxAmount} AZN
+            </div>
+          </div>
+
+          <div className="bg-gray-800 rounded-lg p-3">
+            <div className="text-sm text-gray-400">Aylıq gəlir</div>
+            <div className="text-lg font-bold text-green-400">
+              ~{formatAmount(monthlyEarning)} AZN
+            </div>
+          </div>
+
+          <div className="flex space-x-2">
+            <Button
+              onClick={() => onPurchase(pkg.id, investAmount, false)}
+              className="flex-1 text-black hover:opacity-80"
+              style={{ backgroundColor: pkg.color }}
+            >
+              Satın Al
+            </Button>
+            
+            {canUseFree && (
+              <Button
+                onClick={() => onPurchase(pkg.id, investAmount, true)}
+                variant="outline"
+                className="flex-1 border-green-400 text-green-400 hover:bg-green-400 hover:text-black"
+              >
+                <Gift className="w-4 h-4 mr-1" />
+                Pulsuz
+              </Button>
+            )}
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
+// Store View Component
+const StoreView = ({ storeItems, investmentPackages, onPurchase, userBalance }) => {
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [investAmount, setInvestAmount] = useState(0);
+
+  const handlePurchase = () => {
+    if (!selectedItem) return;
+    
+    const pkg = investmentPackages.find(p => p.type === selectedItem.type);
+    onPurchase(selectedItem, pkg.id, investAmount);
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <p className="text-gray-400">
+          Yeni paket almaq üçün əvvəlcə mağazadan paket lisenziyası almalısınız.
+        </p>
+        <div className="text-sm text-yellow-400 mt-2">
+          Cari balansınız: {formatAmount(userBalance)} AZN
+        </div>
+      </div>
+
+      <div className="grid gap-4">
+        {storeItems.map((item) => {
+          const pkg = investmentPackages.find(p => p.type === item.type);
+          return (
+            <Card
+              key={item.id}
+              className={`bg-gray-800 border-gray-700 p-4 cursor-pointer transition-all ${
+                selectedItem?.id === item.id ? 'border-yellow-400' : 'hover:border-gray-600'
+              }`}
+              onClick={() => {
+                setSelectedItem(item);
+                setInvestAmount(pkg.minAmount);
+              }}
+            >
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-3">
+                  <div className="text-2xl">{item.icon}</div>
+                  <div>
+                    <h3 className="font-bold text-white">{item.name}</h3>
+                    <p className="text-sm text-gray-400">{item.description}</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="font-bold text-yellow-400">{item.price} AZN</div>
+                  <div className="text-xs text-gray-500">Lisenziya haqqı</div>
+                </div>
+              </div>
+            </Card>
+          );
+        })}
+      </div>
+
+      {selectedItem && (
+        <div className="border-t border-gray-700 pt-4">
+          <h4 className="font-bold text-white mb-4">İnvestisiya məbləği seçin</h4>
+          <div className="space-y-4">
+            <Input
+              type="number"
+              value={investAmount}
+              onChange={(e) => setInvestAmount(parseFloat(e.target.value))}
+              min={investmentPackages.find(p => p.type === selectedItem.type)?.minAmount}
+              max={investmentPackages.find(p => p.type === selectedItem.type)?.maxAmount}
+              className="bg-gray-800 border-gray-600 text-white"
+            />
+            
+            <div className="text-sm text-gray-400">
+              Ümumi xərc: {selectedItem.price + investAmount} AZN
+              (Lisenziya: {selectedItem.price} AZN + İnvestisiya: {investAmount} AZN)
+            </div>
+
+            <Button
+              onClick={handlePurchase}
+              disabled={userBalance < (selectedItem.price + investAmount)}
+              className="w-full bg-yellow-400 text-black hover:bg-yellow-500 disabled:opacity-50"
+            >
+              {userBalance >= (selectedItem.price + investAmount) ? 'Satın Al' : 'Balans Yetərsiz'}
+            </Button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+// Other component definitions remain the same...
+// (PendingTransactionsView, LoginForm, RegisterForm, WithdrawForm, DepositForm, MyPackagesView)
 
 // Pending Transactions View Component
 const PendingTransactionsView = ({ transactions }) => {
@@ -1030,8 +1332,8 @@ const DepositForm = ({ onDeposit }) => {
 };
 
 // My Packages View Component
-const MyPackagesView = ({ investments }) => {
-  if (!investments.length) {
+const MyPackagesView = ({ packages, investmentPackages }) => {
+  if (!packages.length) {
     return (
       <div className="text-center py-8">
         <Package className="w-16 h-16 text-gray-400 mx-auto mb-4" />
@@ -1042,34 +1344,37 @@ const MyPackagesView = ({ investments }) => {
 
   return (
     <div className="space-y-4 max-h-96 overflow-y-auto">
-      {investments.map((investment) => (
-        <Card key={investment.id} className="bg-gray-800 border-gray-700 p-4">
-          <div className="flex justify-between items-start">
-            <div className="flex items-center space-x-3">
-              <div className="text-2xl" style={{ color: investment.package.color }}>
-                {investment.package.icon}
-              </div>
-              <div>
-                <h3 className="font-bold text-white">{investment.package.name}</h3>
-                <div className="text-sm text-gray-400">
-                  {new Date(investment.date).toLocaleDateString()}
+      {packages.map((userPkg) => {
+        const pkg = investmentPackages.find(p => p.id === userPkg.packageId);
+        return (
+          <Card key={userPkg.id} className="bg-gray-800 border-gray-700 p-4">
+            <div className="flex justify-between items-start">
+              <div className="flex items-center space-x-3">
+                <div className="text-2xl" style={{ color: pkg.color }}>
+                  {pkg.icon}
+                </div>
+                <div>
+                  <h3 className="font-bold text-white">{pkg.name}</h3>
+                  <div className="text-sm text-gray-400">
+                    {new Date(userPkg.startDate).toLocaleDateString()}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="text-right">
-              <div className="font-bold text-white">
-                {formatAmount(investment.package.price)} AZN
+              <div className="text-right">
+                <div className="font-bold text-white">
+                  {formatAmount(userPkg.investedAmount)} AZN
+                </div>
+                <div className="text-sm text-green-400">
+                  Toplanmış: {formatAmount(userPkg.accumulatedEarnings)} AZN
+                </div>
+                <Badge className="mt-1 bg-green-600">
+                  {userPkg.isActive ? 'Aktiv' : 'Bitib'}
+                </Badge>
               </div>
-              <div className="text-sm text-green-400">
-                +{investment.package.dailyProfit}% gündəlik
-              </div>
-              <Badge className="mt-1 bg-green-600">
-                {investment.status === 'active' ? 'Aktiv' : 'Bitib'}
-              </Badge>
             </div>
-          </div>
-        </Card>
-      ))}
+          </Card>
+        );
+      })}
     </div>
   );
 };
