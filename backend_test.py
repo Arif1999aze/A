@@ -251,9 +251,26 @@ def test_package_purchase():
         return False
     
     headers = {"Authorization": f"Bearer {user_token}"}
+    
+    # First check user balance
+    balance_response = make_request('GET', '/auth/me', headers=headers)
+    if balance_response and balance_response.status_code == 200:
+        user_data = balance_response.json()
+        current_balance = user_data['balance']
+        print(f"   Current user balance: {current_balance} AZN")
+        
+        # Choose appropriate package amount based on balance
+        if current_balance >= 50:
+            purchase_amount = min(50.0, current_balance)  # Use minimum platinum amount
+        else:
+            print(f"❌ Insufficient balance for any package (need at least 50 AZN)")
+            return False
+    else:
+        purchase_amount = 50.0  # Default fallback
+    
     purchase_data = {
         "package_type": "platinum",
-        "invested_amount": 100.0
+        "invested_amount": purchase_amount
     }
     
     response = make_request('POST', '/packages/purchase', purchase_data, headers)
@@ -265,7 +282,7 @@ def test_package_purchase():
             data = response.json()
             if 'id' in data and data['package_type'] == 'platinum':
                 test_package_id = data['id']
-                print(f"✅ Package purchase successful - Package ID: {test_package_id}")
+                print(f"✅ Package purchase successful - Package ID: {test_package_id}, Amount: {purchase_amount} AZN")
                 return True
             else:
                 print(f"❌ Invalid package purchase response: {data}")
