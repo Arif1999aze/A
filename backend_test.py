@@ -1213,12 +1213,13 @@ def test_websocket_connection():
         return False
 
 def run_all_tests():
-    """Run all backend API tests"""
-    print("🚀 Starting Comprehensive InvestAZ Backend API Tests")
+    """Run all backend API tests including NEW FEATURES"""
+    print("🚀 Starting Comprehensive InvestAZ Backend API Tests - NEW FEATURES FOCUS")
     print(f"Backend URL: {API_URL}")
-    print("=" * 60)
+    print("=" * 80)
     
-    tests = [
+    # Core functionality tests
+    core_tests = [
         test_user_registration,
         test_user_login,
         test_admin_login,
@@ -1241,10 +1242,30 @@ def run_all_tests():
         test_admin_message_reply
     ]
     
+    # NEW FEATURE tests
+    new_feature_tests = [
+        test_updated_investment_limits,
+        test_updated_withdrawal_limits,
+        test_admin_search_by_az_code,
+        test_admin_balance_management,
+        test_admin_stats,
+        test_message_deletion,
+        test_receipt_viewing,
+        test_package_earnings_system,
+        test_websocket_connection
+    ]
+    
+    all_tests = core_tests + new_feature_tests
+    
     passed = 0
     failed = 0
+    new_feature_passed = 0
+    new_feature_failed = 0
     
-    for test in tests:
+    print("\n📋 RUNNING CORE FUNCTIONALITY TESTS")
+    print("=" * 50)
+    
+    for i, test in enumerate(core_tests):
         try:
             if test():
                 passed += 1
@@ -1256,19 +1277,45 @@ def run_all_tests():
         
         time.sleep(0.5)  # Small delay between tests
     
-    print("\n" + "=" * 60)
+    print("\n🆕 RUNNING NEW FEATURE TESTS")
+    print("=" * 50)
+    
+    for test in new_feature_tests:
+        try:
+            if test():
+                passed += 1
+                new_feature_passed += 1
+            else:
+                failed += 1
+                new_feature_failed += 1
+        except Exception as e:
+            print(f"❌ Test {test.__name__} crashed: {e}")
+            failed += 1
+            new_feature_failed += 1
+        
+        time.sleep(0.5)  # Small delay between tests
+    
+    print("\n" + "=" * 80)
     print("📊 TEST RESULTS SUMMARY")
-    print("=" * 60)
-    print(f"✅ Passed: {passed}")
-    print(f"❌ Failed: {failed}")
-    print(f"📈 Success Rate: {(passed/(passed+failed)*100):.1f}%")
+    print("=" * 80)
+    print(f"✅ Total Passed: {passed}")
+    print(f"❌ Total Failed: {failed}")
+    print(f"📈 Overall Success Rate: {(passed/(passed+failed)*100):.1f}%")
+    print()
+    print("🆕 NEW FEATURES RESULTS:")
+    print(f"✅ New Features Passed: {new_feature_passed}")
+    print(f"❌ New Features Failed: {new_feature_failed}")
+    if new_feature_passed + new_feature_failed > 0:
+        print(f"📈 New Features Success Rate: {(new_feature_passed/(new_feature_passed+new_feature_failed)*100):.1f}%")
     
     if failed == 0:
-        print("\n🎉 ALL TESTS PASSED! InvestAZ Backend is working correctly.")
+        print("\n🎉 ALL TESTS PASSED! InvestAZ Backend NEW FEATURES are working correctly.")
     else:
         print(f"\n⚠️  {failed} tests failed. Please check the issues above.")
+        if new_feature_failed > 0:
+            print(f"🆕 {new_feature_failed} NEW FEATURE tests failed - Priority attention needed!")
     
-    return passed, failed
+    return passed, failed, new_feature_passed, new_feature_failed
 
 if __name__ == "__main__":
     run_all_tests()
