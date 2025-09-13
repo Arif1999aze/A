@@ -177,6 +177,7 @@ class InvestmentPackage(BaseModel):
     duration_days: int
     start_date: datetime = Field(default_factory=datetime.utcnow)
     accumulated_earnings: float = 0.0
+    last_collection_time: Optional[datetime] = None  # NEW: Track when earnings were last collected
     is_active: bool = True
 
 class InvestmentPackageCreate(BaseModel):
@@ -282,6 +283,9 @@ PACKAGE_DEFINITIONS = {
     "gold": {"name": "Gold Paket", "min_amount": 50, "max_amount": 2500, "multiplier": 4.5, "duration": 60}
 }
 
+# Collection cooldown time (30 minutes)
+COLLECTION_COOLDOWN_MINUTES = 30
+
 # Authentication endpoints
 @api_router.post("/auth/register", response_model=Token)
 async def register_user(user_data: UserCreate):
@@ -377,7 +381,8 @@ async def purchase_package(
         package_type=package_data.package_type,
         invested_amount=package_data.invested_amount,
         multiplier=pkg_def["multiplier"],
-        duration_days=pkg_def["duration"]
+        duration_days=pkg_def["duration"],
+        last_collection_time=None  # No collections yet
     )
     
     await db.investment_packages.insert_one(investment_package.dict())
@@ -419,6 +424,26 @@ async def collect_earnings(package_id: str, current_user: User = Depends(get_cur
     if not package:
         raise HTTPException(status_code=404, detail="Package not found")
     
+    # Check if package is active
+    if not package.get("is_active", False):
+        raise HTTPException(status_code=400, detail="Package is not active")
+    
+    # Check 30-minute cooldown
+    now = datetime.utcnow()
+    last_collection = package.get("last_collection_time")
+    
+    if last_collection:
+        time_since_last = now - last_collection
+        cooldown_remaining = timedelta(minutes=COLLECTION_COOLDOWN_MINUTES) - time_since_last
+        
+        if cooldown_remaining.total_seconds() > 0:
+            minutes_remaining = int(cooldown_remaining.total_seconds() / 60)
+            seconds_remaining = int(cooldown_remaining.total_seconds() % 60)
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Cooldown active. Wait {minutes_remaining} minutes {seconds_remaining} seconds"
+            )
+    
     if package["accumulated_earnings"] < 0.01:
         raise HTTPException(status_code=400, detail="No earnings to collect")
     
@@ -430,10 +455,13 @@ async def collect_earnings(package_id: str, current_user: User = Depends(get_cur
         {"$inc": {"balance": earnings, "total_earned": earnings}}
     )
     
-    # Reset package earnings
+    # Reset package earnings and set collection time
     await db.investment_packages.update_one(
         {"id": package_id},
-        {"$set": {"accumulated_earnings": 0.0}}
+        {"$set": {
+            "accumulated_earnings": 0.0,
+            "last_collection_time": now
+        }}
     )
     
     # Get updated balance
@@ -444,10 +472,48 @@ async def collect_earnings(package_id: str, current_user: User = Depends(get_cur
     await manager.send_to_user(current_user.id, json.dumps({
         "type": "earnings_collected",
         "collected_amount": earnings,
-        "new_balance": new_balance
+        "new_balance": new_balance,
+        "next_collection_time": (now + timedelta(minutes=COLLECTION_COOLDOWN_MINUTES)).isoformat()
     }))
     
-    return {"collected_amount": earnings, "new_balance": new_balance, "message": "Earnings collected successfully"}
+    return {
+        "collected_amount": earnings, 
+        "new_balance": new_balance, 
+        "message": "Earnings collected successfully",
+        "next_collection_time": (now + timedelta(minutes=COLLECTION_COOLDOWN_MINUTES)).isoformat()
+    }
+
+@api_router.get("/packages/{package_id}/collection-status")
+async def get_collection_status(package_id: str, current_user: User = Depends(get_current_user)):
+    package = await db.investment_packages.find_one({"id": package_id, "user_id": current_user.id})
+    if not package:
+        raise HTTPException(status_code=404, detail="Package not found")
+    
+    now = datetime.utcnow()
+    last_collection = package.get("last_collection_time")
+    
+    if not last_collection:
+        return {
+            "can_collect": True,
+            "cooldown_remaining_seconds": 0,
+            "next_collection_time": None
+        }
+    
+    time_since_last = now - last_collection
+    cooldown_remaining = timedelta(minutes=COLLECTION_COOLDOWN_MINUTES) - time_since_last
+    
+    if cooldown_remaining.total_seconds() <= 0:
+        return {
+            "can_collect": True,
+            "cooldown_remaining_seconds": 0,
+            "next_collection_time": None
+        }
+    
+    return {
+        "can_collect": False,
+        "cooldown_remaining_seconds": int(cooldown_remaining.total_seconds()),
+        "next_collection_time": (last_collection + timedelta(minutes=COLLECTION_COOLDOWN_MINUTES)).isoformat()
+    }
 
 # Transaction endpoints
 @api_router.post("/transactions", response_model=Transaction)
@@ -535,20 +601,26 @@ async def upload_receipt(
         {"$set": {"receipt_filename": filename}}
     )
     
-    # Notify admins
+    # Notify admins with enhanced data
     await manager.broadcast_to_admins(json.dumps({
         "type": "receipt_uploaded",
         "transaction_id": transaction_id,
         "user_name": current_user.name,
         "user_code": current_user.user_code,
-        "filename": filename
+        "filename": filename,
+        "amount": transaction["amount"],
+        "file_extension": file_extension
     }))
     
-    return {"message": "Receipt uploaded successfully"}
+    return {"message": "Receipt uploaded successfully", "filename": filename}
 
 @api_router.get("/transactions/my", response_model=List[Transaction])
 async def get_my_transactions(current_user: User = Depends(get_current_user)):
-    transactions = await db.transactions.find({"user_id": current_user.id}).sort("created_date", -1).to_list(100)
+    # Remove _id from results to prevent serialization issues
+    transactions = await db.transactions.find(
+        {"user_id": current_user.id}, 
+        {"_id": 0}  # Exclude _id field
+    ).sort("created_date", -1).to_list(100)
     return [Transaction(**txn) for txn in transactions]
 
 # Message endpoints
@@ -566,21 +638,26 @@ async def send_message(
     
     await db.messages.insert_one(message.dict())
     
-    # Notify admins
+    # Notify admins with enhanced data
     await manager.broadcast_to_admins(json.dumps({
         "type": "new_message",
         "user_name": current_user.name,
         "user_code": current_user.user_code,
         "user_id": current_user.id,
         "content": message_data.content,
-        "message_id": message.id
+        "message_id": message.id,
+        "timestamp": message.created_date.isoformat()
     }))
     
     return message
 
 @api_router.get("/messages/my", response_model=List[Message])
 async def get_my_messages(current_user: User = Depends(get_current_user)):
-    messages = await db.messages.find({"user_id": current_user.id}).sort("created_date", -1).to_list(100)
+    # Remove _id from results to prevent serialization issues
+    messages = await db.messages.find(
+        {"user_id": current_user.id}, 
+        {"_id": 0}  # Exclude _id field
+    ).sort("created_date", -1).to_list(100)
     return [Message(**msg) for msg in messages]
 
 # Admin endpoints
@@ -590,8 +667,14 @@ async def get_admin_stats(current_admin: User = Depends(get_current_admin)):
     active_packages = await db.investment_packages.count_documents({"is_active": True})
     
     # Get transaction stats
-    approved_deposits = await db.transactions.find({"type": "deposit", "status": "approved"}).to_list(None)
-    approved_withdrawals = await db.transactions.find({"type": "withdraw", "status": "approved"}).to_list(None)
+    approved_deposits = await db.transactions.find(
+        {"type": "deposit", "status": "approved"}, 
+        {"_id": 0}
+    ).to_list(None)
+    approved_withdrawals = await db.transactions.find(
+        {"type": "withdraw", "status": "approved"}, 
+        {"_id": 0}
+    ).to_list(None)
     pending_transactions = await db.transactions.count_documents({"status": "pending"})
     
     total_deposits = sum(t["amount"] for t in approved_deposits)
@@ -607,7 +690,11 @@ async def get_admin_stats(current_admin: User = Depends(get_current_admin)):
 
 @api_router.get("/admin/users", response_model=List[UserResponse])
 async def get_all_users(current_admin: User = Depends(get_current_admin)):
-    users = await db.users.find({"is_admin": False}).to_list(1000)
+    # Remove _id from results to prevent serialization issues
+    users = await db.users.find(
+        {"is_admin": False}, 
+        {"_id": 0}  # Exclude _id field
+    ).to_list(1000)
     return [UserResponse(**user) for user in users]
 
 @api_router.get("/admin/users/search")
@@ -615,49 +702,41 @@ async def search_users(
     query: str = Query(..., description="Search by user code (AZ prefix) or name"),
     current_admin: User = Depends(get_current_admin)
 ):
-    # Search by user code or name
-    users = await db.users.find({
-        "$or": [
-            {"user_code": {"$regex": query, "$options": "i"}},
-            {"name": {"$regex": query, "$options": "i"}}
-        ],
-        "is_admin": False
-    }).to_list(50)
-    
-    result = []
-    for user in users:
-        # Convert MongoDB ObjectId to string if present
-        if "_id" in user:
-            del user["_id"]
+    try:
+        # Search by user code or name - exclude _id field to prevent serialization issues
+        users = await db.users.find({
+            "$or": [
+                {"user_code": {"$regex": query, "$options": "i"}},
+                {"name": {"$regex": query, "$options": "i"}}
+            ],
+            "is_admin": False
+        }, {"_id": 0}).to_list(50)  # Exclude _id field
         
-        # Get user's active package
-        active_package = await db.investment_packages.find_one({
-            "user_id": user["id"], 
-            "is_active": True
-        })
+        result = []
+        for user in users:
+            # Get user's active package
+            active_package = await db.investment_packages.find_one({
+                "user_id": user["id"], 
+                "is_active": True
+            }, {"_id": 0})  # Exclude _id field
+            
+            # Get user's recent transactions
+            recent_transactions = await db.transactions.find({
+                "user_id": user["id"]
+            }, {"_id": 0}).sort("created_date", -1).limit(5).to_list(5)  # Exclude _id field
+            
+            user_info = {
+                **UserResponse(**user).dict(),
+                "active_package": active_package,
+                "recent_transactions": recent_transactions
+            }
+            result.append(user_info)
         
-        # Convert ObjectId in active_package if present
-        if active_package and "_id" in active_package:
-            del active_package["_id"]
+        return {"users": result, "total_found": len(result)}
         
-        # Get user's recent transactions
-        recent_transactions = await db.transactions.find({
-            "user_id": user["id"]
-        }).sort("created_date", -1).limit(5).to_list(5)
-        
-        # Convert ObjectId in transactions if present
-        for txn in recent_transactions:
-            if "_id" in txn:
-                del txn["_id"]
-        
-        user_info = {
-            **UserResponse(**user).dict(),
-            "active_package": active_package,
-            "recent_transactions": recent_transactions
-        }
-        result.append(user_info)
-    
-    return result
+    except Exception as e:
+        print(f"Search error: {e}")
+        raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
 
 @api_router.post("/admin/users/update-balance")
 async def update_user_balance(
@@ -684,7 +763,11 @@ async def update_user_balance(
 
 @api_router.get("/admin/transactions", response_model=List[Transaction])
 async def get_all_transactions(current_admin: User = Depends(get_current_admin)):
-    transactions = await db.transactions.find().sort("created_date", -1).to_list(1000)
+    # Remove _id from results to prevent serialization issues
+    transactions = await db.transactions.find(
+        {}, 
+        {"_id": 0}  # Exclude _id field
+    ).sort("created_date", -1).to_list(1000)
     return [Transaction(**txn) for txn in transactions]
 
 @api_router.post("/admin/transactions/approve")
@@ -692,7 +775,7 @@ async def approve_transaction(
     approval_data: AdminApproveTransaction,
     current_admin: User = Depends(get_current_admin)
 ):
-    transaction = await db.transactions.find_one({"id": approval_data.transaction_id})
+    transaction = await db.transactions.find_one({"id": approval_data.transaction_id}, {"_id": 0})
     if not transaction:
         raise HTTPException(status_code=404, detail="Transaction not found")
     
@@ -719,7 +802,7 @@ async def approve_transaction(
         )
         
         # Get updated balance and send real-time update
-        user_doc = await db.users.find_one({"id": transaction["user_id"]})
+        user_doc = await db.users.find_one({"id": transaction["user_id"]}, {"_id": 0})
         await manager.send_to_user(transaction["user_id"], json.dumps({
             "type": "deposit_approved",
             "amount": transaction["amount"],
@@ -734,7 +817,7 @@ async def approve_transaction(
         )
         
         # Get updated balance and send real-time update
-        user_doc = await db.users.find_one({"id": transaction["user_id"]})
+        user_doc = await db.users.find_one({"id": transaction["user_id"]}, {"_id": 0})
         await manager.send_to_user(transaction["user_id"], json.dumps({
             "type": "withdrawal_rejected",
             "amount": transaction["amount"],
@@ -757,11 +840,53 @@ async def get_receipt(filename: str, current_admin: User = Depends(get_current_a
     if not file_path.exists():
         raise HTTPException(status_code=404, detail="Receipt not found")
     
+    # Determine media type based on file extension
+    file_extension = filename.split('.')[-1].lower()
+    media_types = {
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg', 
+        'png': 'image/png',
+        'pdf': 'application/pdf'
+    }
+    media_type = media_types.get(file_extension, 'application/octet-stream')
+    
     return FileResponse(
         path=file_path,
-        media_type='application/octet-stream',
+        media_type=media_type,
         filename=filename
     )
+
+# NEW: Get receipt as base64 for inline display
+@api_router.get("/admin/receipts/{filename}/base64")
+async def get_receipt_base64(filename: str, current_admin: User = Depends(get_current_admin)):
+    file_path = Path(f"/app/uploads/{filename}")
+    if not file_path.exists():
+        raise HTTPException(status_code=404, detail="Receipt not found")
+    
+    import base64
+    
+    try:
+        with open(file_path, "rb") as f:
+            file_content = f.read()
+            base64_content = base64.b64encode(file_content).decode('utf-8')
+            
+            file_extension = filename.split('.')[-1].lower()
+            media_types = {
+                'jpg': 'image/jpeg',
+                'jpeg': 'image/jpeg', 
+                'png': 'image/png',
+                'pdf': 'application/pdf'
+            }
+            media_type = media_types.get(file_extension, 'application/octet-stream')
+            
+            return {
+                "filename": filename,
+                "content": base64_content,
+                "media_type": media_type,
+                "data_url": f"data:{media_type};base64,{base64_content}"
+            }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error reading file: {str(e)}")
 
 @api_router.post("/admin/messages/{message_id}/reply", response_model=Message)
 async def reply_to_message(
@@ -769,7 +894,7 @@ async def reply_to_message(
     reply_content: dict,
     current_admin: User = Depends(get_current_admin)
 ):
-    original_message = await db.messages.find_one({"id": message_id})
+    original_message = await db.messages.find_one({"id": message_id}, {"_id": 0})
     if not original_message:
         raise HTTPException(status_code=404, detail="Message not found")
     
@@ -787,7 +912,8 @@ async def reply_to_message(
     await manager.send_to_user(original_message["user_id"], json.dumps({
         "type": "admin_reply",
         "message": reply_content["content"],
-        "message_id": reply_message.id
+        "message_id": reply_message.id,
+        "timestamp": reply_message.created_date.isoformat()
     }))
     
     return reply_message
@@ -805,7 +931,11 @@ async def delete_message(
 
 @api_router.get("/admin/messages", response_model=List[Message])
 async def get_all_messages(current_admin: User = Depends(get_current_admin)):
-    messages = await db.messages.find().sort("created_date", -1).to_list(1000)
+    # Remove _id from results to prevent serialization issues
+    messages = await db.messages.find(
+        {}, 
+        {"_id": 0}  # Exclude _id field
+    ).sort("created_date", -1).to_list(1000)
     return [Message(**msg) for msg in messages]
 
 # WebSocket endpoints
