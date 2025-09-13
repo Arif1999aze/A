@@ -626,16 +626,29 @@ async def search_users(
     
     result = []
     for user in users:
+        # Convert MongoDB ObjectId to string if present
+        if "_id" in user:
+            del user["_id"]
+        
         # Get user's active package
         active_package = await db.investment_packages.find_one({
             "user_id": user["id"], 
             "is_active": True
         })
         
+        # Convert ObjectId in active_package if present
+        if active_package and "_id" in active_package:
+            del active_package["_id"]
+        
         # Get user's recent transactions
         recent_transactions = await db.transactions.find({
             "user_id": user["id"]
         }).sort("created_date", -1).limit(5).to_list(5)
+        
+        # Convert ObjectId in transactions if present
+        for txn in recent_transactions:
+            if "_id" in txn:
+                del txn["_id"]
         
         user_info = {
             **UserResponse(**user).dict(),
