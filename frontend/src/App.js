@@ -1,14 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import DemoInvestPage from './components/DemoInvestPage';
+import InvestmentPlatform from './components/InvestmentPlatform';
 
 function App() {
   return (
     <div className="App">
-      <BrowserRouter>
+      <BrowserRouter>  
         <Routes>
-          <Route path="/" element={<DemoInvestPage />} />
+          <Route path="/" element={<InvestmentPlatform />} />
         </Routes>
       </BrowserRouter>
     </div>
