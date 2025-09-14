@@ -5,9 +5,14 @@ import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { formatAmount } from '../mock';
 import { Users, DollarSign, MessageCircle, CheckCircle, XCircle, Clock, Eye, FileText, Search, Edit, Trash2, RefreshCw, AlertTriangle, Bell } from 'lucide-react';
 import axios from 'axios';
+
+// Format amount function - inline to avoid import issues
+const formatAmount = (amount) => {
+  if (typeof amount !== 'number' || isNaN(amount)) return '0.00';
+  return amount.toLocaleString('az-AZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+};
 
 const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
