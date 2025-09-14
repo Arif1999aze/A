@@ -433,13 +433,13 @@ const InvestmentPlatform = () => {
     }
   };
 
-  const handleWithdraw = async (amount, cardName, cardNumber) => {
+  const handleWithdraw = async (amount, name, surname, bank) => {
     try {
       await axios.post(`${API_BASE_URL}/api/transactions`, {
         type: 'withdraw',
         amount: parseFloat(amount),
-        card_name: cardName,
-        card_number: cardNumber
+        card_name: `${name} ${surname}`,
+        card_number: bank // Using card_number field for bank name
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
