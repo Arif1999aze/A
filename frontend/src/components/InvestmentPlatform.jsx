@@ -1415,31 +1415,10 @@ const SupportForm = ({ onSend, messages }) => {
 };
 
 // Notifications View Component
-const NotificationsView = ({ pendingTransactions, messages }) => {
+const NotificationsView = ({ messages }) => {
   return (
     <div className="space-y-4 max-h-96 overflow-y-auto">
-      <h3 className="font-bold text-yellow-400">Gözləyən Əməliyyatlar</h3>
-      {pendingTransactions.length === 0 ? (
-        <p className="text-gray-400 text-sm">Gözləyən əməliyyat yoxdur.</p>
-      ) : (
-        pendingTransactions.map((txn) => (
-          <div key={txn.id} className="bg-gray-800 rounded-lg p-3 border-l-4 border-l-yellow-400">
-            <div className="flex justify-between items-center">
-              <div>
-                <span className="text-white font-medium">
-                  {txn.type === 'deposit' ? '💰 Depozit' : '🏦 Çıxarış'}
-                </span>
-                <div className="text-yellow-400 font-bold">
-                  {formatAmount(txn.amount)} AZN
-                </div>
-              </div>
-              <Badge className="bg-yellow-600">İcrada</Badge>
-            </div>
-          </div>
-        ))
-      )}
-
-      <h3 className="font-bold text-yellow-400 mt-6">Yeni Mesajlar</h3>
+      <h3 className="font-bold text-yellow-400">Yeni Mesajlar</h3>
       {messages.filter(m => m.is_from_admin && !m.is_read).length === 0 ? (
         <p className="text-gray-400 text-sm">Yeni mesaj yoxdur.</p>
       ) : (
