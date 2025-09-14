@@ -1454,7 +1454,7 @@ const RegisterForm = ({ onRegister, error, loading }) => {
       
       <div className="text-center">
         <p className="text-gray-400 text-sm">
-          🎁 Qeydiyyatdan sonra 10 AZN bonus alacaqsınız!
+          🎁 Qeydiyyatdan sonra 50 AZN bonus alacaqsınız!
         </p>
       </div>
     </form>
