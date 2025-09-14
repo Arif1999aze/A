@@ -1111,13 +1111,20 @@ const EnhancedInvestmentPlatform = () => {
                               </div>
                             </div>
 
-                            {/* Progress Bar */}
-                            <div className="mb-4">
-                              <div className="flex justify-between text-xs sm:text-sm mb-2">
-                                <span>Qazanc Tamamlanması</span>
-                                <span>{progress.toFixed(1)}% ({formatAmount(pkg.accumulated_earnings || 0)} / {formatAmount(totalExpectedEarnings)} AZN)</span>
+                            {/* Professional Progress Bar */}
+                            <div className="mb-6">
+                              <div className="flex justify-between text-xs sm:text-sm mb-3">
+                                <span className="font-semibold text-gray-300">💎 Qazanc Tamamlanması</span>
+                                <span className="font-bold text-yellow-400">{progress.toFixed(1)}% ({formatAmount(pkg.accumulated_earnings || 0)} / {formatAmount(totalExpectedEarnings)} AZN)</span>
                               </div>
-                              <Progress value={progress} className="h-3" />
+                              <div className="relative">
+                                <Progress value={progress} className="h-4 bg-gray-800 border border-gray-600" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                  <span className="text-xs font-bold text-white drop-shadow-lg">
+                                    {progress.toFixed(1)}%
+                                  </span>
+                                </div>
+                              </div>
                             </div>
 
                             {/* Enhanced Collection Section - 12 Hour System */}
