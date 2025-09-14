@@ -2184,3 +2184,5 @@ const CompanyInfo = ({ className = "" }) => {
 };
 
 export default EnhancedInvestmentPlatform;
+
+export default EnhancedInvestmentPlatform;
