@@ -463,8 +463,10 @@
   run_ui: true
 
 ## test_plan:
-  current_focus: []
-  stuck_tasks: []
+  current_focus:
+    - "CRITICAL: Fix /api/auth/me 500 Server Error"
+  stuck_tasks:
+    - "CRITICAL: Fix /api/auth/me 500 Server Error"
   test_all: false
   test_priority: "high_first"
 
