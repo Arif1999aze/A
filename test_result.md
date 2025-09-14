@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-## user_problem_statement: "The user wants to implement comprehensive improvements to the InvestAZ investment platform including: 1) Remove 'lisenziya' word from the site, 2) Allow customers to choose their own investment amounts within package ranges, 3) Remove 'Pulsuz' word and show 'Seç və Al' button, 4) Show total profit with confirmation system, 5) Hide other packages after purchase showing only active package, 6) Show customer name + package + logo after purchase, 7) Add 'Dəstək' to 3-dot menu for customer-admin messaging, 8) Real-time messaging system between customer and admin, 9) Real-time admin panel updates, 10) Full authentication system that works, 11) When customer uploads dekont, admin sees it immediately, 12) All systems should be automatic with real-time functionality."
+## user_problem_statement: "The user reported a critical package purchase issue in the customer panel, particularly on Android devices. The error message was: 'musterı panelinde paket alımı hata veriyor ve diğer satın alma işlemleri dogru calıssın' (package purchase in customer panel gives error, other purchase operations should work correctly). Additionally, the user requested: 1) Complete removal of 'Gözləyən Əməliyyatlar' (Pending Transactions) section from customer page, 2) Implementation of new withdrawal/deposit window structure with specific fields (name, surname, bank, amount), 3) Fixing Android package purchase bugs with robust fetch function for cross-platform compatibility."
 
 ## backend:
   - task: "Remove lisenziya references from backend"
