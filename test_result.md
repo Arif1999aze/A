@@ -482,9 +482,8 @@
 
 ## test_plan:
   current_focus:
-    - "CRITICAL: Fix /api/auth/me 500 Server Error"
-  stuck_tasks:
-    - "CRITICAL: Fix /api/auth/me 500 Server Error"
+    - "URGENT: Package Purchase Balance Deduction Testing"
+  stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
