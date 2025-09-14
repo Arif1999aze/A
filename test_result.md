@@ -273,6 +273,18 @@
         - agent: "testing"
         - comment: "✅ NEW FEATURE FULLY WORKING: Deposit limits updated from 50-2500 AZN to 50-2000 AZN as requested. Comprehensive testing shows 100% success rate (6/6 tests passed). All boundary conditions work correctly: 49 AZN rejected, 50 AZN accepted, 2000 AZN accepted, 2001 AZN rejected, old maximum 2500 AZN now properly rejected. Error messages are accurate and informative."
 
+  - task: "CRITICAL: Fix /api/auth/me 500 Server Error"
+    implemented: false
+    working: false
+    file: "server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+        - agent: "testing"
+        - comment: "🚨 CRITICAL BUG DISCOVERED: The /api/auth/me endpoint is returning 500 server errors, which is the ROOT CAUSE of package purchase failures. Frontend testing revealed console errors: 'Failed to load resource: the server responded with a status of 500 ()' and 'Error fetching user data: AxiosError'. This prevents users from accessing dashboard and purchasing packages. Backend logs show mixed success/failure rates for package purchases, indicating server instability. URGENT FIX REQUIRED: Investigate and resolve the authentication endpoint server error."
+
 
 
 ## frontend:
