@@ -388,15 +388,28 @@ const EnhancedInvestmentPlatform = () => {
     showNotification('👋 Çıxış edildi', 'info');
   };
 
-  // Handle package purchase
+  // Handle package purchase - Fixed for mobile
   const handlePackagePurchase = async (packageType) => {
+    console.log('📦 Package purchase started:', { packageType, amount: investmentAmount, user: user?.id });
+    
     if (!investmentAmount || !selectedPackage) {
       showNotification('❌ Paket və məbləğ seçin', 'error');
       return;
     }
     
+    if (!user) {
+      showNotification('❌ İlk olaraq sisteme daxil olun', 'error');
+      setShowLogin(true);
+      return;
+    }
+    
     const amount = parseFloat(investmentAmount);
     const pkg = packageDefinitions[packageType];
+    
+    if (isNaN(amount) || amount <= 0) {
+      showNotification('❌ Düzgün məbləğ daxil edin', 'error');
+      return;
+    }
     
     if (amount < pkg.minAmount || amount > pkg.maxAmount) {
       showNotification(`❌ Məbləğ ${pkg.minAmount}-${pkg.maxAmount} AZN arasında olmalıdır`, 'error');
@@ -404,24 +417,37 @@ const EnhancedInvestmentPlatform = () => {
     }
     
     if (user.balance < amount) {
-      showNotification('❌ Balansınız kifayət etmir', 'error');
+      showNotification(`❌ Balansınız kifayət etmir. Cari balans: ${formatAmount(user.balance)} AZN`, 'error');
       return;
     }
     
     try {
-      await axios.post(`${API_BASE_URL}/api/packages/purchase`, {
+      console.log('🚀 Making API call for package purchase...');
+      const response = await axios.post(`${API_BASE_URL}/api/packages/purchase`, {
         package_type: packageType,
         amount: amount
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 15000
       });
+      
+      console.log('✅ Package purchase successful:', response.data);
       
       setInvestmentAmount('');
       setSelectedPackage(null);
       await fetchUserData();
-      showNotification(`✅ ${pkg.name} uğurla alındı!`, 'success');
+      showNotification(`✅ ${pkg.name} uğurla alındı! ${formatAmount(amount)} AZN`, 'success');
+      
+      // Switch to dashboard to show new package
+      setActiveTab('dashboard');
+      
     } catch (error) {
-      showNotification(error.response?.data?.detail || '❌ Alış zamanı xəta', 'error');
+      console.error('❌ Package purchase error:', error);
+      const errorMessage = error.response?.data?.detail || error.message || 'Paket alış zamanı xəta baş verdi';
+      showNotification(`❌ ${errorMessage}`, 'error');
     }
   };
 
