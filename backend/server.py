@@ -292,7 +292,7 @@ async def get_current_admin(current_user: User = Depends(get_current_user)):
 PACKAGE_DEFINITIONS = {
     "gold": {"name": "Gold Paket", "min_amount": 50, "max_amount": 250, "multiplier": 4.5, "duration": 60},
     "titanium": {"name": "Titanium Paket", "min_amount": 250, "max_amount": 500, "multiplier": 4.0, "duration": 45},
-    "platinum": {"name": "Platinum Paket", "min_amount": 500, "max_amount": 2000, "multiplier": 3.0, "duration": 30}
+    "platinum": {"name": "Platinum Paket", "min_amount": 50, "max_amount": 250, "multiplier": 3.0, "duration": 30}
 }
 
 # Collection cooldown time (30 minutes)
