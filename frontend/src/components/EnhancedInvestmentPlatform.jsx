@@ -970,10 +970,10 @@ const EnhancedInvestmentPlatform = () => {
                 👤 {user?.user_code}
               </Badge>
               
-              {/* Profile Menu Button */}
+              {/* Profile Menu Button with Dropdown */}
               <div className="relative">
                 <Button 
-                  onClick={() => setShowProfileModal(true)}
+                  onClick={() => setShowDropdownMenu(!showDropdownMenu)}
                   variant="outline" 
                   size="sm"
                   className="border-gray-600 text-gray-300 hover:bg-gray-700 p-2"
@@ -984,6 +984,81 @@ const EnhancedInvestmentPlatform = () => {
                     <div className="w-4 h-0.5 bg-current"></div>
                   </div>
                 </Button>
+                
+                {/* Dropdown Menu */}
+                {showDropdownMenu && (
+                  <div className="absolute right-0 top-12 w-48 bg-gray-900 border border-gray-700 rounded-lg shadow-xl z-50">
+                    <div className="p-2 space-y-1">
+                      <Button
+                        onClick={() => {
+                          setShowProfileModal(true);
+                          setShowDropdownMenu(false);
+                        }}
+                        variant="ghost"
+                        className="w-full justify-start text-gray-300 hover:bg-gray-800 hover:text-blue-400"
+                      >
+                        <Users className="w-4 h-4 mr-3" />
+                        Profil
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setShowDepositModal(true);
+                          setShowDropdownMenu(false);
+                        }}
+                        variant="ghost"
+                        className="w-full justify-start text-gray-300 hover:bg-gray-800 hover:text-green-400"
+                      >
+                        <DollarSign className="w-4 h-4 mr-3" />
+                        Depozit
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setShowWithdrawModal(true);
+                          setShowDropdownMenu(false);
+                        }}
+                        variant="ghost"
+                        className="w-full justify-start text-gray-300 hover:bg-gray-800 hover:text-purple-400"
+                      >
+                        <Activity className="w-4 h-4 mr-3" />
+                        Çıxarış
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setShowTrackingModal(true);
+                          setShowDropdownMenu(false);
+                        }}
+                        variant="ghost"
+                        className="w-full justify-start text-gray-300 hover:bg-gray-800 hover:text-yellow-400"
+                      >
+                        <BarChart3 className="w-4 h-4 mr-3" />
+                        Tarixçə
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          setShowMarketModal(true);
+                          setShowDropdownMenu(false);
+                        }}
+                        variant="ghost"
+                        className="w-full justify-start text-gray-300 hover:bg-gray-800 hover:text-pink-400"
+                      >
+                        <ShoppingCart className="w-4 h-4 mr-3" />
+                        Market
+                      </Button>
+                      <Separator className="bg-gray-700 my-2" />
+                      <Button
+                        onClick={() => {
+                          handleLogout();
+                          setShowDropdownMenu(false);
+                        }}
+                        variant="ghost"
+                        className="w-full justify-start text-gray-300 hover:bg-gray-800 hover:text-red-400"
+                      >
+                        <LogOut className="w-4 h-4 mr-3" />
+                        Çıxış
+                      </Button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>
