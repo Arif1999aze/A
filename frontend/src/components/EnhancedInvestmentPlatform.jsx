@@ -1225,39 +1225,8 @@ const EnhancedInvestmentPlatform = () => {
                   </div>
                 </Card>
 
-                {/* Company Information Card */}
-                <Card className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 border-blue-600 p-4">
-                  <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 flex items-center">
-                    <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                    <span className="text-sm sm:text-base">InvestAZ</span>
-                  </h3>
-                  <div className="space-y-2 text-xs sm:text-sm">
-                    <div className="flex items-center space-x-2">
-                      <Badge className="bg-green-600 text-white px-2 py-1">
-                        🏢 2007-dən işləyir
-                      </Badge>
-                    </div>
-                    <p className="text-gray-300 leading-relaxed">
-                      <span className="font-semibold text-blue-400">18 il</span> təcrübə ilə 
-                      Azərbaycanda <span className="font-semibold text-yellow-400">uğurlu</span> investisiya şirkəti
-                    </p>
-                    <div className="grid grid-cols-2 gap-2 mt-3">
-                      <div className="text-center bg-gray-800/50 rounded p-2">
-                        <div className="font-bold text-green-400">15,000+</div>
-                        <div className="text-gray-400 text-xs">Müştəri</div>
-                      </div>
-                      <div className="text-center bg-gray-800/50 rounded p-2">
-                        <div className="font-bold text-blue-400">99.8%</div>
-                        <div className="text-gray-400 text-xs">Uğur</div>
-                      </div>
-                    </div>
-                    <div className="text-center mt-3">
-                      <Badge className="bg-yellow-600 text-white text-xs">
-                        ⭐ Güvənilir şirkət
-                      </Badge>
-                    </div>
-                  </div>
-                </Card>
+                {/* Enhanced Company Information */}
+                <CompanyInfo />
               </div>
             </div>
           </TabsContent>
