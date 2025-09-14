@@ -218,9 +218,9 @@ def test_collection_cooldown_system():
     
     print("✅ New package correctly starts with null last_collection_time")
     
-    # Step 4: Wait for some earnings to accumulate (15 seconds should be enough)
-    print("   Waiting 15 seconds for earnings to accumulate...")
-    time.sleep(15)
+    # Step 4: Wait for some earnings to accumulate (60 seconds should be enough)
+    print("   Waiting 60 seconds for earnings to accumulate...")
+    time.sleep(60)
     
     # Step 5: Test first collection (should be immediately available)
     print("   Testing first collection (should be immediately available)...")
