@@ -1153,18 +1153,29 @@ const AdminPanel = () => {
                       </div>
                     </div>
                     
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => {
-                        setBalanceEditUser(user);
-                        setNewBalance(user.balance.toString());
-                      }}
-                      className="border-yellow-600 text-yellow-400"
-                    >
-                      <Edit className="w-4 h-4 mr-1" />
-                      Balans
-                    </Button>
+                    <div className="flex space-x-2">
+                      <Button
+                        size="sm"
+                        onClick={() => setSelectedCustomer(user)}
+                        className="border-blue-600 text-blue-400"
+                        variant="outline"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        Detaylar
+                      </Button>
+                      <Button
+                        size="sm"
+                        onClick={() => {
+                          setBalanceEditUser(user);
+                          setNewBalance(user.balance.toString());
+                        }}
+                        className="border-yellow-600 text-yellow-400"
+                        variant="outline"
+                      >
+                        <Edit className="w-4 h-4 mr-1" />
+                        Balans
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
