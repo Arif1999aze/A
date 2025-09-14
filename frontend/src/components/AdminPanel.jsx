@@ -855,6 +855,145 @@ const AdminPanel = () => {
           </Card>
         </TabsContent>
 
+        {/* New Management Tab for Transaction Approval */}
+        <TabsContent value="management">
+          <Card className="bg-gray-900 border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-bold text-blue-400">
+                🏛️ Əməliyyat Təsdiqi
+              </h2>
+              <Button onClick={fetchTransactions} size="sm" variant="outline">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Yenilə
+              </Button>
+            </div>
+            
+            {/* Filter Buttons */}
+            <div className="flex flex-wrap gap-2 mb-6">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="border-yellow-600 text-yellow-400 hover:bg-yellow-600 hover:text-black"
+              >
+                🕐 Gözləyən ({pendingTransactions.length})
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="border-green-600 text-green-400 hover:bg-green-600 hover:text-black"
+              >
+                ✅ Təsdiqlənən (5)
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="border-red-600 text-red-400 hover:bg-red-600 hover:text-black"
+              >
+                ❌ İmtina (2)
+              </Button>
+            </div>
+            
+            {/* Pending Transactions for Approval */}
+            {pendingTransactions.length === 0 ? (
+              <div className="text-center py-12">
+                <CheckCircle className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400">Təsdiq gözləyən əməliyyat yoxdur</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {pendingTransactions.map((transaction) => {
+                  const user = users.find(u => u.id === transaction.user_id);
+                  
+                  return (
+                    <Card key={transaction.id} className="bg-gray-800 border-gray-700 p-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-3">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              transaction.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'
+                            }`}>
+                              {transaction.type === 'deposit' ? '💰' : '🏦'}
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-white">
+                                {transaction.type === 'deposit' ? 'Depozit' : 'Çıxarış'} Sorğusu
+                              </h3>
+                              <p className="text-sm text-gray-400">
+                                {user?.name || 'Naməlum'} - {user?.user_code || 'N/A'}
+                              </p>
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <p className="text-xs text-gray-400">Məbləğ</p>
+                              <p className="text-lg font-bold text-yellow-400">
+                                {formatAmount(transaction.amount)} AZN
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-xs text-gray-400">Tarix</p>
+                              <p className="text-sm text-white">
+                                {new Date(transaction.created_date).toLocaleString()}
+                              </p>
+                            </div>
+                            {transaction.card_name && (
+                              <div>
+                                <p className="text-xs text-gray-400">Kart Adı</p>
+                                <p className="text-sm text-white">{transaction.card_name}</p>
+                              </div>
+                            )}
+                            {transaction.card_number && (
+                              <div>
+                                <p className="text-xs text-gray-400">Kart/Bank</p>
+                                <p className="text-sm text-white">****{transaction.card_number.slice(-4)}</p>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {transaction.receipt_filename && (
+                            <div className="mb-4">
+                              <p className="text-xs text-gray-400 mb-2">Dekont</p>
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                className="border-purple-600 text-purple-400"
+                              >
+                                <Eye className="w-4 h-4 mr-2" />
+                                Dekont Göstər
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                        
+                        <div className="flex flex-col space-y-2 ml-4">
+                          <Button
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700 text-white"
+                            onClick={() => handleApproveTransaction(transaction.id)}
+                          >
+                            <CheckCircle className="w-4 h-4 mr-2" />
+                            Təsdiq Et
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+                            onClick={() => handleRejectTransaction(transaction.id)}
+                          >
+                            <XCircle className="w-4 h-4 mr-2" />
+                            İmtina Et
+                          </Button>
+                        </div>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
+        </TabsContent>
+
         {/* Messages Tab */}
         <TabsContent value="messages">
           <Card className="bg-gray-900 border-gray-700 p-6">
