@@ -252,6 +252,13 @@ const InvestmentPlatform = () => {
 
   // API Functions
   const fetchUserData = async () => {
+    // Don't make API calls if token is invalid
+    if (!token || !token.trim() || !token.includes('.')) {
+      console.warn('Invalid token, skipping user data fetch');
+      handleLogout();
+      return;
+    }
+    
     try {
       const response = await axios.get(`${API_BASE_URL}/api/auth/me`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -259,7 +266,9 @@ const InvestmentPlatform = () => {
       setUser(response.data);
     } catch (error) {
       console.error('Error fetching user data:', error);
-      if (error.response?.status === 401) {
+      if (error.response?.status === 401 || error.response?.status === 500) {
+        // Clear invalid token and logout
+        console.warn('Authentication failed, logging out');
         handleLogout();
       }
     }
