@@ -1126,7 +1126,12 @@ const EnhancedInvestmentPlatform = () => {
                             <div className="flex flex-col space-y-3">
                               <div className="flex justify-between items-center text-xs sm:text-sm text-gray-400">
                                 <span>Son toplama: {pkg.last_collection ? new Date(pkg.last_collection).toLocaleString() : 'Heç vaxt'}</span>
-                                <span>Auto-toplama: {autoCollectionEnabled ? '✅ Aktiv' : '❌ Deaktiv'}</span>
+                                <div className="flex items-center space-x-2">
+                                  <span>Auto-toplama:</span>
+                                  <Badge className={autoCollectionEnabled ? 'bg-green-600' : 'bg-gray-600'}>
+                                    {autoCollectionEnabled ? '✅ Aktiv' : '❌ Deaktiv'}
+                                  </Badge>
+                                </div>
                               </div>
                               
                               <div className="flex flex-col sm:flex-row gap-3">
@@ -1145,18 +1150,35 @@ const EnhancedInvestmentPlatform = () => {
                                 <Button
                                   onClick={() => setAutoCollectionEnabled(!autoCollectionEnabled)}
                                   variant="outline"
-                                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                                  className={`border-gray-600 hover:bg-gray-800 ${autoCollectionEnabled ? 
+                                    'text-green-300 border-green-600' : 'text-gray-300'}`}
                                 >
                                   <Timer className="w-4 h-4 mr-2" />
-                                  {autoCollectionEnabled ? 'Auto OFF' : 'Auto ON'}
+                                  {autoCollectionEnabled ? 'Auto BAĞLA' : 'Auto AÇ'}
                                 </Button>
                               </div>
                               
                               {countdownTime > 0 && (
-                                <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-3 text-center">
-                                  <p className="text-blue-300 text-sm">
-                                    🕐 Növbəti qazanc {formatCountdown(countdownTime)} sonra {autoCollectionEnabled ? 'avtomatik' : 'əl ilə'} toplanacaq
+                                <div className={`border rounded-lg p-3 text-center ${
+                                  autoCollectionEnabled 
+                                    ? 'bg-blue-900/50 border-blue-600' 
+                                    : 'bg-orange-900/50 border-orange-600'
+                                }`}>
+                                  <p className={`text-sm ${
+                                    autoCollectionEnabled ? 'text-blue-300' : 'text-orange-300'
+                                  }`}>
+                                    🕐 Növbəti qazanc {formatCountdown(countdownTime)} sonra{' '}
+                                    {autoCollectionEnabled ? (
+                                      <span className="font-bold text-green-400">avtomatik toplanacaq</span>
+                                    ) : (
+                                      <span className="font-bold text-yellow-400">əl ilə toplanacaq</span>
+                                    )}
                                   </p>
+                                  {!autoCollectionEnabled && (
+                                    <p className="text-xs text-orange-400 mt-1">
+                                      💡 Auto-toplama açsanız, vaxt bitdikdə avtomatik toplanacaq
+                                    </p>
+                                  )}
                                 </div>
                               )}
                             </div>
