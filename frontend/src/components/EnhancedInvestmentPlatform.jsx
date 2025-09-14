@@ -635,90 +635,36 @@ const EnhancedInvestmentPlatform = () => {
     }
   };
 
-  // Countdown timer management with enhanced error handling
-  const startCountdownTimer = (packageId, initialTime = 20 * 60) => {
-    try {
-      // Clear existing timer
-      if (countdownTimers[packageId] && typeof countdownTimers[packageId] === 'number') {
-        clearInterval(countdownTimers[packageId]);
-      }
-      
-      // Validate initialTime
-      let timeLeft = Math.floor(Math.max(0, initialTime));
-      if (timeLeft === 0) {
-        console.log(`Timer for package ${packageId} already at 0, ready for collection`);
-        return;
-      }
-      
-      console.log(`Starting countdown timer for package ${packageId}: ${timeLeft} seconds`);
-      
-      const timer = setInterval(() => {
-        timeLeft--;
-        
-        setCountdownTimers(prev => ({
-          ...prev,
-          [packageId]: Math.max(0, timeLeft)
-        }));
-        
-        // Auto-collect when timer reaches 0
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          console.log(`Timer completed for package ${packageId}`);
-          
-          if (autoCollectionEnabled) {
-            handleAutoCollection(packageId);
-          } else {
-            // Remove timer and allow manual collection
-            setCountdownTimers(prev => {
-              const updated = { ...prev };
-              delete updated[packageId];
-              return updated;
-            });
-          }
-        }
-      }, 1000);
-      
-      // Store timer ID for cleanup
-      setCountdownTimers(prev => ({
-        ...prev,
-        [packageId]: timeLeft
-      }));
-      
-      // Store timer reference for cleanup
-      if (!window.packageTimers) window.packageTimers = {};
-      window.packageTimers[packageId] = timer;
-      
-    } catch (error) {
-      console.error(`Error starting countdown timer for package ${packageId}:`, error);
-    }
+  // Check if earnings can be collected (12-hour cooldown)
+  const canCollectEarnings = (pkg) => {
+    if (!pkg.last_collection_time) return true; // First collection
+    
+    const lastCollection = new Date(pkg.last_collection_time);
+    const now = new Date();
+    const timeSinceLastCollection = (now - lastCollection) / 1000; // seconds
+    const cooldownSeconds = 12 * 60 * 60; // 12 hours in seconds
+    
+    return timeSinceLastCollection >= cooldownSeconds;
   };
 
-  // Auto-collection function
-  const handleAutoCollection = async (packageId) => {
-    try {
-      await axios.post(`${API_BASE_URL}/api/packages/${packageId}/collect`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      await fetchUserData();
-      showNotification('🎉 Qazanc avtomatik olaraq balansa əlavə edildi!', 'success');
-      
-      // Restart timer for next collection
-      startCountdownTimer(packageId);
-      
-    } catch (error) {
-      console.error('Auto-collection error:', error);
-      // Retry after 30 seconds if failed
-      setTimeout(() => startCountdownTimer(packageId), 30000);
+  // Get time until next collection (12-hour system)
+  const getTimeUntilNextCollection = (pkg) => {
+    if (!pkg.last_collection_time) return { hours: 0, minutes: 0, canCollect: true };
+    
+    const lastCollection = new Date(pkg.last_collection_time);
+    const now = new Date();
+    const timeSinceLastCollection = (now - lastCollection) / 1000; // seconds
+    const cooldownSeconds = 12 * 60 * 60; // 12 hours in seconds
+    
+    if (timeSinceLastCollection >= cooldownSeconds) {
+      return { hours: 0, minutes: 0, canCollect: true };
     }
-  };
-  
-  // Format countdown time
-  const formatCountdown = (seconds) => {
-    if (seconds <= 0) return '00:00';
-    const minutes = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    
+    const remainingSeconds = cooldownSeconds - timeSinceLastCollection;
+    const hours = Math.floor(remainingSeconds / 3600);
+    const minutes = Math.floor((remainingSeconds % 3600) / 60);
+    
+    return { hours, minutes, canCollect: false };
   };
 
   // Handle send message
