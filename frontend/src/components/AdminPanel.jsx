@@ -752,6 +752,10 @@ const AdminPanel = () => {
             <AlertCircle className="w-4 h-4 mr-2" />
             Əməliyyatlar ({pendingTransactions.length})
           </TabsTrigger>
+          <TabsTrigger value="management" className="data-[state=active]:bg-blue-400 data-[state=active]:text-black">
+            <CheckCircle className="w-4 h-4 mr-2" />
+            Təsdiq/İmtina
+          </TabsTrigger>
           <TabsTrigger value="messages" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
             <MessageCircle className="w-4 h-4 mr-2" />
             Mesajlar ({userMessages.length})
@@ -762,7 +766,7 @@ const AdminPanel = () => {
           </TabsTrigger>
           <TabsTrigger value="search" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
             <Search className="w-4 h-4 mr-2" />
-            Axtarış
+            Müştəri Axtarış
           </TabsTrigger>
         </TabsList>
 
