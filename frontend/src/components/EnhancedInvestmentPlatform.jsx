@@ -940,48 +940,41 @@ const EnhancedInvestmentPlatform = () => {
       {/* Main Content - Mobile Responsive */}
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-gray-900 mb-4 sm:mb-6 grid grid-cols-3 sm:grid-cols-6 h-auto">
+          <TabsList className="bg-gradient-to-r from-gray-800 to-gray-700 mb-4 sm:mb-6 grid grid-cols-5 h-auto border border-gray-600 shadow-lg">
             <TabsTrigger 
               value="dashboard" 
-              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white text-xs sm:text-sm py-3 px-2 sm:px-4 font-medium"
             >
-              <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Dashboard
-            </TabsTrigger>
-            <TabsTrigger 
-              value="packages" 
-              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
-            >
-              <Package className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Paketlər
-            </TabsTrigger>
-            <TabsTrigger 
-              value="market" 
-              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
-            >
-              <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Market
+              <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              Profil
             </TabsTrigger>
             <TabsTrigger 
               value="transactions" 
-              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white text-xs sm:text-sm py-3 px-2 sm:px-4 font-medium"
             >
               <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Əməliyyatlar
+              Depozit
+            </TabsTrigger>
+            <TabsTrigger 
+              value="withdraw" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white text-xs sm:text-sm py-3 px-2 sm:px-4 font-medium"
+            >
+              <Activity className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              Çıxarış
             </TabsTrigger>
             <TabsTrigger 
               value="tracking" 
-              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-yellow-600 data-[state=active]:text-white text-xs sm:text-sm py-3 px-2 sm:px-4 font-medium"
             >
-              <Activity className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Tarixçə
             </TabsTrigger>
             <TabsTrigger 
-              value="support" 
-              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
+              value="market" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-pink-600 data-[state=active]:text-white text-xs sm:text-sm py-3 px-2 sm:px-4 font-medium"
             >
-              <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Dəstək
+              <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              Market
             </TabsTrigger>
           </TabsList>
 
