@@ -1088,63 +1088,40 @@ const EnhancedInvestmentPlatform = () => {
                               <Progress value={progress} className="h-3" />
                             </div>
 
-                            {/* Enhanced Collection Section */}
+                            {/* Enhanced Collection Section - 12 Hour System */}
                             <div className="flex flex-col space-y-3">
                               <div className="flex justify-between items-center text-xs sm:text-sm text-gray-400">
-                                <span>Son toplama: {pkg.last_collection ? new Date(pkg.last_collection).toLocaleString() : 'Heç vaxt'}</span>
+                                <span>Son toplama: {pkg.last_collection_time ? new Date(pkg.last_collection_time).toLocaleString() : 'Heç vaxt'}</span>
                                 <div className="flex items-center space-x-2">
-                                  <span>Auto-toplama:</span>
-                                  <Badge className={autoCollectionEnabled ? 'bg-green-600' : 'bg-gray-600'}>
-                                    {autoCollectionEnabled ? '✅ Aktiv' : '❌ Deaktiv'}
+                                  <span>Sistem:</span>
+                                  <Badge className="bg-blue-600">
+                                    📅 Gündə 2 dəfə
                                   </Badge>
                                 </div>
                               </div>
                               
-                              <div className="flex flex-col sm:flex-row gap-3">
+                              <div className="flex flex-col gap-3">
                                 <Button
                                   onClick={() => handleCollectEarnings(pkg.id)}
-                                  disabled={!pkg.can_collect || pkg.accumulated_earnings <= 0 || countdownTime > 0}
-                                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 flex-1"
+                                  disabled={!canCollect || pkg.accumulated_earnings <= 0}
+                                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 w-full"
                                 >
                                   <Coins className="w-4 h-4 mr-2" />
-                                  {countdownTime > 0 ? 
-                                    `Qazanc Topla (${formatCountdown(countdownTime)})` : 
-                                    `Qazanc Topla (${formatAmount(pkg.accumulated_earnings || 0)} AZN)`
+                                  {canCollect ? 
+                                    `Qazanc Topla (${formatAmount(pkg.accumulated_earnings || 0)} AZN)` : 
+                                    `Gözlə (${nextCollection.hours}s ${nextCollection.minutes}d)`
                                   }
-                                </Button>
-                                
-                                <Button
-                                  onClick={() => setAutoCollectionEnabled(!autoCollectionEnabled)}
-                                  variant="outline"
-                                  className={`border-gray-600 hover:bg-gray-800 ${autoCollectionEnabled ? 
-                                    'text-green-300 border-green-600' : 'text-gray-300'}`}
-                                >
-                                  <Timer className="w-4 h-4 mr-2" />
-                                  {autoCollectionEnabled ? 'Auto BAĞLA' : 'Auto AÇ'}
                                 </Button>
                               </div>
                               
-                              {countdownTime > 0 && (
-                                <div className={`border rounded-lg p-3 text-center ${
-                                  autoCollectionEnabled 
-                                    ? 'bg-blue-900/50 border-blue-600' 
-                                    : 'bg-orange-900/50 border-orange-600'
-                                }`}>
-                                  <p className={`text-sm ${
-                                    autoCollectionEnabled ? 'text-blue-300' : 'text-orange-300'
-                                  }`}>
-                                    🕐 Növbəti qazanc {formatCountdown(countdownTime)} sonra{' '}
-                                    {autoCollectionEnabled ? (
-                                      <span className="font-bold text-green-400">avtomatik toplanacaq</span>
-                                    ) : (
-                                      <span className="font-bold text-yellow-400">əl ilə toplanacaq</span>
-                                    )}
+                              {!canCollect && (
+                                <div className="border rounded-lg p-3 text-center bg-blue-900/50 border-blue-600">
+                                  <p className="text-sm text-blue-300">
+                                    🕐 Növbəti qazanc {nextCollection.hours} saat {nextCollection.minutes} dəqiqə sonra toplanacaq
                                   </p>
-                                  {!autoCollectionEnabled && (
-                                    <p className="text-xs text-orange-400 mt-1">
-                                      💡 Auto-toplama açsanız, vaxt bitdikdə avtomatik toplanacaq
-                                    </p>
-                                  )}
+                                  <p className="text-xs text-blue-400 mt-1">
+                                    💡 Səbirlə gözləyin - 12 saatda bir qazanc toplayın
+                                  </p>
                                 </div>
                               )}
                             </div>
