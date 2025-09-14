@@ -181,17 +181,28 @@ const EnhancedInvestmentPlatform = () => {
           // Check if collection is available
           const lastCollection = pkg.last_collection_time ? new Date(pkg.last_collection_time) : null;
           const now = new Date();
-          const timeSinceLastCollection = lastCollection ? (now - lastCollection) / 1000 : Infinity;
           
-          if (timeSinceLastCollection >= 20 * 60) { // 20 minutes passed
+          let timeSinceLastCollection = Infinity;
+          if (lastCollection && !isNaN(lastCollection.getTime())) {
+            timeSinceLastCollection = (now - lastCollection) / 1000; // Convert to seconds
+          }
+          
+          const cooldownSeconds = 20 * 60; // 20 minutes in seconds
+          
+          if (timeSinceLastCollection >= cooldownSeconds) {
             // Ready for collection, no countdown needed
             if (autoCollectionEnabled && pkg.accumulated_earnings > 0) {
               handleAutoCollection(pkg.id);
             }
-          } else {
+          } else if (timeSinceLastCollection < cooldownSeconds && lastCollection) {
             // Start countdown for remaining time
-            const remainingTime = (20 * 60) - timeSinceLastCollection;
-            startCountdownTimer(pkg.id, remainingTime);
+            const remainingTime = cooldownSeconds - timeSinceLastCollection;
+            if (remainingTime > 0) {
+              startCountdownTimer(pkg.id, remainingTime);
+            }
+          } else {
+            // First time or invalid date, start fresh 20 minute timer
+            startCountdownTimer(pkg.id, cooldownSeconds);
           }
         }
       });
@@ -200,7 +211,7 @@ const EnhancedInvestmentPlatform = () => {
     // Cleanup timers for packages that no longer exist
     Object.keys(countdownTimers).forEach(packageId => {
       if (!activePackages.find(pkg => pkg.id === packageId)) {
-        if (countdownTimers[packageId]) {
+        if (countdownTimers[packageId] && typeof countdownTimers[packageId] === 'number') {
           clearInterval(countdownTimers[packageId]);
         }
         setCountdownTimers(prev => {
@@ -210,7 +221,7 @@ const EnhancedInvestmentPlatform = () => {
         });
       }
     });
-  }, [activePackages]);
+  }, [activePackages, autoCollectionEnabled]);
 
   // Cleanup timers on unmount
   useEffect(() => {
