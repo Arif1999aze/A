@@ -871,16 +871,18 @@ const EnhancedInvestmentPlatform = () => {
               </Badge>
             </div>
             
-            {/* Balance Info - Stack on mobile */}
-            <div className="flex justify-between sm:justify-end items-center space-x-4 sm:space-x-6">
-              <div className="text-center sm:text-right">
-                <p className="text-xs sm:text-sm text-gray-400">Balans</p>
-                <p className="text-lg sm:text-xl font-bold text-green-400">{formatAmount(user?.balance || 0)} AZN</p>
+            {/* Enhanced Balance Info - Separated balances */}
+            <div className="flex justify-between sm:justify-end items-center space-x-3 sm:space-x-6">
+              <div className="text-center sm:text-right bg-gray-800 rounded-lg p-2">
+                <p className="text-xs sm:text-sm text-gray-400">Depozit Balansı</p>
+                <p className="text-sm sm:text-lg font-bold text-blue-400">{formatAmount(user?.balance || 0)} AZN</p>
+                <p className="text-xs text-gray-500">Paket alımı üçün</p>
               </div>
               
-              <div className="text-center sm:text-right">
-                <p className="text-xs sm:text-sm text-gray-400">Toplam Qazanc</p>
-                <p className="text-sm sm:text-lg font-bold text-yellow-400">{formatAmount(user?.total_earned || 0)} AZN</p>
+              <div className="text-center sm:text-right bg-gray-800 rounded-lg p-2">
+                <p className="text-xs sm:text-sm text-gray-400">Çəkiləbilir Qazanc</p>
+                <p className="text-sm sm:text-lg font-bold text-green-400">{formatAmount(user?.total_earned || 0)} AZN</p>
+                <p className="text-xs text-gray-500">Çıxarış üçün</p>
               </div>
 
               <Button 
