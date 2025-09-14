@@ -171,18 +171,40 @@ const EnhancedInvestmentPlatform = () => {
     }
   }, [token]);
 
-  // Initialize platform
-  const initializePlatform = () => {
-    setMarketItems(marketItemsData);
-    generateLiveTransactions();
-    
-    // Start live transaction generator
-    const interval = setInterval(() => {
-      generateLiveTransactions();
-    }, 8000);
-    
-    return () => clearInterval(interval);
-  };
+  // Auto-refresh functionality
+  useEffect(() => {
+    if (isLoggedIn && user) {
+      // Refresh user data every 10 seconds
+      const userRefreshInterval = setInterval(() => {
+        console.log('🔄 Auto-refreshing user data...');
+        fetchUserData();
+      }, 10000);
+
+      // Refresh live transactions every 8 seconds
+      const liveTransactionInterval = setInterval(() => {
+        generateLiveTransactions();
+      }, 8000);
+
+      return () => {
+        clearInterval(userRefreshInterval);
+        clearInterval(liveTransactionInterval);
+      };
+    }
+  }, [isLoggedIn, user]);
+
+  // Page visibility auto-refresh - refresh when user returns to tab
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden && isLoggedIn) {
+        console.log('👁️ Page visible again, refreshing data...');
+        fetchUserData();
+        generateLiveTransactions();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isLoggedIn]);
 
   // Validate token
   const validateToken = async () => {
