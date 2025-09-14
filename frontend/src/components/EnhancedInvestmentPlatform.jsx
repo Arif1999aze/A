@@ -404,16 +404,17 @@ const EnhancedInvestmentPlatform = () => {
     showNotification('👋 Çıxış edildi', 'info');
   };
 
-  // Handle package purchase - Enhanced for Android/Mobile
+  // Handle package purchase - Simplified and robust for all devices
   const handlePackagePurchase = async (packageType) => {
-    console.log('📦 Package purchase started:', { packageType, amount: investmentAmount, user: user?.id });
+    console.log('📦 Paket alış başladıldı:', { packageType, amount: investmentAmount, userBalance: user?.balance });
     
-    if (!investmentAmount || !selectedPackage) {
+    // Basic validations
+    if (!investmentAmount || !selectedPackage || !packageType) {
       showNotification('❌ Paket və məbləğ seçin', 'error');
       return;
     }
     
-    if (!user) {
+    if (!user || !token) {
       showNotification('❌ İlk olaraq sisteme daxil olun', 'error');
       setShowLogin(true);
       return;
@@ -422,6 +423,7 @@ const EnhancedInvestmentPlatform = () => {
     const amount = parseFloat(investmentAmount);
     const pkg = packageDefinitions[packageType];
     
+    // Amount validation
     if (isNaN(amount) || amount <= 0) {
       showNotification('❌ Düzgün məbləğ daxil edin', 'error');
       return;
@@ -433,90 +435,98 @@ const EnhancedInvestmentPlatform = () => {
     }
     
     if (user.balance < amount) {
-      showNotification(`❌ Balansınız kifayət etmir. Cari balans: ${formatAmount(user.balance)} AZN`, 'error');
+      showNotification(`❌ Balansınız kifayət etmir. Lazım: ${formatAmount(amount)} AZN, Mövcud: ${formatAmount(user.balance)} AZN`, 'error');
       return;
     }
 
-    // Show loading notification
-    showNotification('⏳ Paket alış işlənir...', 'info');
+    // Show loading
+    showNotification('⏳ Paket alınır...', 'info');
     
     try {
-      console.log('🚀 Making API call for package purchase...');
+      console.log('🔄 API sorğusu göndərilir...');
       
-      // Enhanced request with multiple retry attempts and better error handling
-      const requestData = {
-        package_type: packageType,
-        amount: amount
-      };
-      
-      console.log('📤 Request data:', requestData);
-      
-      const response = await fetch(`${API_BASE_URL}/api/packages/purchase`, {
+      // Simple axios request - most reliable
+      const response = await axios({
         method: 'POST',
+        url: `${API_BASE_URL}/api/packages/purchase`,
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-          // Add headers for better mobile compatibility
-          'Cache-Control': 'no-cache',
-          'X-Requested-With': 'XMLHttpRequest'
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(requestData),
-        // Enhanced options for mobile
-        credentials: 'omit',
-        mode: 'cors',
-        timeout: 30000
+        data: {
+          package_type: packageType,
+          amount: amount
+        },
+        timeout: 20000, // 20 seconds
+        validateStatus: function (status) {
+          return status < 500; // Resolve only if status is less than 500
+        }
       });
       
-      console.log('📡 Response received:', {
+      console.log('📡 API cavabı:', {
         status: response.status,
-        statusText: response.statusText,
-        ok: response.ok
+        data: response.data
       });
       
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error('❌ API Error Response:', errorText);
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      if (response.status >= 400) {
+        throw new Error(response.data?.detail || `HTTP ${response.status}`);
       }
       
-      const responseData = await response.json();
-      console.log('✅ Package purchase successful:', responseData);
+      console.log('✅ Paket alış uğurlu');
       
-      // Clear form and update UI
+      // Clear form
       setInvestmentAmount('');
       setSelectedPackage(null);
       
-      // Force refresh user data
+      // Refresh user data
+      console.log('🔄 İstifadəçi məlumatları yenilənir...');
       await fetchUserData();
       
-      showNotification(`✅ ${pkg.name} uğurla alındı! ${formatAmount(amount)} AZN yatırıldı.`, 'success');
+      // Success notification
+      showNotification(`🎉 ${pkg.name} uğurla alındı! ${formatAmount(amount)} AZN investisiya edildi.`, 'success');
       
-      // Switch to dashboard to show new package
+      // Switch to dashboard after short delay
       setTimeout(() => {
         setActiveTab('dashboard');
-      }, 1000);
+      }, 2000);
       
     } catch (error) {
-      console.error('❌ Package purchase error:', error);
+      console.error('❌ Paket alış xətası:', error);
       
-      let errorMessage = 'Paket alış zamanı xəta baş verdi';
+      // Detailed error handling
+      let errorMessage = 'Naməlum xəta';
       
-      if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        errorMessage = 'İnternet bağlantısını yoxlayın və yenidən cəhd edin';
-      } else if (error.message.includes('timeout')) {
-        errorMessage = 'Sorğu vaxtı bitdi, yenidən cəhd edin';
-      } else if (error.message.includes('400')) {
-        errorMessage = 'Yanlış məlumat göndərildi';
-      } else if (error.message.includes('401')) {
-        errorMessage = 'Giriş vaxtınız bitib, yenidən daxil olun';
-        // Force logout
-        handleLogout();
-        return;
-      } else if (error.message.includes('500')) {
-        errorMessage = 'Server xətası, bir qədər sonra cəhd edin';
+      if (error.code === 'ECONNABORTED') {
+        errorMessage = 'Bağlantı vaxtı bitdi. İnternet bağlantınızı yoxlayın.';
+      } else if (error.response) {
+        // Server responded with error
+        const status = error.response.status;
+        const detail = error.response.data?.detail || error.response.data?.message;
+        
+        if (status === 400) {
+          errorMessage = detail || 'Yanlış məlumat göndərildi';
+        } else if (status === 401) {
+          errorMessage = 'Giriş vaxtınız bitib. Yenidən daxil olun.';
+          setTimeout(() => {
+            handleLogout();
+          }, 2000);
+        } else if (status === 403) {
+          errorMessage = 'Bu əməliyyat üçün icazəniz yoxdur';
+        } else if (status === 422) {
+          errorMessage = detail || 'Məlumat doğrulanmadı';
+        } else if (status >= 500) {
+          errorMessage = 'Server xətası. Bir neçə dəqiqə sonra cəhd edin.';
+        } else {
+          errorMessage = detail || `Server xətası (${status})`;
+        }
+      } else if (error.request) {
+        // Network error
+        errorMessage = 'İnternet bağlantısı problemi. Bağlantınızı yoxlayın.';
+      } else {
+        errorMessage = error.message || 'Paket alış zamanı xəta baş verdi';
       }
       
+      console.log('📋 Xəta təfsilatı:', errorMessage);
       showNotification(`❌ ${errorMessage}`, 'error');
     }
   };
