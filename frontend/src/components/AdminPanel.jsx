@@ -14,8 +14,8 @@ const formatAmount = (amount) => {
   return amount.toLocaleString('az-AZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
-// Use development URL for local testing
-const API_BASE_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:8001' : process.env.REACT_APP_BACKEND_URL;
+// Use environment variable for API URL - always use backend URL from .env
+const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 const AdminPanel = () => {
   // State management
