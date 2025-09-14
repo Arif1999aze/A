@@ -63,16 +63,25 @@ const AdminPanel = () => {
   const initializeAdminPanel = async () => {
     console.log('🚀 Admin panel başladılır...');
     
+    if (!token) {
+      console.log('❌ Token yoxdur, panel başladıla bilməz');
+      return;
+    }
+    
     try {
       // Fetch initial data
+      console.log('📊 İlkin məlumatlar yüklənir...');
       await fetchAllData();
       
       // Setup WebSocket connection
+      console.log('🔌 WebSocket bağlantısı qurulur...');
       setupWebSocketConnection();
       
       // Start auto-refresh timer
+      console.log('⏰ Avtomatik yeniləmə başladılır...');
       startAutoRefresh();
       
+      console.log('✅ Admin panel tam hazır');
       showNotification('✅ Admin panel uğurla başladıldı', 'success');
     } catch (error) {
       console.error('❌ Admin panel başladılarkən xəta:', error);
