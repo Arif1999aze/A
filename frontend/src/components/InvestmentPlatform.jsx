@@ -27,7 +27,6 @@ const InvestmentPlatform = () => {
   const [withdrawOpen, setWithdrawOpen] = useState(false);
   const [depositOpen, setDepositOpen] = useState(false);
   const [packageConfirmOpen, setPackageConfirmOpen] = useState(false);
-  const [pendingOpen, setPendingOpen] = useState(false);
   const [supportOpen, setSupportOpen] = useState(false);  
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
