@@ -454,12 +454,13 @@ const InvestmentPlatform = () => {
     }
   };
 
-  const handleDeposit = async (amount, cardNumber, receipt) => {
+  const handleDeposit = async (amount, name, surname, bank, receipt) => {
     try {
       const response = await axios.post(`${API_BASE_URL}/api/transactions`, {
         type: 'deposit',
         amount: parseFloat(amount),
-        card_number: cardNumber
+        card_name: `${name} ${surname}`,
+        card_number: bank // Using card_number field for bank name
       }, {
         headers: { Authorization: `Bearer ${token}` }
       });
