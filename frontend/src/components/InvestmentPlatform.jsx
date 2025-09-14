@@ -1641,9 +1641,9 @@ const DepositForm = ({ onDeposit }) => {
     e.preventDefault();
     const amountNum = parseFloat(amount);
     
-    // New deposit limits: 50-2500 AZN
-    if (amountNum < 50 || amountNum > 2500) {
-      alert('❌ Depozit məbləği 50-2500 AZN arası olmalıdır.');
+    // New deposit limits: 50-2000 AZN
+    if (amountNum < 50 || amountNum > 2000) {
+      alert('❌ Depozit məbləği 50-2000 AZN arası olmalıdır.');
       return;
     }
     
