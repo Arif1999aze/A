@@ -250,10 +250,15 @@ const InvestmentPlatform = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Helper function to validate token
+  const isValidToken = (token) => {
+    return token && token.trim() && token.includes('.') && token !== 'null' && token !== 'undefined';
+  };
+
   // API Functions
   const fetchUserData = async () => {
     // Don't make API calls if token is invalid
-    if (!token || !token.trim() || !token.includes('.')) {
+    if (!isValidToken(token)) {
       console.warn('Invalid token, skipping user data fetch');
       handleLogout();
       return;
@@ -275,6 +280,8 @@ const InvestmentPlatform = () => {
   };
 
   const fetchUserPackages = async () => {
+    if (!isValidToken(token)) return;
+    
     try {
       const response = await axios.get(`${API_BASE_URL}/api/packages/my`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -282,10 +289,15 @@ const InvestmentPlatform = () => {
       setUserPackages(response.data.filter(pkg => pkg.is_active));
     } catch (error) {
       console.error('Error fetching packages:', error);
+      if (error.response?.status === 401 || error.response?.status === 500) {
+        handleLogout();
+      }
     }
   };
 
   const fetchUserTransactions = async () => {
+    if (!isValidToken(token)) return;
+    
     try {
       const response = await axios.get(`${API_BASE_URL}/api/transactions/my`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -293,10 +305,15 @@ const InvestmentPlatform = () => {
       setPendingTransactions(response.data.filter(txn => txn.status === 'pending'));
     } catch (error) {
       console.error('Error fetching transactions:', error);
+      if (error.response?.status === 401 || error.response?.status === 500) {
+        handleLogout();
+      }
     }
   };
 
   const fetchUserMessages = async () => {
+    if (!isValidToken(token)) return;
+    
     try {
       const response = await axios.get(`${API_BASE_URL}/api/messages/my`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -304,6 +321,9 @@ const InvestmentPlatform = () => {
       setMessages(response.data);
     } catch (error) {
       console.error('Error fetching messages:', error);
+      if (error.response?.status === 401 || error.response?.status === 500) {
+        handleLogout();
+      }
     }
   };
 
