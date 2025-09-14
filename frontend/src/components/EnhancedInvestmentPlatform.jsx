@@ -1693,8 +1693,8 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
   const handleDeposit = async (e) => {
     e.preventDefault();
     
-    if (!amount || !cardName || !cardNumber || !bankName || !receipt) {
-      showNotification('❌ Bütün sahələri doldurun və dekont əlavə edin', 'error');
+    if (!amount || !cardName || !cardNumber || !bankName) {
+      showNotification('❌ Bütün sahələri doldurun', 'error');
       return;
     }
 
@@ -1706,28 +1706,41 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
 
     setLoading(true);
     try {
-      const formData = new FormData();
-      formData.append('type', 'deposit');
-      formData.append('amount', amountNum);
-      formData.append('card_name', cardName);
-      formData.append('card_number', cardNumber);
-      formData.append('bank_name', bankName);
-      formData.append('receipt', receipt);
-
       console.log('📤 Depozit sorğusu göndərilir...', {
         amount: amountNum,
         cardName,
-        bankName,
-        receiptName: receipt.name
+        cardNumber,
+        bankName
       });
 
-      await axios.post(`${API_BASE_URL}/api/transactions`, formData, {
+      // First create transaction
+      const response = await axios.post(`${API_BASE_URL}/api/transactions`, {
+        type: 'deposit',
+        amount: amountNum,
+        card_name: cardName,
+        card_number: cardNumber,
+        bank_name: bankName
+      }, {
         headers: { 
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         },
         timeout: 30000
       });
+
+      // Then upload receipt if provided
+      if (receipt) {
+        const formData = new FormData();
+        formData.append('file', receipt);
+        
+        await axios.post(`${API_BASE_URL}/api/transactions/${response.data.id}/upload-receipt`, formData, {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          },
+          timeout: 30000
+        });
+      }
 
       // Clear form
       setAmount('');
