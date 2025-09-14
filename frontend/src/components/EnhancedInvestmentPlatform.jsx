@@ -1003,8 +1003,9 @@ const EnhancedInvestmentPlatform = () => {
                       const totalExpectedEarnings = pkg.invested_amount * packageDef.multiplier;
                       const progress = (pkg.accumulated_earnings / totalExpectedEarnings) * 100;
                       const timeRemaining = formatTimeRemaining(pkg.end_date);
-                      const countdownTime = countdownTimers[pkg.id] || 0;
+                      const nextCollection = getTimeUntilNextCollection(pkg);
                       const dailyEarnings = (pkg.invested_amount * packageDef.multiplier) / packageDef.duration;
+                      const canCollect = canCollectEarnings(pkg);
                       
                       return (
                         <Card key={pkg.id} className={`bg-gradient-to-r ${packageDef.gradient} p-1 relative`}>
