@@ -1105,46 +1105,80 @@ const EnhancedInvestmentPlatform = () => {
             </div>
           </TabsContent>
 
-          {/* Market Tab */}
+          {/* Market Tab - Now Package Store */}
           <TabsContent value="market">
             <div className="space-y-6">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-4">🛒 InvestAZ Market</h2>
-                <p className="text-gray-400">Premium alətlər və xidmətlər</p>
+              <div className="text-center mb-6 sm:mb-8">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4">🛒 Paket Mağazası</h2>
+                <p className="text-gray-400 text-sm sm:text-base">Bütün investisiya paketləri burada</p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {marketItems.map((item) => (
-                  <Card key={item.id} className="bg-gray-900 border-gray-700 hover:border-yellow-400 transition-colors">
-                    <div className="p-6">
-                      <div className="text-center mb-4">
-                        <div className="text-4xl mb-3">{item.icon}</div>
-                        <h3 className="text-xl font-bold mb-2">{item.name}</h3>
-                        <p className="text-gray-400 text-sm mb-4">{item.description}</p>
-                        <div className="text-2xl font-bold text-yellow-400">{formatAmount(item.price)} AZN</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                {Object.entries(packageDefinitions).map(([key, pkg]) => (
+                  <Card key={key} className="bg-gray-900 border-gray-700 hover:border-yellow-400 transition-all duration-300 hover:scale-105">
+                    <div className="p-4 sm:p-6">
+                      <div className="text-center mb-4 sm:mb-6">
+                        <div className="text-4xl sm:text-5xl mb-3">{pkg.icon}</div>
+                        <h3 className="text-xl sm:text-2xl font-bold mb-2 text-white" style={{color: pkg.color}}>
+                          {pkg.name}
+                        </h3>
+                        <p className="text-gray-400 text-sm leading-relaxed mb-4">{pkg.description}</p>
+                        <div className="text-xl sm:text-2xl font-bold text-yellow-400 mb-4">
+                          {pkg.minAmount === pkg.maxAmount ? 
+                            `${formatAmount(pkg.minAmount)} AZN` : 
+                            `${formatAmount(pkg.minAmount)}-${formatAmount(pkg.maxAmount)} AZN`
+                          }
+                        </div>
                       </div>
 
-                      <div className="space-y-2 mb-6">
-                        <h4 className="font-medium text-green-400">Faydalar:</h4>
-                        {item.benefits.map((benefit, index) => (
-                          <div key={index} className="flex items-center space-x-2 text-sm">
-                            <CheckCircle className="w-4 h-4 text-green-400" />
-                            <span>{benefit}</span>
-                          </div>
-                        ))}
+                      <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
+                        <div className="flex items-center space-x-2 text-sm">
+                          <CheckCircle className="w-4 h-4 text-green-400" />
+                          <span className="text-white">Gündəlik %{pkg.dailyReturn} gəlir</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm">
+                          <CheckCircle className="w-4 h-4 text-green-400" />
+                          <span className="text-white">{pkg.duration} gün müddət</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm">
+                          <CheckCircle className="w-4 h-4 text-green-400" />
+                          <span className="text-white">Toplam %{(pkg.multiplier * 100).toFixed(0)} gəlir</span>
+                        </div>
+                        <div className="flex items-center space-x-2 text-sm">
+                          <CheckCircle className="w-4 h-4 text-green-400" />
+                          <span className="text-white">30 dəqiqədə bir qazanc toplama</span>
+                        </div>
                       </div>
 
                       <Button
-                        onClick={() => handleMarketPurchase(item)}
-                        disabled={user?.balance < item.price}
-                        className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50"
+                        onClick={() => {
+                          setSelectedPackage(key);
+                          setActiveTab('packages');
+                        }}
+                        className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black hover:from-yellow-500 hover:to-yellow-600 py-3 text-base font-semibold"
                       >
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        {user?.balance < item.price ? 'Balans kifayət etmir' : 'Satın Al'}
+                        <Package className="w-4 h-4 mr-2" />
+                        Bu Paketi Seç
                       </Button>
                     </div>
                   </Card>
                 ))}
+              </div>
+              
+              {/* Market instruction */}
+              <div className="bg-blue-900/30 border border-blue-600 rounded-lg p-4 mt-6">
+                <div className="flex items-start space-x-3">
+                  <div className="text-2xl">💡</div>
+                  <div>
+                    <h4 className="text-blue-200 font-medium mb-2">Paket Seçim Təlimatı</h4>
+                    <ul className="text-blue-200 text-sm space-y-1 list-disc list-inside">
+                      <li>İstədiyiniz paketi seçin və "Bu Paketi Seç" düyməsini basın</li>
+                      <li>Paketlər bölməsinə keçəcək və paket seçili olacaq</li>
+                      <li>Məbləği yazıb "Paketi Al" düyməsi ilə satın alın</li>
+                      <li>Çoxlu paket satın ala bilərsiniz</li>
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
           </TabsContent>
