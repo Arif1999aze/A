@@ -39,14 +39,26 @@ print("=" * 60)
 
 # Test data - Using realistic data as per requirements
 test_user_data = {
-    "email": "aysel.mammadova@gmail.com",
-    "name": "Aysel Mammadova",
+    "email": "leyla.hasanova@gmail.com",
+    "name": "Leyla Hasanova",
     "password": "securepass123"
 }
 
 admin_credentials = {
     "email": "admin@investaz.com",
     "password": "18061999"
+}
+
+# Test data for new transaction format
+transaction_test_data = {
+    "withdrawal": {
+        "card_name": "Leyla Hasanova",  # Combined name + surname
+        "card_number": "Kapital Bank"   # Bank name instead of card number
+    },
+    "deposit": {
+        "card_name": "Leyla Hasanova",  # Combined name + surname  
+        "card_number": "Pasha Bank"     # Bank name instead of card number
+    }
 }
 
 # Global variables for tokens and test data
