@@ -282,7 +282,7 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.DecodeError:
         raise HTTPException(status_code=401, detail="Invalid token format") 
-    except jwt.JWTError as e:
+    except Exception as e:
         raise HTTPException(status_code=401, detail="Invalid token")
     except Exception as e:
         # Catch any other unexpected errors to prevent 500 errors
