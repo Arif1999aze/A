@@ -1127,13 +1127,16 @@ const EnhancedInvestmentPlatform = () => {
                               </div>
                             </div>
 
-                            {/* Enhanced Collection Section - 12 Hour System */}
-                            <div className="flex flex-col space-y-3">
-                              <div className="flex justify-between items-center text-xs sm:text-sm text-gray-400">
-                                <span>Son toplama: {pkg.last_collection_time ? new Date(pkg.last_collection_time).toLocaleString() : 'Heç vaxt'}</span>
+                            {/* Professional Collection Section - 12 Hour System */}
+                            <div className="flex flex-col space-y-4">
+                              <div className="flex justify-between items-center text-xs sm:text-sm bg-gray-800/50 rounded-lg p-3 border border-gray-600/30">
                                 <div className="flex items-center space-x-2">
-                                  <span>Sistem:</span>
-                                  <Badge className="bg-blue-600">
+                                  <span className="text-lg">🕐</span>
+                                  <span className="text-gray-300">Son toplama: {pkg.last_collection_time ? new Date(pkg.last_collection_time).toLocaleString() : 'Heç vaxt'}</span>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-gray-300">Sistem:</span>
+                                  <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 font-semibold">
                                     📅 Gündə 2 dəfə
                                   </Badge>
                                 </div>
@@ -1143,23 +1146,28 @@ const EnhancedInvestmentPlatform = () => {
                                 <Button
                                   onClick={() => handleCollectEarnings(pkg.id)}
                                   disabled={!canCollect || pkg.accumulated_earnings <= 0}
-                                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 w-full"
+                                  className={`w-full py-4 text-base font-bold transition-all duration-300 ${
+                                    canCollect && pkg.accumulated_earnings > 0
+                                      ? `bg-gradient-to-r ${packageDef.borderGradient} hover:scale-105 shadow-lg ${packageDef.shadowColor} text-white`
+                                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
+                                  } disabled:opacity-50 disabled:cursor-not-allowed`}
                                 >
-                                  <Coins className="w-4 h-4 mr-2" />
+                                  <Coins className="w-5 h-5 mr-2" />
                                   {canCollect ? 
-                                    `Qazanc Topla (${formatAmount(pkg.accumulated_earnings || 0)} AZN)` : 
-                                    `Gözlə (${nextCollection.hours}s ${nextCollection.minutes}d)`
+                                    `💰 Qazanc Topla (${formatAmount(pkg.accumulated_earnings || 0)} AZN)` : 
+                                    `⏳ Gözlə (${nextCollection.hours}s ${nextCollection.minutes}d)`
                                   }
                                 </Button>
                               </div>
                               
                               {!canCollect && (
-                                <div className="border rounded-lg p-3 text-center bg-blue-900/50 border-blue-600">
-                                  <p className="text-sm text-blue-300">
-                                    🕐 Növbəti qazanc {nextCollection.hours} saat {nextCollection.minutes} dəqiqə sonra toplanacaq
+                                <div className="border-2 border-dashed border-blue-500/50 rounded-xl p-4 text-center bg-gradient-to-br from-blue-900/20 to-indigo-900/20">
+                                  <div className="text-3xl mb-2">⏰</div>
+                                  <p className="text-sm text-blue-300 font-semibold mb-2">
+                                    Növbəti qazanc {nextCollection.hours} saat {nextCollection.minutes} dəqiqə sonra toplanacaq
                                   </p>
-                                  <p className="text-xs text-blue-400 mt-1">
-                                    💡 Səbirlə gözləyin - 12 saatda bir qazanc toplayın
+                                  <p className="text-xs text-blue-400">
+                                    💡 Səbirlə gözləyin - 12 saatda bir qazanc toplayın və gəlirinizi artırın
                                   </p>
                                 </div>
                               )}
