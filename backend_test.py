@@ -115,6 +115,7 @@ def setup_test_environment():
     print("\n🔧 Setting up test environment...")
     
     # Register test user
+    print(f"   Registering user: {test_user_data['email']}")
     response = make_request('POST', '/auth/register', test_user_data)
     if response and response.status_code in [200, 201]:
         data = response.json()
@@ -128,6 +129,14 @@ def setup_test_environment():
             test_user_id = profile_data['id']
             test_user_code = profile_data['user_code']
             print(f"✅ Test user created: {test_user_code}")
+        else:
+            print(f"❌ Failed to get user profile: {profile_response.status_code if profile_response else 'No response'}")
+            return False
+    else:
+        print(f"❌ User registration failed: {response.status_code if response else 'No response'}")
+        if response:
+            print(f"   Error details: {response.text}")
+        return False
     
     # Login admin
     admin_response = make_request('POST', '/auth/login', admin_credentials)
@@ -135,6 +144,11 @@ def setup_test_environment():
         admin_data = admin_response.json()
         admin_token = admin_data.get('access_token')
         print(f"✅ Admin logged in successfully")
+    else:
+        print(f"❌ Admin login failed: {admin_response.status_code if admin_response else 'No response'}")
+        if admin_response:
+            print(f"   Error details: {admin_response.text}")
+        return False
     
     return user_token and admin_token
 
