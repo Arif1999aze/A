@@ -1564,8 +1564,9 @@ const RegisterForm = ({ onRegister }) => {
 
 const WithdrawForm = ({ onWithdraw, maxAmount }) => {
   const [amount, setAmount] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
+  const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
+  const [bank, setBank] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -1582,11 +1583,12 @@ const WithdrawForm = ({ onWithdraw, maxAmount }) => {
       return;
     }
     
-    if (cardName && cardNumber.length === 16) {
-      onWithdraw(amountNum, cardName, cardNumber);
+    if (name && surname && bank) {
+      onWithdraw(amountNum, name, surname, bank);
       setAmount('');
-      setCardName('');
-      setCardNumber('');
+      setName('');
+      setSurname('');
+      setBank('');
     } else {
       alert('❌ Zəhmət olmasa bütün məlumatları düzgün daxil edin.');
     }
@@ -1611,34 +1613,39 @@ const WithdrawForm = ({ onWithdraw, maxAmount }) => {
       </div>
       
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Kart Üstündə Ad Soyad</label>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Ad</label>
         <Input
           type="text"
-          value={cardName}
-          onChange={(e) => setCardName(e.target.value)}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className="bg-gray-800 border-gray-600 text-white"
-          placeholder="ELVIN MAHMUDOV"
+          placeholder="Adınızı daxil edin"
           required
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Kart Nömrəsi (16 rəqəm)</label>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Soyad</label>
         <Input
           type="text"
-          value={cardNumber}
-          onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 16) {
-              setCardNumber(value);
-            }
-          }}
+          value={surname}
+          onChange={(e) => setSurname(e.target.value)}
           className="bg-gray-800 border-gray-600 text-white"
-          placeholder="1234567890123456"
-          maxLength="16"
+          placeholder="Soyadınızı daxil edin"
           required
         />
-        <div className="text-xs text-gray-400 mt-1">{cardNumber.length}/16 rəqəm</div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Bank Adı</label>
+        <Input
+          type="text"
+          value={bank}
+          onChange={(e) => setBank(e.target.value)}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="Bank adını daxil edin (məs: Kapital Bank)"
+          required
+        />
       </div>
 
       <Button type="submit" className="w-full bg-red-500 text-white hover:bg-red-600">
