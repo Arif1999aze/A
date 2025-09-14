@@ -269,20 +269,35 @@ async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(s
         raise HTTPException(status_code=401, detail="Token required")
     
     try:
-        payload = jwt.decode(credentials.credentials, SECRET_KEY, algorithms=[ALGORITHM])
+        # Additional validation for token format
+        token = credentials.credentials
+        if not token or token.count('.') != 2:
+            raise HTTPException(status_code=401, detail="Invalid token format")
+            
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id: str = payload.get("sub")
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
-    except jwt.JWTError:
+    except jwt.DecodeError:
+        raise HTTPException(status_code=401, detail="Invalid token format") 
+    except jwt.JWTError as e:
         raise HTTPException(status_code=401, detail="Invalid token")
+    except Exception as e:
+        # Catch any other unexpected errors to prevent 500 errors
+        print(f"Unexpected error in get_current_user: {e}")
+        raise HTTPException(status_code=401, detail="Authentication failed")
     
-    user_data = await db.users.find_one({"id": user_id})
-    if user_data is None:
-        raise HTTPException(status_code=401, detail="User not found")
-    
-    return User(**user_data)
+    try:
+        user_data = await db.users.find_one({"id": user_id})
+        if user_data is None:
+            raise HTTPException(status_code=401, detail="User not found")
+        
+        return User(**user_data)
+    except Exception as e:
+        print(f"Database error in get_current_user: {e}")
+        raise HTTPException(status_code=401, detail="Authentication failed")
 
 async def get_current_admin(current_user: User = Depends(get_current_user)):
     if not current_user.is_admin:
