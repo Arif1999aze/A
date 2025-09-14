@@ -1017,23 +1017,30 @@ const EnhancedInvestmentPlatform = () => {
                       const canCollect = canCollectEarnings(pkg);
                       
                       return (
-                        <Card key={pkg.id} className={`bg-gradient-to-r ${packageDef.gradient} p-1 relative`}>
-                          <div className="bg-gray-900 rounded-lg p-4 sm:p-6">
-                            {/* Package Header - Enhanced */}
-                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-3 sm:space-y-0 mb-4">
-                              <div className="flex items-center space-x-3">
-                                <div className="text-2xl sm:text-3xl">{packageDef.icon}</div>
+                        <Card key={pkg.id} className={`bg-gradient-to-br ${packageDef.gradient} p-1 relative overflow-hidden ${packageDef.shadowColor} shadow-xl hover:shadow-2xl transition-all duration-500`}>
+                          <div className="bg-gray-900/95 backdrop-blur rounded-lg p-4 sm:p-6 relative">
+                            {/* Professional Package Header */}
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-3 sm:space-y-0 mb-6">
+                              <div className="flex items-center space-x-4">
+                                <div className={`text-3xl sm:text-4xl p-3 rounded-xl bg-gradient-to-r ${packageDef.borderGradient} shadow-lg`}>
+                                  {packageDef.icon}
+                                </div>
                                 <div>
-                                  <h3 className="text-lg sm:text-xl font-bold" style={{color: packageDef.color}}>
+                                  <h3 className="text-xl sm:text-2xl font-bold mb-1" style={{color: packageDef.color}}>
                                     {packageDef.name} #{index + 1}
                                   </h3>
-                                  <p className="text-gray-400 text-sm">İnvestisya: {formatAmount(pkg.invested_amount)} AZN</p>
-                                  <p className="text-green-400 text-xs">Gündelik gəlir: {formatAmount(dailyEarnings)} AZN</p>
+                                  <p className="text-gray-300 text-sm font-semibold">İnvestisya: {formatAmount(pkg.invested_amount)} AZN</p>
+                                  <p className="text-green-400 text-xs bg-green-900/30 px-2 py-1 rounded-full inline-block mt-1">
+                                    💰 Gündelik: {formatAmount(dailyEarnings)} AZN
+                                  </p>
                                 </div>
                               </div>
                               <div className="flex flex-col space-y-2">
-                                <Badge className="bg-green-600 animate-pulse self-start">
-                                  Aktiv
+                                <Badge className={`bg-gradient-to-r ${packageDef.borderGradient} text-white animate-pulse px-3 py-1 self-start font-semibold`}>
+                                  ✨ AKTİV
+                                </Badge>
+                                <Badge className="bg-blue-600/80 text-white text-xs self-start">
+                                  🔥 CANLI
                                 </Badge>
                               </div>
                             </div>
