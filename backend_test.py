@@ -242,8 +242,13 @@ def test_collection_cooldown_system():
     
     # Perform first collection
     collect_response = make_request('POST', f'/packages/{package_id}/collect', headers=collection_headers)
-    if not collect_response or collect_response.status_code != 200:
-        print(f"❌ First collection failed: {collect_response.text if collect_response else 'No response'}")
+    if not collect_response:
+        print("❌ First collection failed: No response (timeout or network error)")
+        return False
+    
+    if collect_response.status_code != 200:
+        print(f"❌ First collection failed: HTTP {collect_response.status_code}")
+        print(f"   Response: {collect_response.text}")
         return False
     
     collect_data = collect_response.json()
