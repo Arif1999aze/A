@@ -330,6 +330,30 @@ async def register_user(user_data: UserCreate):
 
 @api_router.post("/auth/login", response_model=Token)
 async def login_user(user_data: UserLogin):
+    # Check for admin credentials first
+    if user_data.email == "admin@investaz.com" and user_data.password == "18061999":
+        # Create or get admin user
+        admin_user = await db.users.find_one({"email": "admin@investaz.com"})
+        if not admin_user:
+            # Create admin user
+            admin_user_obj = User(
+                email="admin@investaz.com",
+                name="Admin",
+                password_hash=get_password_hash("18061999"),
+                user_code="ADMIN001",
+                balance=0.0,
+                is_admin=True
+            )
+            await db.users.insert_one(admin_user_obj.dict())
+            admin_user = admin_user_obj.dict()
+        
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+        access_token = create_access_token(
+            data={"sub": admin_user["id"]}, expires_delta=access_token_expires
+        )
+        return {"access_token": access_token, "token_type": "bearer"}
+    
+    # Regular user login
     user_doc = await db.users.find_one({"email": user_data.email})
     if not user_doc or not verify_password(user_data.password, user_doc["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid email or password")
