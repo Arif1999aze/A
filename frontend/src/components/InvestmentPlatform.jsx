@@ -382,22 +382,54 @@ const InvestmentPlatform = () => {
 
   const confirmPackagePurchase = async () => {
     try {
-      await axios.post(`${API_BASE_URL}/api/packages/purchase`, {
-        package_type: selectedPackage,
-        invested_amount: selectedAmount
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
+      // Enhanced error handling and mobile-friendly fetch
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+      
+      const response = await fetch(`${API_BASE_URL}/api/packages/purchase`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+          'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+          package_type: selectedPackage,
+          invested_amount: selectedAmount
+        }),
+        signal: controller.signal,
+        credentials: 'include',
+        mode: 'cors'
       });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `Server error: ${response.status}`);
+      }
+
+      const data = await response.json();
       
       alert('🎉 Paket uğurla alındı! Gəliriniz toplanmağa başladı.');
       setPackageConfirmOpen(false);
       
       // Refresh data
-      fetchUserData();
-      fetchUserPackages();
+      await Promise.all([
+        fetchUserData(),
+        fetchUserPackages()
+      ]);
       
     } catch (error) {
-      alert('❌ ' + (error.response?.data?.detail || 'Paket alınırken xəta baş verdi.'));
+      console.error('Package purchase error:', error);
+      
+      if (error.name === 'AbortError') {
+        alert('❌ Bağlantı vaxtı doldu. Zəhmət olmasa yenidən cəhd edin.');
+      } else if (error.message.includes('fetch')) {
+        alert('❌ İnternet bağlantısı problemi. Zəhmət olmasa yenidən cəhd edin.');
+      } else {
+        alert('❌ ' + (error.message || 'Paket alınırken xəta baş verdi.'));
+      }
     }
   };
 
