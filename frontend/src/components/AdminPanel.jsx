@@ -331,7 +331,7 @@ const AdminPanel = () => {
     }
   };
 
-  // Start auto-refresh every 10 seconds for admin panel
+  // Start auto-refresh every 5 seconds for admin panel (faster)
   const startAutoRefresh = () => {
     if (refreshInterval.current) {
       clearInterval(refreshInterval.current);
@@ -342,7 +342,7 @@ const AdminPanel = () => {
         console.log('🔄 Admin panel avtomatik yenilənir...');
         refreshAllData();
       }
-    }, 10000); // Every 10 seconds
+    }, 5000); // Every 5 seconds (faster)
   };
   
   // Page visibility refresh for admin panel
