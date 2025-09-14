@@ -236,10 +236,10 @@ const EnhancedInvestmentPlatform = () => {
         fetchUserData();
       }, 5000);
 
-      // Refresh live transactions every 4 seconds (faster)
+      // Refresh live transactions every 2.5 seconds (faster for customer engagement)
       const liveTransactionInterval = setInterval(() => {
         generateLiveTransactions();
-      }, 4000);
+      }, 2500);
 
       return () => {
         clearInterval(userRefreshInterval);
