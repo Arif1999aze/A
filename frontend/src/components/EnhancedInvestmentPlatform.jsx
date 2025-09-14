@@ -2065,4 +2065,47 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
   );
 };
 
+// Company Information Component for all pages
+const CompanyInfo = ({ className = "" }) => {
+  return (
+    <Card className={`bg-gradient-to-br from-yellow-900/30 to-orange-900/30 border-yellow-600/50 p-4 ${className}`}>
+      <div className="text-center space-y-3">
+        <div className="flex items-center justify-center space-x-2">
+          <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+          <h3 className="text-lg font-bold text-yellow-400">🏢 InvestAZ</h3>
+          <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
+        </div>
+        
+        <div className="space-y-2">
+          <Badge className="bg-yellow-600 text-white font-semibold px-3 py-1">
+            ⭐ 2007-ci ildən işləyir
+          </Badge>
+          <p className="text-yellow-300 font-semibold text-sm">
+            🎯 Azərbaycanda ən <span className="text-yellow-400 font-bold">uğurlu</span> investisiya şirkəti
+          </p>
+          <div className="grid grid-cols-3 gap-2 mt-3">
+            <div className="text-center bg-yellow-900/30 rounded p-2">
+              <div className="font-bold text-yellow-400 text-sm">18 il</div>
+              <div className="text-yellow-300 text-xs">Təcrübə</div>
+            </div>
+            <div className="text-center bg-yellow-900/30 rounded p-2">
+              <div className="font-bold text-green-400 text-sm">25,000+</div>
+              <div className="text-yellow-300 text-xs">Müştəri</div>
+            </div>
+            <div className="text-center bg-yellow-900/30 rounded p-2">
+              <div className="font-bold text-blue-400 text-sm">%99.9</div>
+              <div className="text-yellow-300 text-xs">Uğur</div>
+            </div>
+          </div>
+          <div className="flex justify-center space-x-2 mt-3">
+            <Badge className="bg-green-600 text-white text-xs">🛡️ Təhlükəsiz</Badge>
+            <Badge className="bg-blue-600 text-white text-xs">⚡ Sürətli</Badge>
+            <Badge className="bg-purple-600 text-white text-xs">💎 Güvənilir</Badge>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+};
+
 export default EnhancedInvestmentPlatform;
