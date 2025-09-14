@@ -38,7 +38,11 @@ const InvestmentPlatform = () => {
   const [user, setUser] = useState(null);
   const [userPackages, setUserPackages] = useState([]);
   const [pendingTransactions, setPendingTransactions] = useState([]);
-  const [token, setToken] = useState(localStorage.getItem('token'));
+  const [token, setToken] = useState(() => {
+    const savedToken = localStorage.getItem('token');
+    // Only return valid looking tokens (not empty strings or null)
+    return savedToken && savedToken.trim() && savedToken !== 'null' ? savedToken : null;
+  });
   const [packages, setPackages] = useState([]);
   const [messages, setMessages] = useState([]);
   const [notifications, setNotifications] = useState([]);
