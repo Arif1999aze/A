@@ -523,13 +523,23 @@ async def collect_earnings(package_id: str, current_user: User = Depends(get_cur
     user_doc = await db.users.find_one({"id": current_user.id})
     new_balance = user_doc["balance"]
     
-    # Send real-time update to user
-    await manager.send_to_user(current_user.id, json.dumps({
-        "type": "earnings_collected",
-        "collected_amount": earnings,
-        "new_balance": new_balance,
-        "next_collection_time": (now + timedelta(minutes=COLLECTION_COOLDOWN_MINUTES)).isoformat()
-    }))
+    # Send real-time update to user with timeout protection
+    try:
+        await asyncio.wait_for(
+            manager.send_to_user(current_user.id, json.dumps({
+                "type": "earnings_collected",
+                "collected_amount": earnings,
+                "new_balance": new_balance,
+                "next_collection_time": (now + timedelta(minutes=COLLECTION_COOLDOWN_MINUTES)).isoformat()
+            })),
+            timeout=2.0  # 2 second timeout
+        )
+    except asyncio.TimeoutError:
+        # WebSocket notification failed but continue with HTTP response
+        print(f"WebSocket notification timeout for user {current_user.id}")
+    except Exception as e:
+        # Handle any other WebSocket errors
+        print(f"WebSocket notification error for user {current_user.id}: {e}")
     
     return {
         "collected_amount": earnings, 
