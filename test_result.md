@@ -426,17 +426,17 @@
 
 ## test_plan:
   current_focus:
-    - "Connect frontend to backend APIs"
-    - "Real-time messaging interface"
-    - "Package system - custom amount selection"
+    - "Admin Panel Real-time Notifications"
+    - "Investment Package Limits Update"
+    - "Support System Message Restriction"
   stuck_tasks:
     - "Enhanced Admin Search by AZ Code"
-  test_all: false
+  test_all: true
   test_priority: "high_first"
 
 ## agent_communication:
     - agent: "main"
-    - message: "Starting comprehensive implementation of InvestAZ platform improvements. Focus will be on backend implementation first, then frontend integration, followed by real-time features."
+    - message: "MAJOR UPDATES IMPLEMENTED: 1) Fixed admin panel real-time notifications with enhanced WebSocket handling and auto-refresh every 3 seconds, 2) Updated investment package limits: Gold (50-250 AZN), Titanium (250-500 AZN), Platinum (500-2000 AZN), 3) Implemented support message restriction - users can only send one message until admin responds, 4) Updated deposit limits to 50-2000 AZN. All changes implemented in both backend and frontend. Ready for comprehensive testing."
     - agent: "testing"
     - message: "✅ BACKEND TESTING COMPLETE - All 7 backend tasks are FULLY WORKING! Comprehensive testing performed on 20 API endpoints with 90% success rate. Key findings: 1) Authentication system working perfectly with JWT tokens, 2) Package system allows flexible amounts and real-time earnings, 3) Transaction system with admin approval working, 4) File upload for receipts working, 5) Messaging system with admin replies working, 6) WebSocket real-time notifications working, 7) All admin endpoints working. Backend is production-ready. Focus should now shift to frontend integration."
     - agent: "testing"
