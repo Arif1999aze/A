@@ -1251,7 +1251,7 @@ const LoginForm = ({ onLogin, error, loading }) => {
   );
 };
 
-// Register Form Component
+// Register Form Component - Mobile Enhanced
 const RegisterForm = ({ onRegister, error, loading }) => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -1276,7 +1276,9 @@ const RegisterForm = ({ onRegister, error, loading }) => {
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
+          className="bg-gray-800 border-gray-600 text-white w-full"
+          placeholder="Ad Soyad"
+          autoComplete="name"
           required
         />
       </div>
@@ -1287,7 +1289,9 @@ const RegisterForm = ({ onRegister, error, loading }) => {
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
+          className="bg-gray-800 border-gray-600 text-white w-full"
+          placeholder="email@example.com"
+          autoComplete="email"
           required
         />
       </div>
@@ -1298,18 +1302,33 @@ const RegisterForm = ({ onRegister, error, loading }) => {
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white"
+          className="bg-gray-800 border-gray-600 text-white w-full"
+          placeholder="••••••••"
+          autoComplete="new-password"
           required
         />
       </div>
       
       <Button
         type="submit"
-        disabled={loading}
-        className="w-full bg-yellow-400 text-black hover:bg-yellow-500"
+        disabled={loading || !name.trim() || !email.trim() || !password.trim()}
+        className="w-full bg-yellow-400 text-black hover:bg-yellow-500 py-3 text-base font-semibold disabled:opacity-50"
       >
-        {loading ? 'Gözləyin...' : 'Qeydiyyat'}
+        {loading ? (
+          <div className="flex items-center justify-center">
+            <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
+            Qeydiyyat edilir...
+          </div>
+        ) : (
+          'Qeydiyyat'
+        )}
       </Button>
+      
+      <div className="text-center">
+        <p className="text-gray-400 text-sm">
+          🎁 Qeydiyyatdan sonra 10 AZN bonus alacaqsınız!
+        </p>
+      </div>
     </form>
   );
 };
