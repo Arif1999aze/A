@@ -37,8 +37,6 @@ const EnhancedInvestmentPlatform = () => {
   const [activePackages, setActivePackages] = useState([]);
   const [selectedPackage, setSelectedPackage] = useState(null);
   const [investmentAmount, setInvestmentAmount] = useState('');
-  const [countdownTimers, setCountdownTimers] = useState({});
-  const [autoCollectionEnabled, setAutoCollectionEnabled] = useState(true);
 
   // Market States
   const [marketItems, setMarketItems] = useState([]);
