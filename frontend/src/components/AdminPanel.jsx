@@ -38,6 +38,7 @@ const AdminPanel = () => {
   
   // UI states
   const [selectedUser, setSelectedUser] = useState(null);
+  const [selectedCustomer, setSelectedCustomer] = useState(null);
   const [replyMessage, setReplyMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
