@@ -1417,19 +1417,27 @@ const RegisterForm = ({ onRegister, error, loading }) => {
   );
 };
 
-// Transaction Manager Component
+// Transaction Manager Component - Enhanced Mobile
 const TransactionManager = ({ user, token, onTransactionUpdate, showNotification }) => {
   const [activeTransactionTab, setActiveTransactionTab] = useState('deposit');
   const [amount, setAmount] = useState('');
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
+  const [bankName, setBankName] = useState('');
   const [receipt, setReceipt] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  // Bank options
+  const bankOptions = [
+    'Kapital Bank', 'Rabitəbank', 'Unibank', 'AccessBank', 'Paşa Bank',
+    'Bank of Baku', 'Xalq Bank', 'AMAY Bank', 'Express Bank', 'Digər'
+  ];
 
   const handleDeposit = async (e) => {
     e.preventDefault();
     
-    if (!amount || !cardName || !cardNumber || !receipt) {
-      showNotification('❌ Bütün sahələri doldurun', 'error');
+    if (!amount || !cardName || !cardNumber || !bankName || !receipt) {
+      showNotification('❌ Bütün sahələri doldurun və dekont əlavə edin', 'error');
       return;
     }
 
@@ -1439,36 +1447,52 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
       return;
     }
 
+    setLoading(true);
     try {
       const formData = new FormData();
       formData.append('type', 'deposit');
       formData.append('amount', amountNum);
       formData.append('card_name', cardName);
       formData.append('card_number', cardNumber);
+      formData.append('bank_name', bankName);
       formData.append('receipt', receipt);
+
+      console.log('📤 Depozit sorğusu göndərilir...', {
+        amount: amountNum,
+        cardName,
+        bankName,
+        receiptName: receipt.name
+      });
 
       await axios.post(`${API_BASE_URL}/api/transactions`, formData, {
         headers: { 
           Authorization: `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
-        }
+        },
+        timeout: 30000
       });
 
+      // Clear form
       setAmount('');
       setCardName('');
       setCardNumber('');
+      setBankName('');
       setReceipt(null);
+      
       onTransactionUpdate();
-      showNotification('✅ Depozit sorğusu göndərildi', 'success');
+      showNotification('✅ Depozit sorğusu uğurla göndərildi! Admin tərəfindən yoxlanılacaq.', 'success');
     } catch (error) {
-      showNotification(error.response?.data?.detail || '❌ Depozit zamanı xəta', 'error');
+      console.error('Depozit xətası:', error);
+      showNotification(error.response?.data?.detail || '❌ Depozit zamanı xəta baş verdi', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleWithdraw = async (e) => {
     e.preventDefault();
     
-    if (!amount || !cardName || !cardNumber) {
+    if (!amount || !cardName || !cardNumber || !bankName) {
       showNotification('❌ Bütün sahələri doldurun', 'error');
       return;
     }
@@ -1480,86 +1504,137 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
     }
 
     if (user?.balance < amountNum) {
-      showNotification('❌ Balansınız kifayət etmir', 'error');
+      showNotification(`❌ Balansınız kifayət etmir. Cari balans: ${formatAmount(user.balance)} AZN`, 'error');
       return;
     }
 
+    setLoading(true);
     try {
+      console.log('📤 Çıxarış sorğusu göndərilir...', {
+        amount: amountNum,
+        cardName,
+        bankName
+      });
+
       await axios.post(`${API_BASE_URL}/api/transactions`, {
         type: 'withdrawal',
         amount: amountNum,
         card_name: cardName,
-        card_number: cardNumber
+        card_number: cardNumber,
+        bank_name: bankName
       }, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        timeout: 30000
       });
 
+      // Clear form
       setAmount('');
       setCardName('');
       setCardNumber('');
+      setBankName('');
+      
       onTransactionUpdate();
-      showNotification('✅ Çıxarış sorğusu göndərildi', 'success');
+      showNotification('✅ Çıxarış sorğusu uğurla göndərildi! Admin tərəfindən emal ediləcək.', 'success');
     } catch (error) {
-      showNotification(error.response?.data?.detail || '❌ Çıxarış zamanı xəta', 'error');
+      console.error('Çıxarış xətası:', error);
+      showNotification(error.response?.data?.detail || '❌ Çıxarış zamanı xəta baş verdi', 'error');
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
-      <Card className="bg-gray-900 border-gray-700 p-6">
-        <h2 className="text-2xl font-bold mb-6">💰 Maliyyə Əməliyyatları</h2>
+    <div className="max-w-2xl mx-auto space-y-4">
+      {/* Enhanced Form with Mobile Support */}
+      <Card className="bg-gray-900 border-gray-700 p-4 sm:p-6">
+        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">💰 Maliyyə Əməliyyatları</h2>
+        
+        {/* Current Balance Display */}
+        <div className="bg-gradient-to-r from-green-900/50 to-blue-900/50 border border-green-600 rounded-lg p-4 mb-6 text-center">
+          <p className="text-sm text-gray-300 mb-1">Cari Balansınız</p>
+          <p className="text-2xl sm:text-3xl font-bold text-green-400">
+            {formatAmount(user?.balance || 0)} AZN
+          </p>
+        </div>
         
         <Tabs value={activeTransactionTab} onValueChange={setActiveTransactionTab}>
-          <TabsList className="bg-gray-800 mb-6">
-            <TabsTrigger value="deposit" className="data-[state=active]:bg-green-600">
-              Depozit
+          <TabsList className="bg-gray-800 mb-6 w-full">
+            <TabsTrigger value="deposit" className="data-[state=active]:bg-green-600 flex-1">
+              💰 Depozit
             </TabsTrigger>
-            <TabsTrigger value="withdraw" className="data-[state=active]:bg-blue-600">
-              Çıxarış
+            <TabsTrigger value="withdraw" className="data-[state=active]:bg-blue-600 flex-1">
+              🏦 Çıxarış
             </TabsTrigger>
           </TabsList>
 
           <TabsContent value="deposit">
             <form onSubmit={handleDeposit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Məbləğ (50-2000 AZN)
-                </label>
-                <Input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  min="50"
-                  max="2000"
-                  className="bg-gray-800 border-gray-600 text-white"
-                  placeholder="Depozit məbləği"
-                  required
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    💵 Məbləğ (50-2000 AZN)
+                  </label>
+                  <Input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    min="50"
+                    max="2000"
+                    className="bg-gray-800 border-gray-600 text-white text-lg text-center"
+                    placeholder="Məbləğ"
+                    required
+                  />
+                  <div className="text-xs text-gray-400 mt-1">Minimum: 50 AZN, Maksimum: 2000 AZN</div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    🏦 Bank Seçin
+                  </label>
+                  <select
+                    value={bankName}
+                    onChange={(e) => setBankName(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-600 text-white rounded-md px-3 py-2"
+                    required
+                  >
+                    <option value="">Bank seçin...</option>
+                    {bankOptions.map((bank) => (
+                      <option key={bank} value={bank}>{bank}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Kart Sahibi
+                  👤 Ad Soyad (Kart sahibi)
                 </label>
                 <Input
                   type="text"
                   value={cardName}
                   onChange={(e) => setCardName(e.target.value)}
                   className="bg-gray-800 border-gray-600 text-white"
-                  placeholder="Ad Soyad"
+                  placeholder="Kart sahibinin ad soyadı"
                   required
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Kart Nömrəsi
+                  💳 Kart Nömrəsi
                 </label>
                 <Input
                   type="text"
                   value={cardNumber}
-                  onChange={(e) => setCardNumber(e.target.value)}
-                  className="bg-gray-800 border-gray-600 text-white"
+                  onChange={(e) => {
+                    // Format card number
+                    const formatted = e.target.value.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');
+                    setCardNumber(formatted);
+                  }}
+                  className="bg-gray-800 border-gray-600 text-white text-center tracking-wider"
                   placeholder="1234 5678 9012 3456"
                   maxLength="19"
                   required
@@ -1568,7 +1643,7 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
               
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Dekont (JPG, PNG, PDF)
+                  📄 Dekont (JPG, PNG, PDF)
                 </label>
                 <Input
                   type="file"
@@ -1577,72 +1652,125 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
                   className="bg-gray-800 border-gray-600 text-white"
                   required
                 />
+                <div className="text-xs text-gray-400 mt-1">Ödəniş dekontunu yükləyin</div>
               </div>
               
-              <Button type="submit" className="w-full bg-green-600 hover:bg-green-700">
-                <DollarSign className="w-4 h-4 mr-2" />
-                Depozit Et
+              <Button 
+                type="submit" 
+                disabled={loading}
+                className="w-full bg-green-600 hover:bg-green-700 py-3 text-lg font-semibold disabled:opacity-50"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Göndərilir...
+                  </div>
+                ) : (
+                  <>
+                    <DollarSign className="w-5 h-5 mr-2" />
+                    Depozit Et
+                  </>
+                )}
               </Button>
             </form>
           </TabsContent>
 
           <TabsContent value="withdraw">
             <form onSubmit={handleWithdraw} className="space-y-4">
-              <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-3 mb-4">
-                <p className="text-blue-200 text-sm">
-                  💡 Cari balansınız: {formatAmount(user?.balance || 0)} AZN
-                </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    💵 Məbləğ (500-6500 AZN)
+                  </label>
+                  <Input
+                    type="number"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.value)}
+                    min="500"
+                    max="6500"
+                    className="bg-gray-800 border-gray-600 text-white text-lg text-center"
+                    placeholder="Məbləğ"
+                    required
+                  />
+                  <div className="text-xs text-gray-400 mt-1">Minimum: 500 AZN, Maksimum: 6500 AZN</div>
+                </div>
+                
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    🏦 Bank Seçin
+                  </label>
+                  <select
+                    value={bankName}
+                    onChange={(e) => setBankName(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-600 text-white rounded-md px-3 py-2"
+                    required
+                  >
+                    <option value="">Bank seçin...</option>
+                    {bankOptions.map((bank) => (
+                      <option key={bank} value={bank}>{bank}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Məbləğ (500-6500 AZN)
-                </label>
-                <Input
-                  type="number"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.value)}
-                  min="500"
-                  max="6500"
-                  className="bg-gray-800 border-gray-600 text-white"
-                  placeholder="Çıxarış məbləği"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Kart Sahibi
+                  👤 Ad Soyad (Kart sahibi)
                 </label>
                 <Input
                   type="text"
                   value={cardName}
                   onChange={(e) => setCardName(e.target.value)}
                   className="bg-gray-800 border-gray-600 text-white"
-                  placeholder="Ad Soyad"
+                  placeholder="Kart sahibinin ad soyadı"
                   required
                 />
               </div>
               
               <div>
                 <label className="block text-sm font-medium text-gray-300 mb-2">
-                  Kart Nömrəsi
+                  💳 Kart Nömrəsi
                 </label>
                 <Input
                   type="text"
                   value={cardNumber}
-                  onChange={(e) => setCardNumber(e.target.value)}
-                  className="bg-gray-800 border-gray-600 text-white"
+                  onChange={(e) => {
+                    // Format card number
+                    const formatted = e.target.value.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');
+                    setCardNumber(formatted);
+                  }}
+                  className="bg-gray-800 border-gray-600 text-white text-center tracking-wider"
                   placeholder="1234 5678 9012 3456"
                   maxLength="19"
                   required
                 />
               </div>
               
-              <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-                <DollarSign className="w-4 h-4 mr-2" />
-                Çıxarış Et
+              <Button 
+                type="submit" 
+                disabled={loading || (user?.balance < parseFloat(amount || 0))}
+                className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-lg font-semibold disabled:opacity-50"
+              >
+                {loading ? (
+                  <div className="flex items-center justify-center">
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                    Göndərilir...
+                  </div>
+                ) : (
+                  <>
+                    <DollarSign className="w-5 h-5 mr-2" />
+                    Çıxarış Et
+                  </>
+                )}
               </Button>
+              
+              {user?.balance < parseFloat(amount || 0) && amount && (
+                <div className="bg-red-900/50 border border-red-600 rounded-lg p-3">
+                  <p className="text-red-200 text-sm text-center">
+                    ⚠️ Balansınız kifayət etmir
+                  </p>
+                </div>
+              )}
             </form>
           </TabsContent>
         </Tabs>
