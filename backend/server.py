@@ -768,7 +768,20 @@ async def get_all_users(current_admin: User = Depends(get_current_admin)):
         {"is_admin": False}, 
         {"_id": 0}  # Exclude _id field
     ).to_list(1000)
-    return [UserResponse(**user) for user in users]
+    
+    # Handle missing user_code field for existing users
+    user_responses = []
+    for user in users:
+        if 'user_code' not in user or not user['user_code']:
+            user['user_code'] = generate_user_code()
+            # Update user in database
+            await db.users.update_one(
+                {"id": user["id"]},
+                {"$set": {"user_code": user['user_code']}}
+            )
+        user_responses.append(UserResponse(**user))
+    
+    return user_responses
 
 @api_router.get("/admin/users/search")
 async def search_users(
