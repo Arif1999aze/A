@@ -1,30 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from './ui/tabs';
-import { Users, DollarSign, MessageCircle, CheckCircle, XCircle, Clock, Eye, FileText, Search, Edit, Trash2, RefreshCw, AlertTriangle, Bell } from 'lucide-react';
+import { Users, DollarSign, MessageCircle, CheckCircle, XCircle, Clock, Eye, FileText, Search, Edit, Trash2, RefreshCw, Bell, AlertCircle, TrendingUp, Activity } from 'lucide-react';
 import axios from 'axios';
 
-// Format amount function - inline to avoid import issues
+// Format amount function
 const formatAmount = (amount) => {
   if (typeof amount !== 'number' || isNaN(amount)) return '0.00';
   return amount.toLocaleString('az-AZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
-// For testing purposes, use local backend URL
+// Use development URL for local testing
 const API_BASE_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:8001' : process.env.REACT_APP_BACKEND_URL;
 
 const AdminPanel = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [token, setToken] = useState(localStorage.getItem('admin_token'));
   const [users, setUsers] = useState([]);
-  const [transactions, setPendingTransactions] = useState([]);
+  const [transactions, setTransactions] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [replyMessage, setReplyMessage] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
@@ -34,7 +33,7 @@ const AdminPanel = () => {
   const [receiptViewOpen, setReceiptViewOpen] = useState(false);
   const [currentReceipt, setCurrentReceipt] = useState(null);
   const [lastRefresh, setLastRefresh] = useState(new Date());
-  const [autoRefresh, setAutoRefresh] = useState(true);
+  const [isConnected, setIsConnected] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -44,107 +43,139 @@ const AdminPanel = () => {
     activePackages: 0
   });
 
+  // Refs for auto-scroll
+  const notificationsRef = useRef(null);
+  const messagesEndRef = useRef(null);
+
   useEffect(() => {
     if (token) {
       setIsLoggedIn(true);
-      fetchData();
-      setupAdminWebSocket();
+      initializeAdminPanel();
     }
   }, [token]);
 
-  // Auto-refresh data every 3 seconds for better real-time experience
-  useEffect(() => {
-    if (isLoggedIn && autoRefresh) {
-      const interval = setInterval(() => {
-        fetchData();
-        setLastRefresh(new Date());
-      }, 3000); // 3 seconds for faster updates
+  // Initialize admin panel with data fetching and WebSocket
+  const initializeAdminPanel = async () => {
+    console.log('🚀 Admin panel başladılır...');
+    
+    try {
+      // Fetch initial data
+      await fetchAllData();
       
-      return () => clearInterval(interval);
+      // Setup WebSocket connection
+      setupWebSocketConnection();
+      
+      // Start auto-refresh timer
+      startAutoRefresh();
+      
+      showNotification('✅ Admin panel uğurla başladıldı', 'success');
+    } catch (error) {
+      console.error('❌ Admin panel başladılarkən xəta:', error);
+      showNotification('❌ Admin panel başladılarkən xəta baş verdi', 'error');
     }
-  }, [isLoggedIn, autoRefresh]);
+  };
 
-  // Setup WebSocket for real-time admin updates
-  const setupAdminWebSocket = () => {
+  // Setup WebSocket connection for real-time updates
+  const setupWebSocketConnection = () => {
     const wsUrl = `${API_BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://')}/ws/admin`;
+    console.log('🔌 WebSocket bağlantısı qurulur:', wsUrl);
+    
     const ws = new WebSocket(wsUrl);
     
     ws.onopen = () => {
-      console.log('✅ Admin WebSocket connected');
-      showNotification('🔗 Real-vaxt bağlantı quruldu');
+      console.log('✅ Admin WebSocket bağlandı');
+      setIsConnected(true);
+      showNotification('🔗 Real-vaxt bağlantı quruldu', 'success');
     };
     
     ws.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        handleAdminWebSocketMessage(data);
+        console.log('📨 WebSocket mesajı alındı:', data);
+        handleRealtimeUpdate(data);
       } catch (e) {
-        console.log('Admin WebSocket message:', event.data);
+        console.log('📨 WebSocket mətn mesajı:', event.data);
       }
     };
     
     ws.onerror = (error) => {
-      console.log('❌ Admin WebSocket error:', error);
-      showNotification('⚠️ Bağlantı problemi');
+      console.error('❌ WebSocket xətası:', error);
+      setIsConnected(false);
+      showNotification('⚠️ Bağlantı problemi', 'error');
     };
     
-    ws.onclose = () => {
-      console.log('🔌 Admin WebSocket disconnected, reconnecting...');
+    ws.onclose = (event) => {
+      console.log('🔌 WebSocket bağlantısı kəsildi, yenidən bağlanılır...');
+      setIsConnected(false);
+      
       // Reconnect after 3 seconds
-      setTimeout(() => setupAdminWebSocket(), 3000);
+      setTimeout(() => {
+        if (isLoggedIn) {
+          setupWebSocketConnection();
+        }
+      }, 3000);
     };
     
     setWebsocket(ws);
-    
-    return () => {
-      if (ws) ws.close();
-    };
   };
 
-  const handleAdminWebSocketMessage = (data) => {
-    console.log('📧 Admin WebSocket message received:', data);
-    
-    // Handle real-time admin notifications
+  // Handle real-time updates from WebSocket
+  const handleRealtimeUpdate = (data) => {
     switch (data.type) {
       case 'new_user_registration':
+        showNotification(`🎉 Yeni qeydiyyat: ${data.user_name} (${data.user_code})`, 'info');
         fetchUsers();
         fetchStats();
-        showNotification(`🎉 Yeni qeydiyyat: ${data.user_name} (${data.user_code})`, 'success');
         break;
+        
       case 'package_purchase':
+        showNotification(`📦 Paket alışı: ${data.user_name} - ${data.package_type}`, 'info');
+        fetchUsers();
         fetchStats();
-        fetchUsers(); // Refresh to show updated user investment
-        showNotification(`📦 Paket alışı: ${data.user_name} - ${data.package_type} (${formatAmount(data.amount)} AZN)`, 'info');
         break;
+        
       case 'new_transaction':
+        showNotification(`💰 Yeni ${data.transaction_type}: ${data.user_name} - ${formatAmount(data.amount)} AZN`, 'warning');
         fetchTransactions();
         fetchStats();
-        showNotification(`💰 Yeni ${data.transaction_type}: ${data.user_name} - ${formatAmount(data.amount)} AZN`, 'warning');
         break;
+        
       case 'receipt_uploaded':
+        showNotification(`📄 Dekont yükləndi: ${data.user_name}`, 'info');
         fetchTransactions();
-        showNotification(`📄 Dekont yükləndi: ${data.user_name} - ${data.filename}`, 'info');
         break;
+        
       case 'new_message':
+        showNotification(`💬 Yeni mesaj: ${data.user_name}`, 'message');
         fetchMessages();
-        showNotification(`💬 Yeni mesaj: ${data.user_name} - ${data.content.substring(0, 50)}...`, 'message');
+        // Auto-scroll to new message
+        setTimeout(() => scrollToBottom(), 100);
         break;
+        
       default:
-        // Refresh all data for unknown message types
-        fetchData();
+        console.log('🔄 Bilinməyən mesaj tipi, bütün məlumatlar yenilənir');
+        fetchAllData();
         break;
     }
   };
 
+  // Auto-scroll to bottom of messages
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  // Show notification with auto-remove
   const showNotification = (message, type = 'info') => {
     const notification = {
-      id: Date.now(),
+      id: Date.now() + Math.random(),
       message,
       type,
       timestamp: new Date()
     };
     
-    setNotifications(prev => [notification, ...prev.slice(0, 9)]); // Keep last 10 notifications
+    console.log('📢 Bildiriş göstərilir:', notification);
+    
+    setNotifications(prev => [notification, ...prev.slice(0, 4)]); // Keep last 5 notifications
     
     // Auto-remove after 5 seconds
     setTimeout(() => {
@@ -152,19 +183,37 @@ const AdminPanel = () => {
     }, 5000);
   };
 
-  const fetchData = async () => {
+  // Fetch all data
+  const fetchAllData = async () => {
+    console.log('🔄 Bütün məlumatlar yenilənir...');
+    setLastRefresh(new Date());
+    
     try {
       await Promise.all([
-        fetchUsers(),
+        fetchStats(),
+        fetchUsers(), 
         fetchTransactions(),
-        fetchMessages(),
-        fetchStats()
+        fetchMessages()
       ]);
+      console.log('✅ Bütün məlumatlar yeniləndi');
     } catch (error) {
-      console.error('Error fetching admin data:', error);
+      console.error('❌ Məlumatları yenilərkən xəta:', error);
+      showNotification('❌ Məlumatlar yenilənərkən xəta baş verdi', 'error');
     }
   };
 
+  // Start auto-refresh every 10 seconds
+  const startAutoRefresh = () => {
+    const interval = setInterval(() => {
+      if (isLoggedIn && isConnected) {
+        fetchAllData();
+      }
+    }, 10000); // 10 seconds
+    
+    return () => clearInterval(interval);
+  };
+
+  // Fetch functions
   const fetchStats = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/admin/stats`, {
@@ -172,7 +221,7 @@ const AdminPanel = () => {
       });
       setStats(response.data);
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('Stats xətası:', error);
     }
   };
 
@@ -182,8 +231,9 @@ const AdminPanel = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setUsers(response.data);
+      console.log(`👥 ${response.data.length} istifadəçi yükləndi`);
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('İstifadəçilər xətası:', error);
     }
   };
 
@@ -192,9 +242,10 @@ const AdminPanel = () => {
       const response = await axios.get(`${API_BASE_URL}/api/admin/transactions`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setPendingTransactions(response.data);
+      setTransactions(response.data);
+      console.log(`💰 ${response.data.length} əməliyyat yükləndi`);
     } catch (error) {
-      console.error('Error fetching transactions:', error);
+      console.error('Əməliyyatlar xətası:', error);
     }
   };
 
@@ -204,14 +255,15 @@ const AdminPanel = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setMessages(response.data);
+      console.log(`💬 ${response.data.length} mesaj yükləndi`);
     } catch (error) {
-      console.error('Error fetching messages:', error);
+      console.error('Mesajlar xətası:', error);
     }
   };
 
+  // Login function
   const handleLogin = async (username, password) => {
     try {
-      // Use the correct admin credentials for API
       const loginEmail = username === 'Batu' ? 'admin@investaz.com' : username;
       const loginPassword = password === '18061999' ? '18061999' : password;
       
@@ -224,24 +276,37 @@ const AdminPanel = () => {
       localStorage.setItem('admin_token', newToken);
       setToken(newToken);
       setIsLoggedIn(true);
-      fetchData();
-      setupAdminWebSocket();
+      
+      console.log('✅ Admin girişi uğurlu');
       showNotification('✅ Admin panelinə daxil oldunuz', 'success');
+      
     } catch (error) {
-      console.error('Admin login error:', error);
+      console.error('❌ Admin girişi xətası:', error);
       showNotification('❌ Yanlış istifadəçi adı və ya şifrə', 'error');
     }
   };
 
+  // Logout function
   const handleLogout = () => {
     localStorage.removeItem('admin_token');
     setToken(null);
     setIsLoggedIn(false);
+    setIsConnected(false);
+    
     if (websocket) {
       websocket.close();
     }
+    
+    // Clear all data
+    setUsers([]);
+    setTransactions([]);
+    setMessages([]);
+    setNotifications([]);
+    
+    showNotification('👋 Admin paneldən çıxış edildi', 'info');
   };
 
+  // Search users function
   const searchUsers = async () => {
     if (!searchQuery.trim()) {
       setSearchResults([]);
@@ -253,12 +318,14 @@ const AdminPanel = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
       setSearchResults(response.data.users || []);
+      showNotification(`🔍 ${response.data.users?.length || 0} nəticə tapıldı`, 'info');
     } catch (error) {
-      console.error('Error searching users:', error);
+      console.error('Axtarış xətası:', error);
       showNotification('❌ Axtarış zamanı xəta baş verdi', 'error');
     }
   };
 
+  // Approve transaction
   const approveTransaction = async (transactionId, approve, notes = '') => {
     try {
       await axios.post(`${API_BASE_URL}/api/admin/transactions/approve`, {
@@ -273,11 +340,12 @@ const AdminPanel = () => {
       fetchStats();
       showNotification(`✅ Əməliyyat ${approve ? 'təsdiqləndi' : 'rədd edildi'}`, 'success');
     } catch (error) {
-      console.error('Error approving transaction:', error);
+      console.error('Əməliyyat təsdiqləmə xətası:', error);
       showNotification('❌ Əməliyyat zamanı xəta baş verdi', 'error');
     }
   };
 
+  // Update user balance
   const updateUserBalance = async (userId, newBalanceValue) => {
     try {
       await axios.post(`${API_BASE_URL}/api/admin/users/update-balance`, {
@@ -293,12 +361,18 @@ const AdminPanel = () => {
       fetchUsers();
       showNotification('✅ İstifadəçi balansı yeniləndi', 'success');
     } catch (error) {
-      console.error('Error updating balance:', error);
+      console.error('Balans yeniləmə xətası:', error);
       showNotification('❌ Balans yenilinərkən xəta baş verdi', 'error');
     }
   };
 
+  // Reply to message
   const replyToMessage = async (messageId, content) => {
+    if (!content.trim()) {
+      showNotification('❌ Cavab boş ola bilməz', 'error');
+      return;
+    }
+
     try {
       await axios.post(`${API_BASE_URL}/api/admin/messages/${messageId}/reply`, {
         content: content
@@ -307,15 +381,24 @@ const AdminPanel = () => {
       });
       
       setReplyMessage('');
+      setSelectedUser(null);
       fetchMessages();
       showNotification('✅ Cavab göndərildi', 'success');
+      
+      // Auto-scroll to see the new reply
+      setTimeout(() => scrollToBottom(), 100);
     } catch (error) {
-      console.error('Error replying to message:', error);
+      console.error('Cavab göndərmə xətası:', error);
       showNotification('❌ Cavab göndərilərkən xəta baş verdi', 'error');
     }
   };
 
+  // Delete message
   const deleteMessage = async (messageId) => {
+    if (!window.confirm('Bu mesajı silmək istədiyinizə əminsiniz?')) {
+      return;
+    }
+
     try {
       await axios.delete(`${API_BASE_URL}/api/admin/messages/${messageId}`, {
         headers: { Authorization: `Bearer ${token}` }
@@ -324,11 +407,12 @@ const AdminPanel = () => {
       fetchMessages();
       showNotification('✅ Mesaj silindi', 'success');
     } catch (error) {
-      console.error('Error deleting message:', error);
+      console.error('Mesaj silmə xətası:', error);
       showNotification('❌ Mesaj silinərkən xəta baş verdi', 'error');
     }
   };
 
+  // View receipt
   const viewReceipt = async (filename) => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/admin/receipts/${filename}/base64`, {
@@ -338,83 +422,84 @@ const AdminPanel = () => {
       setCurrentReceipt(response.data);
       setReceiptViewOpen(true);
     } catch (error) {
-      console.error('Error viewing receipt:', error);
+      console.error('Dekont görüntüləmə xətası:', error);
       showNotification('❌ Dekont görüntülənərkən xəta baş verdi', 'error');
     }
   };
 
+  // Login screen
   if (!isLoggedIn) {
     return <AdminLogin onLogin={handleLogin} />;
   }
 
+  // Filter data
   const pendingTransactions = transactions.filter(t => t.status === 'pending');
   const userMessages = messages.filter(m => !m.is_from_admin);
 
   return (
     <div className="min-h-screen bg-gray-950 text-white p-4">
-      {/* Header with notifications */}
+      {/* Fixed notification area */}
+      <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm" ref={notificationsRef}>
+        {notifications.map((notification) => (
+          <div
+            key={notification.id}
+            className={`p-3 rounded-lg shadow-lg border-l-4 transform transition-all duration-300 animate-in slide-in-from-right ${
+              notification.type === 'success' ? 'bg-green-900/90 border-green-400' :
+              notification.type === 'error' ? 'bg-red-900/90 border-red-400' :
+              notification.type === 'warning' ? 'bg-yellow-900/90 border-yellow-400' :
+              notification.type === 'message' ? 'bg-blue-900/90 border-blue-400' :
+              'bg-gray-900/90 border-gray-400'
+            }`}
+          >
+            <div className="flex items-start space-x-2">
+              <Bell className="w-4 h-4 mt-0.5 text-yellow-400 animate-pulse" />
+              <div className="flex-1">
+                <p className="text-sm text-white font-medium">{notification.message}</p>
+                <p className="text-xs text-gray-300 mt-1">
+                  {notification.timestamp.toLocaleTimeString()}
+                </p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
           <h1 className="text-3xl font-bold text-yellow-400">InvestAZ Admin Panel</h1>
           <div className="flex items-center space-x-4 mt-2">
             <div className="flex items-center space-x-2">
-              <div className={`w-3 h-3 rounded-full ${websocket?.readyState === 1 ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
+              <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'}`}></div>
               <span className="text-sm text-gray-400">
-                {websocket?.readyState === 1 ? 'Real-vaxt bağlı' : 'Bağlantı kəsildi'}
+                {isConnected ? 'Real-vaxt bağlı' : 'Bağlantı kəsildi'}
               </span>
             </div>
             <div className="flex items-center space-x-2">
-              <RefreshCw className="w-4 h-4 text-blue-400" />
+              <Activity className="w-4 h-4 text-blue-400" />
               <span className="text-sm text-gray-400">
                 Son yeniləmə: {lastRefresh.toLocaleTimeString()}
               </span>
             </div>
             <Button
+              onClick={fetchAllData}
               variant="outline"
               size="sm"
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              className="border-gray-600"
+              className="border-gray-600 hover:border-yellow-400"
             >
-              {autoRefresh ? 'Avtomatik yeniləmə açıq' : 'Avtomatik yeniləmə bağlı'}
+              <RefreshCw className="w-4 h-4 mr-2" />
+              Yenilə
             </Button>
           </div>
         </div>
-        <Button onClick={handleLogout} variant="outline" className="border-red-600 text-red-400">
+        <Button onClick={handleLogout} variant="outline" className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white">
           Çıxış
         </Button>
       </div>
 
-      {/* Real-time notifications */}
-      {notifications.length > 0 && (
-        <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
-          {notifications.slice(0, 3).map((notification) => (
-            <div
-              key={notification.id}
-              className={`p-3 rounded-lg shadow-lg border-l-4 ${
-                notification.type === 'success' ? 'bg-green-900 border-green-400' :
-                notification.type === 'error' ? 'bg-red-900 border-red-400' :
-                notification.type === 'warning' ? 'bg-yellow-900 border-yellow-400' :
-                notification.type === 'message' ? 'bg-blue-900 border-blue-400' :
-                'bg-gray-900 border-gray-400'
-              } animate-pulse`}
-            >
-              <div className="flex items-start space-x-2">
-                <Bell className="w-4 h-4 mt-0.5 text-yellow-400" />
-                <div className="flex-1">
-                  <p className="text-sm text-white">{notification.message}</p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {notification.timestamp.toLocaleTimeString()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {/* Stats Dashboard - Enhanced with real-time indicators */}
+      {/* Stats Dashboard */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-        <Card className="bg-gray-900 border-gray-700 p-4">
+        <Card className="bg-gray-900 border-gray-700 p-4 hover:border-blue-400 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Ümumi İstifadəçilər</p>
@@ -424,7 +509,7 @@ const AdminPanel = () => {
           </div>
         </Card>
         
-        <Card className="bg-gray-900 border-gray-700 p-4">
+        <Card className="bg-gray-900 border-gray-700 p-4 hover:border-green-400 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Aktiv Paketlər</p>
@@ -434,7 +519,7 @@ const AdminPanel = () => {
           </div>
         </Card>
         
-        <Card className="bg-gray-900 border-gray-700 p-4">
+        <Card className="bg-gray-900 border-gray-700 p-4 hover:border-yellow-400 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Gözləyən Əməliyyatlar</p>
@@ -444,39 +529,44 @@ const AdminPanel = () => {
           </div>
         </Card>
         
-        <Card className="bg-gray-900 border-gray-700 p-4">
+        <Card className="bg-gray-900 border-gray-700 p-4 hover:border-green-400 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Toplam Depozitlər</p>
-              <p className="text-2xl font-bold text-green-400">{formatAmount(stats.totalDeposits)} AZN</p>
+              <p className="text-xl font-bold text-green-400">{formatAmount(stats.totalDeposits)} AZN</p>
             </div>
-            <DollarSign className="w-8 h-8 text-green-400" />
+            <TrendingUp className="w-8 h-8 text-green-400" />
           </div>
         </Card>
         
-        <Card className="bg-gray-900 border-gray-700 p-4">
+        <Card className="bg-gray-900 border-gray-700 p-4 hover:border-red-400 transition-colors">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-gray-400 text-sm">Toplam Çıxarışlar</p>
-              <p className="text-2xl font-bold text-red-400">{formatAmount(stats.totalWithdrawals)} AZN</p>
+              <p className="text-xl font-bold text-red-400">{formatAmount(stats.totalWithdrawals)} AZN</p>
             </div>
             <DollarSign className="w-8 h-8 text-red-400" />
           </div>
         </Card>
       </div>
 
+      {/* Main Tabs */}
       <Tabs defaultValue="transactions" className="space-y-6">
         <TabsList className="bg-gray-900 border-gray-700">
           <TabsTrigger value="transactions" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
+            <Clock className="w-4 h-4 mr-2" />
             Əməliyyatlar ({pendingTransactions.length})
           </TabsTrigger>
-          <TabsTrigger value="users" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
-            İstifadəçilər ({users.length})
-          </TabsTrigger>
           <TabsTrigger value="messages" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
+            <MessageCircle className="w-4 h-4 mr-2" />
             Mesajlar ({userMessages.length})
           </TabsTrigger>
+          <TabsTrigger value="users" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
+            <Users className="w-4 h-4 mr-2" />
+            İstifadəçilər ({users.length})
+          </TabsTrigger>
           <TabsTrigger value="search" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
+            <Search className="w-4 h-4 mr-2" />
             Axtarış
           </TabsTrigger>
         </TabsList>
@@ -484,67 +574,181 @@ const AdminPanel = () => {
         {/* Transactions Tab */}
         <TabsContent value="transactions">
           <Card className="bg-gray-900 border-gray-700 p-6">
-            <h2 className="text-xl font-bold text-yellow-400 mb-4 flex items-center">
-              <Clock className="w-5 h-5 mr-2" />
-              Gözləyən Əməliyyatlar ({pendingTransactions.length})
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-yellow-400 flex items-center">
+                <AlertCircle className="w-5 h-5 mr-2 animate-pulse" />
+                Gözləyən Əməliyyatlar ({pendingTransactions.length})
+              </h2>
+              <Button onClick={fetchTransactions} size="sm" variant="outline" className="border-blue-600 text-blue-400">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Yenilə
+              </Button>
+            </div>
             
             {pendingTransactions.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">Gözləyən əməliyyat yoxdur.</p>
+              <div className="text-center py-12">
+                <Clock className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400 text-lg">Gözləyən əməliyyat yoxdur</p>
+                <p className="text-gray-500 text-sm mt-2">Yeni əməliyyatlar burada görünəcək</p>
+              </div>
             ) : (
               <div className="space-y-4 max-h-96 overflow-y-auto">
-                {pendingTransactions.map((transaction) => (
-                  <div key={transaction.id} className="bg-gray-800 rounded-lg p-4 border-l-4 border-l-yellow-400">
-                    <div className="flex justify-between items-start">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <Badge className={transaction.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'}>
-                            {transaction.type === 'deposit' ? 'Depozit' : 'Çıxarış'}
-                          </Badge>
-                          <span className="text-white font-medium">
-                            {formatAmount(transaction.amount)} AZN
-                          </span>
+                {pendingTransactions.map((transaction) => {
+                  const user = users.find(u => u.id === transaction.user_id);
+                  return (
+                    <div key={transaction.id} className="bg-gray-800 rounded-lg p-4 border-l-4 border-l-yellow-400 hover:bg-gray-750 transition-colors">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center space-x-3 mb-3">
+                            <Badge className={transaction.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'}>
+                              {transaction.type === 'deposit' ? '💰 Depozit' : '🏦 Çıxarış'}
+                            </Badge>
+                            <span className="text-white font-bold text-lg">
+                              {formatAmount(transaction.amount)} AZN
+                            </span>
+                            {user && (
+                              <Badge variant="outline" className="border-purple-600 text-purple-400">
+                                {user.user_code}
+                              </Badge>
+                            )}
+                          </div>
+                          
+                          <div className="text-sm text-gray-400 space-y-1">
+                            <p><strong>İstifadəçi:</strong> {user?.name || 'Naməlum'}</p>
+                            <p><strong>Kart adı:</strong> {transaction.card_name}</p>
+                            <p><strong>Kart:</strong> ****{transaction.card_number?.slice(-4)}</p>
+                            <p><strong>Tarix:</strong> {new Date(transaction.created_date).toLocaleString()}</p>
+                            {transaction.receipt_filename && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => viewReceipt(transaction.receipt_filename)}
+                                className="mt-2 border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
+                              >
+                                <Eye className="w-4 h-4 mr-1" />
+                                Dekont Gör
+                              </Button>
+                            )}
+                          </div>
                         </div>
                         
-                        <div className="text-sm text-gray-400 space-y-1">
-                          <p>Kart adı: {transaction.card_name}</p>
-                          <p>Kart nömrəsi: ****{transaction.card_number?.slice(-4)}</p>
-                          <p>Tarix: {new Date(transaction.created_date).toLocaleString()}</p>
-                          {transaction.receipt_filename && (
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => viewReceipt(transaction.receipt_filename)}
-                              className="mt-2 border-blue-600 text-blue-400"
-                            >
-                              <Eye className="w-4 h-4 mr-1" />
-                              Dekont Gör
-                            </Button>
+                        <div className="flex flex-col space-y-2">
+                          <Button
+                            size="sm"
+                            onClick={() => approveTransaction(transaction.id, true)}
+                            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2"
+                          >
+                            <CheckCircle className="w-4 h-4 mr-1" />
+                            Təsdiqlə
+                          </Button>
+                          <Button
+                            size="sm"
+                            onClick={() => approveTransaction(transaction.id, false)}
+                            className="bg-red-600 hover:bg-red-700 text-white px-4 py-2"
+                          >
+                            <XCircle className="w-4 h-4 mr-1" />
+                            Rədd Et
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
+        </TabsContent>
+
+        {/* Messages Tab */}
+        <TabsContent value="messages">
+          <Card className="bg-gray-900 border-gray-700 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-yellow-400 flex items-center">
+                <MessageCircle className="w-5 h-5 mr-2" />
+                Dəstək Mesajları ({userMessages.length})
+              </h2>
+              <Button onClick={fetchMessages} size="sm" variant="outline" className="border-green-600 text-green-400">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Yenilə
+              </Button>
+            </div>
+            
+            {userMessages.length === 0 ? (
+              <div className="text-center py-12">
+                <MessageCircle className="w-16 h-16 text-gray-600 mx-auto mb-4" />
+                <p className="text-gray-400 text-lg">Mesaj yoxdur</p>
+                <p className="text-gray-500 text-sm mt-2">Yeni mesajlar burada görünəcək</p>
+              </div>
+            ) : (
+              <div className="space-y-4 max-h-96 overflow-y-auto">
+                {userMessages.map((message) => {
+                  const user = users.find(u => u.id === message.user_id);
+                  const isSelected = selectedUser === message.id;
+                  
+                  return (
+                    <div key={message.id} className="bg-gray-800 rounded-lg p-4 border-l-4 border-l-green-400 hover:bg-gray-750 transition-colors">
+                      <div className="flex justify-between items-start mb-3">
+                        <div className="flex items-center space-x-3">
+                          <span className="text-white font-medium text-lg">{user?.name || 'Naməlum'}</span>
+                          {user && (
+                            <Badge className="bg-purple-600">{user.user_code}</Badge>
                           )}
+                          <Badge variant="outline" className="border-green-600 text-green-400">
+                            Yeni Mesaj
+                          </Badge>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-xs text-gray-500">
+                            {new Date(message.created_date).toLocaleString()}
+                          </span>
                         </div>
                       </div>
                       
-                      <div className="flex space-x-2">
+                      <div className="bg-gray-700 rounded-lg p-3 mb-3">
+                        <p className="text-gray-100">{message.content}</p>
+                      </div>
+                      
+                      <div className="flex items-center space-x-2">
+                        <Input
+                          placeholder="Cavabınızı yazın..."
+                          value={isSelected ? replyMessage : ''}
+                          onChange={(e) => {
+                            if (isSelected) {
+                              setReplyMessage(e.target.value);
+                            }
+                          }}
+                          onFocus={() => {
+                            setSelectedUser(message.id);
+                            setReplyMessage('');
+                          }}
+                          className="bg-gray-700 border-gray-600 text-white flex-1"
+                        />
                         <Button
                           size="sm"
-                          onClick={() => approveTransaction(transaction.id, true)}
-                          className="bg-green-600 hover:bg-green-700"
+                          onClick={() => {
+                            if (replyMessage.trim()) {
+                              replyToMessage(message.id, replyMessage);
+                            }
+                          }}
+                          disabled={!replyMessage.trim() || !isSelected}
+                          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2"
                         >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Təsdiqlə
+                          <MessageCircle className="w-4 h-4 mr-1" />
+                          Cavab Ver
                         </Button>
                         <Button
                           size="sm"
-                          onClick={() => approveTransaction(transaction.id, false)}
-                          className="bg-red-600 hover:bg-red-700"
+                          variant="outline"
+                          onClick={() => deleteMessage(message.id)}
+                          className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
                         >
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Rədd Et
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
+                <div ref={messagesEndRef} />
               </div>
             )}
           </Card>
@@ -553,27 +757,40 @@ const AdminPanel = () => {
         {/* Users Tab */}
         <TabsContent value="users">
           <Card className="bg-gray-900 border-gray-700 p-6">
-            <h2 className="text-xl font-bold text-yellow-400 mb-4 flex items-center">
-              <Users className="w-5 h-5 mr-2" />
-              Bütün İstifadəçilər ({users.length})
-            </h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-yellow-400 flex items-center">
+                <Users className="w-5 h-5 mr-2" />
+                Bütün İstifadəçilər ({users.length})
+              </h2>
+              <Button onClick={fetchUsers} size="sm" variant="outline" className="border-purple-600 text-purple-400">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Yenilə
+              </Button>
+            </div>
             
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {users.map((user) => (
-                <div key={user.id} className="bg-gray-800 rounded-lg p-4 border-l-4 border-l-blue-400">
+                <div key={user.id} className="bg-gray-800 rounded-lg p-4 border-l-4 border-l-blue-400 hover:bg-gray-750 transition-colors">
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-white font-medium">{user.name}</h3>
+                      <div className="flex items-center space-x-3 mb-3">
+                        <h3 className="text-white font-bold text-lg">{user.name}</h3>
                         <Badge className="bg-purple-600">{user.user_code}</Badge>
+                        <Badge variant="outline" className="border-green-600 text-green-400">
+                          Online
+                        </Badge>
                       </div>
                       
-                      <div className="text-sm text-gray-400 space-y-1">
-                        <p>Email: {user.email}</p>
-                        <p>Balans: <span className="text-green-400 font-bold">{formatAmount(user.balance)} AZN</span></p>
-                        <p>Ümumi investisiya: {formatAmount(user.total_invested)} AZN</p>
-                        <p>Ümumi qazanc: {formatAmount(user.total_earned)} AZN</p>
-                        <p>Qeydiyyat: {new Date(user.join_date).toLocaleDateString()}</p>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="text-gray-400">Email: <span className="text-white">{user.email}</span></p>
+                          <p className="text-gray-400">Qeydiyyat: <span className="text-white">{new Date(user.join_date).toLocaleDateString()}</span></p>
+                        </div>
+                        <div>
+                          <p className="text-gray-400">Balans: <span className="text-green-400 font-bold">{formatAmount(user.balance)} AZN</span></p>
+                          <p className="text-gray-400">Ümumi investisiya: <span className="text-blue-400">{formatAmount(user.total_invested)} AZN</span></p>
+                          <p className="text-gray-400">Ümumi qazanc: <span className="text-yellow-400">{formatAmount(user.total_earned)} AZN</span></p>
+                        </div>
                       </div>
                     </div>
                     
@@ -585,7 +802,7 @@ const AdminPanel = () => {
                           setBalanceEditUser(user);
                           setNewBalance(user.balance.toString());
                         }}
-                        className="border-yellow-600 text-yellow-400"
+                        className="border-yellow-600 text-yellow-400 hover:bg-yellow-600 hover:text-black"
                       >
                         <Edit className="w-4 h-4 mr-1" />
                         Balans
@@ -595,75 +812,6 @@ const AdminPanel = () => {
                 </div>
               ))}
             </div>
-          </Card>
-        </TabsContent>
-
-        {/* Messages Tab */}
-        <TabsContent value="messages">
-          <Card className="bg-gray-900 border-gray-700 p-6">
-            <h2 className="text-xl font-bold text-yellow-400 mb-4 flex items-center">
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Dəstək Mesajları ({userMessages.length})
-            </h2>
-            
-            {userMessages.length === 0 ? (
-              <p className="text-gray-400 text-center py-8">Mesaj yoxdur.</p>
-            ) : (
-              <div className="space-y-4 max-h-96 overflow-y-auto">
-                {userMessages.map((message) => {
-                  const user = users.find(u => u.id === message.user_id);
-                  return (
-                    <div key={message.id} className="bg-gray-800 rounded-lg p-4 border-l-4 border-l-green-400">
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center space-x-2">
-                          <span className="text-white font-medium">{user?.name || 'Unknown'}</span>
-                          <Badge className="bg-purple-600">{user?.user_code}</Badge>
-                        </div>
-                        <span className="text-xs text-gray-500">
-                          {new Date(message.created_date).toLocaleString()}
-                        </span>
-                      </div>
-                      
-                      <p className="text-gray-300 mb-3">{message.content}</p>
-                      
-                      <div className="flex items-center space-x-2">
-                        <Input
-                          placeholder="Cavabınızı yazın..."
-                          value={selectedUser === message.id ? replyMessage : ''}
-                          onChange={(e) => {
-                            if (selectedUser === message.id) {
-                              setReplyMessage(e.target.value);
-                            }
-                          }}
-                          onFocus={() => setSelectedUser(message.id)}
-                          className="bg-gray-700 border-gray-600 text-white flex-1"
-                        />
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            if (replyMessage.trim()) {
-                              replyToMessage(message.id, replyMessage);
-                            }
-                          }}
-                          disabled={!replyMessage.trim() || selectedUser !== message.id}
-                          className="bg-blue-600 hover:bg-blue-700"
-                        >
-                          Cavab Ver
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => deleteMessage(message.id)}
-                          className="border-red-600 text-red-400"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
           </Card>
         </TabsContent>
 
@@ -683,7 +831,10 @@ const AdminPanel = () => {
                 className="bg-gray-800 border-gray-600 text-white"
                 onKeyPress={(e) => e.key === 'Enter' && searchUsers()}
               />
-              <Button onClick={searchUsers} className="bg-blue-600 hover:bg-blue-700">
+              <Button 
+                onClick={searchUsers} 
+                className="bg-blue-600 hover:bg-blue-700 text-white px-6"
+              >
                 <Search className="w-4 h-4 mr-2" />
                 Axtar
               </Button>
@@ -691,42 +842,55 @@ const AdminPanel = () => {
             
             {searchResults.length > 0 && (
               <div className="space-y-4">
-                <h3 className="text-white font-medium">Axtarış nəticələri ({searchResults.length})</h3>
+                <h3 className="text-white font-medium flex items-center">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Axtarış nəticələri ({searchResults.length})
+                </h3>
                 {searchResults.map((user) => (
-                  <div key={user.id} className="bg-gray-800 rounded-lg p-4 border-l-4 border-l-purple-400">
+                  <div key={user.id} className="bg-gray-800 rounded-lg p-4 border-l-4 border-l-purple-400 hover:bg-gray-750 transition-colors">
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <div className="flex items-center space-x-3 mb-2">
-                          <h3 className="text-white font-medium">{user.name}</h3>
+                        <div className="flex items-center space-x-3 mb-3">
+                          <h3 className="text-white font-bold text-lg">{user.name}</h3>
                           <Badge className="bg-purple-600">{user.user_code}</Badge>
                         </div>
                         
-                        <div className="text-sm text-gray-400 space-y-1">
-                          <p>Email: {user.email}</p>
-                          <p>Balans: <span className="text-green-400 font-bold">{formatAmount(user.balance)} AZN</span></p>
-                          <p>Ümumi investisiya: {formatAmount(user.total_invested)} AZN</p>
-                          <p>Ümumi qazanc: {formatAmount(user.total_earned)} AZN</p>
-                          
-                          {user.active_package && (
-                            <div className="mt-2 p-2 bg-gray-700 rounded">
-                              <p className="text-yellow-400 font-medium">Aktiv Paket:</p>
-                              <p>Tip: {user.active_package.package_type}</p>
-                              <p>İnvestisiya: {formatAmount(user.active_package.invested_amount)} AZN</p>
-                              <p>Toplanmış qazanc: {formatAmount(user.active_package.accumulated_earnings || 0)} AZN</p>
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-400">Email: <span className="text-white">{user.email}</span></p>
+                            <p className="text-gray-400">Balans: <span className="text-green-400 font-bold">{formatAmount(user.balance)} AZN</span></p>
+                          </div>
+                          <div>
+                            <p className="text-gray-400">Ümumi investisiya: <span className="text-blue-400">{formatAmount(user.total_invested)} AZN</span></p>
+                            <p className="text-gray-400">Ümumi qazanc: <span className="text-yellow-400">{formatAmount(user.total_earned)} AZN</span></p>
+                          </div>
+                        </div>
+                        
+                        {user.active_package && (
+                          <div className="mt-3 p-3 bg-gray-700 rounded-lg">
+                            <p className="text-yellow-400 font-medium mb-2">🏆 Aktiv Paket:</p>
+                            <div className="grid grid-cols-2 gap-2 text-sm">
+                              <p className="text-gray-300">Tip: <span className="text-white">{user.active_package.package_type}</span></p>
+                              <p className="text-gray-300">İnvestisiya: <span className="text-green-400">{formatAmount(user.active_package.invested_amount)} AZN</span></p>
                             </div>
-                          )}
-                          
-                          {user.recent_transactions && user.recent_transactions.length > 0 && (
-                            <div className="mt-2">
-                              <p className="text-blue-400 font-medium">Son əməliyyatlar:</p>
+                          </div>
+                        )}
+                        
+                        {user.recent_transactions && user.recent_transactions.length > 0 && (
+                          <div className="mt-3">
+                            <p className="text-blue-400 font-medium mb-2">📊 Son Əməliyyatlar:</p>
+                            <div className="space-y-1">
                               {user.recent_transactions.slice(0, 3).map((txn, idx) => (
-                                <p key={idx} className="text-xs">
-                                  {txn.type}: {formatAmount(txn.amount)} AZN ({txn.status})
+                                <p key={idx} className="text-xs text-gray-400">
+                                  {txn.type === 'deposit' ? '💰' : '🏦'} {formatAmount(txn.amount)} AZN - 
+                                  <span className={txn.status === 'approved' ? 'text-green-400' : txn.status === 'pending' ? 'text-yellow-400' : 'text-red-400'}>
+                                    {' '}{txn.status}
+                                  </span>
                                 </p>
                               ))}
                             </div>
-                          )}
-                        </div>
+                          </div>
+                        )}
                       </div>
                       
                       <div className="flex space-x-2">
@@ -737,7 +901,7 @@ const AdminPanel = () => {
                             setBalanceEditUser(user);
                             setNewBalance(user.balance.toString());
                           }}
-                          className="border-yellow-600 text-yellow-400"
+                          className="border-yellow-600 text-yellow-400 hover:bg-yellow-600 hover:text-black"
                         >
                           <Edit className="w-4 h-4 mr-1" />
                           Balans
@@ -756,15 +920,15 @@ const AdminPanel = () => {
       <Dialog open={!!balanceEditUser} onOpenChange={() => setBalanceEditUser(null)}>
         <DialogContent className="bg-gray-900 border-gray-700">
           <DialogHeader>
-            <DialogTitle className="text-white">
-              {balanceEditUser?.name} - Balans Yenilə
+            <DialogTitle className="text-white text-lg">
+              💰 {balanceEditUser?.name} - Balans Yenilə
             </DialogTitle>
           </DialogHeader>
           
           <div className="space-y-4">
-            <div>
+            <div className="bg-gray-800 rounded-lg p-4">
               <label className="block text-sm text-gray-400 mb-2">Cari Balans</label>
-              <p className="text-xl font-bold text-green-400">
+              <p className="text-2xl font-bold text-green-400">
                 {formatAmount(balanceEditUser?.balance || 0)} AZN
               </p>
             </div>
@@ -775,24 +939,26 @@ const AdminPanel = () => {
                 type="number"
                 value={newBalance}
                 onChange={(e) => setNewBalance(e.target.value)}
-                className="bg-gray-800 border-gray-600 text-white"
+                className="bg-gray-800 border-gray-600 text-white text-lg"
                 placeholder="Yeni balans daxil edin"
+                step="0.01"
               />
             </div>
             
-            <div className="flex space-x-2">
+            <div className="flex space-x-3">
               <Button
                 onClick={() => setBalanceEditUser(null)}
                 variant="outline"
-                className="flex-1"
+                className="flex-1 border-gray-600 text-gray-400"
               >
                 Ləğv Et
               </Button>
               <Button
                 onClick={() => updateUserBalance(balanceEditUser?.id, newBalance)}
-                className="flex-1 bg-green-600 hover:bg-green-700"
+                className="flex-1 bg-green-600 hover:bg-green-700 text-white"
                 disabled={!newBalance || isNaN(parseFloat(newBalance))}
               >
+                <CheckCircle className="w-4 h-4 mr-2" />
                 Yenilə
               </Button>
             </div>
@@ -804,7 +970,7 @@ const AdminPanel = () => {
       <Dialog open={receiptViewOpen} onOpenChange={setReceiptViewOpen}>
         <DialogContent className="bg-gray-900 border-gray-700 max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="text-white">Dekont Görüntülə</DialogTitle>
+            <DialogTitle className="text-white text-lg">📄 Dekont Görüntülə</DialogTitle>
           </DialogHeader>
           
           {currentReceipt && (
@@ -815,16 +981,17 @@ const AdminPanel = () => {
                   <img
                     src={currentReceipt.data_url}
                     alt="Receipt"
-                    className="max-w-full max-h-96 mx-auto rounded-lg border border-gray-600"
+                    className="max-w-full max-h-96 mx-auto rounded-lg border border-gray-600 shadow-lg"
                   />
                 ) : (
                   <div className="p-8 border border-gray-600 rounded-lg">
                     <FileText className="w-16 h-16 mx-auto text-gray-400 mb-4" />
-                    <p className="text-gray-400">PDF faylını görmək üçün aşağıdakı düyməni basın</p>
+                    <p className="text-gray-400 mb-4">PDF faylını görmək üçün aşağıdakı düyməni basın</p>
                     <Button
-                      className="mt-4"
+                      className="bg-blue-600 hover:bg-blue-700 text-white"
                       onClick={() => window.open(currentReceipt.data_url, '_blank')}
                     >
+                      <FileText className="w-4 h-4 mr-2" />
                       PDF-i Aç
                     </Button>
                   </div>
@@ -842,22 +1009,28 @@ const AdminPanel = () => {
 const AdminLogin = ({ onLogin }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (username === 'Batu' && password === '18061999') {
-      onLogin('admin@investaz.com', '18061999');
-    } else {
-      alert('❌ Yanlış istifadəçi adı və ya şifrə');
+    setLoading(true);
+    
+    try {
+      await onLogin(username, password);
+    } catch (error) {
+      console.error('Login error:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      <Card className="bg-gray-900 border-gray-700 p-8 w-full max-w-md">
+      <Card className="bg-gray-900 border-gray-700 p-8 w-full max-w-md shadow-2xl">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-yellow-400 mb-2">InvestAZ</h1>
           <p className="text-gray-400">Admin Paneli</p>
+          <div className="w-16 h-1 bg-yellow-400 mx-auto mt-2"></div>
         </div>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -891,9 +1064,17 @@ const AdminLogin = ({ onLogin }) => {
           
           <Button
             type="submit"
-            className="w-full bg-yellow-400 text-black hover:bg-yellow-500"
+            disabled={loading}
+            className="w-full bg-yellow-400 text-black hover:bg-yellow-500 font-bold py-3"
           >
-            Daxil Ol
+            {loading ? (
+              <div className="flex items-center justify-center">
+                <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
+                Daxil olunur...
+              </div>
+            ) : (
+              'Daxil Ol'
+            )}
           </Button>
         </form>
       </Card>
