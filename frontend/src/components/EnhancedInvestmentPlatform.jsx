@@ -727,28 +727,43 @@ const EnhancedInvestmentPlatform = () => {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-6 py-6">
+      {/* Main Content - Mobile Responsive */}
+      <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-gray-900 mb-6">
-            <TabsTrigger value="dashboard" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
-              <BarChart3 className="w-4 h-4 mr-2" />
+          <TabsList className="bg-gray-900 mb-4 sm:mb-6 grid grid-cols-2 sm:grid-cols-5 h-auto">
+            <TabsTrigger 
+              value="dashboard" 
+              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
+            >
+              <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Dashboard
             </TabsTrigger>
-            <TabsTrigger value="packages" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
-              <Package className="w-4 h-4 mr-2" />
+            <TabsTrigger 
+              value="packages" 
+              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
+            >
+              <Package className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Paketlər
             </TabsTrigger>
-            <TabsTrigger value="market" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
-              <ShoppingCart className="w-4 h-4 mr-2" />
+            <TabsTrigger 
+              value="market" 
+              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
+            >
+              <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Market
             </TabsTrigger>
-            <TabsTrigger value="transactions" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
-              <DollarSign className="w-4 h-4 mr-2" />
+            <TabsTrigger 
+              value="transactions" 
+              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
+            >
+              <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Əməliyyatlar
             </TabsTrigger>
-            <TabsTrigger value="support" className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black">
-              <MessageCircle className="w-4 h-4 mr-2" />
+            <TabsTrigger 
+              value="support" 
+              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
+            >
+              <MessageCircle className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Dəstək
             </TabsTrigger>
           </TabsList>
