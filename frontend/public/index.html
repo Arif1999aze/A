@@ -1,14 +1,85 @@
 <!doctype html>
-<html lang="en">
+<html lang="az">
     <head>
         <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="theme-color" content="#000000" />
-        <meta name="description" content="InvestAZ - Azərbaycanın ən etibarlı investisiya platforması" />
+        <!-- Enhanced Mobile Viewport -->
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        
+        <!-- iOS Meta Tags -->
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="InvestAZ" />
+        
+        <!-- Android Meta Tags -->
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="theme-color" content="#1f2937" />
+        <meta name="msapplication-navbutton-color" content="#1f2937" />
+        
+        <!-- PWA Meta Tags -->
+        <meta name="application-name" content="InvestAZ" />
+        <meta name="msapplication-TileColor" content="#1f2937" />
+        
+        <!-- SEO Meta Tags -->
+        <meta name="description" content="InvestAZ - Azərbaycanın ən etibarlı investisiya platforması. Güvənli investisiya və yüksək gəlir." />
+        <meta name="keywords" content="investisiya, azerbaijan, invest, gəlir, paket, crypto, maliyyə" />
+        <meta name="author" content="InvestAZ" />
+        
+        <!-- Open Graph Meta Tags -->
+        <meta property="og:title" content="InvestAZ - İnvestisiya Platforması" />
+        <meta property="og:description" content="Azərbaycanın ən etibarlı investisiya platforması" />
+        <meta property="og:type" content="website" />
+        <meta property="og:image" content="/favicon.ico" />
+        
+        <!-- CSS for mobile enhancements -->
+        <style>
+            * {
+                -webkit-tap-highlight-color: transparent;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            
+            input, textarea, button, select, a {
+                -webkit-user-select: auto;
+                -khtml-user-select: auto;
+                -moz-user-select: auto;
+                -ms-user-select: auto;
+                user-select: auto;
+            }
+            
+            body {
+                -webkit-overflow-scrolling: touch;
+                overscroll-behavior: none;
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+            }
+            
+            #root {
+                width: 100%;
+                height: 100vh;
+                overflow-y: auto;
+                overflow-x: hidden;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            /* iOS Safe Area */
+            @supports (padding-top: env(safe-area-inset-top)) {
+                body {
+                    padding-top: env(safe-area-inset-top);
+                    padding-bottom: env(safe-area-inset-bottom);
+                }
+            }
+        </style>
+        
         <title>InvestAZ - İnvestisiya Platforması</title>
     </head>
     <body>
-        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <noscript>Bu tətbiqi işlətmək üçün JavaScript aktivləşdirməlisiniz.</noscript>
         <div id="root"></div>
     </body>
 </html>
