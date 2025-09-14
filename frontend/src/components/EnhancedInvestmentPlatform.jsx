@@ -1787,7 +1787,7 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
       });
 
       await axios.post(`${API_BASE_URL}/api/transactions`, {
-        type: 'withdrawal',
+        type: 'withdraw',  // Fixed: backend expects 'withdraw' not 'withdrawal'
         amount: amountNum,
         card_name: cardName,
         card_number: cardNumber,
