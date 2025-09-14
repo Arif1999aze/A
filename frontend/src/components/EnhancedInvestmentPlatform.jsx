@@ -978,263 +978,148 @@ const EnhancedInvestmentPlatform = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Dashboard Tab - Mobile Responsive */}
+          {/* Profile Tab - User Profile Management */}
           <TabsContent value="dashboard">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-              {/* Left Column - Package Details - Full width on mobile */}
-              <div className="lg:col-span-2 space-y-4 sm:space-y-6">
-                <h2 className="text-xl sm:text-2xl font-bold">Aktiv Paketləriniz</h2>
+            <div className="space-y-6">
+              {/* Balance Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Card className="bg-gradient-to-br from-blue-900/50 to-blue-800/30 border border-blue-700/50 p-6 text-center">
+                  <div className="text-blue-400 text-3xl mb-2">💰</div>
+                  <p className="text-sm text-blue-300 font-medium mb-1">Depozit Balansı</p>
+                  <p className="text-2xl font-bold text-blue-400 mb-1">{formatAmount(user?.balance || 0)} AZN</p>
+                  <p className="text-xs text-blue-500">Paket alımı üçün</p>
+                </Card>
+                
+                <Card className="bg-gradient-to-br from-green-900/50 to-green-800/30 border border-green-700/50 p-6 text-center">
+                  <div className="text-green-400 text-3xl mb-2">💎</div>
+                  <p className="text-sm text-green-300 font-medium mb-1">Çəkiləbilir Qazanc</p>
+                  <p className="text-2xl font-bold text-green-400 mb-1">{formatAmount(user?.total_earned || 0)} AZN</p>
+                  <p className="text-xs text-green-500">Çıxarış üçün</p>
+                </Card>
+              </div>
+
+              {/* User Profile Info */}
+              <Card className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border border-gray-600/50 p-6">
+                <h3 className="text-xl font-bold mb-4 text-white flex items-center">
+                  <Users className="w-5 h-5 mr-2 text-blue-400" />
+                  Profil Məlumatları
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm text-gray-400">Ad Soyad</label>
+                      <p className="font-semibold text-white">{user?.name}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-400">Email</label>
+                      <p className="font-semibold text-white">{user?.email}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm text-gray-400">İstifadəçi Kodu</label>
+                      <p className="font-semibold text-purple-400">{user?.user_code}</p>
+                    </div>
+                    <div>
+                      <label className="text-sm text-gray-400">Referral Numarası</label>
+                      <p className="font-semibold text-yellow-400">{user?.user_code || 'REF-' + (user?.id?.slice(-6) || '000000')}</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="flex space-x-3 mt-6">
+                  <Button 
+                    onClick={() => setShowProfileModal(true)}
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700"
+                  >
+                    <Edit className="w-4 h-4 mr-2" />
+                    Profili Düzəlt
+                  </Button>
+                  <Button 
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="border-red-500 text-red-400 hover:bg-red-500 hover:text-white"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Çıxış
+                  </Button>
+                </div>
+              </Card>
+
+              {/* Active Packages */}
+              <Card className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 border border-gray-600/50 p-6">
+                <h3 className="text-xl font-bold mb-4 text-white flex items-center">
+                  <Package className="w-5 h-5 mr-2 text-green-400" />
+                  Aktiv Paketləriniz ({activePackages.length})
+                </h3>
                 
                 {activePackages.length === 0 ? (
-                  <Card className="bg-gray-900 border-gray-700 p-6 sm:p-8 text-center">
-                    <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-lg sm:text-xl font-medium mb-2">Aktiv paketiniz yoxdur</h3>
-                    <p className="text-gray-400 mb-4 text-sm sm:text-base">İnvestisiya etmək üçün paket seçin</p>
+                  <div className="text-center py-8">
+                    <div className="text-gray-600 text-4xl mb-4">📦</div>
+                    <p className="text-gray-400 mb-4">Aktiv paketiniz yoxdur</p>
                     <Button 
-                      onClick={() => setActiveTab('packages')}
-                      className="bg-yellow-400 text-black hover:bg-yellow-500 w-full sm:w-auto"
+                      onClick={() => setActiveTab('market')}
+                      className="bg-gradient-to-r from-yellow-500 to-yellow-600"
                     >
                       Paket Seç
                     </Button>
-                  </Card>
+                  </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
                     {activePackages.map((pkg, index) => {
                       const packageDef = packageDefinitions[pkg.package_type];
                       const totalExpectedEarnings = pkg.invested_amount * packageDef.multiplier;
                       const progress = (pkg.accumulated_earnings / totalExpectedEarnings) * 100;
-                      const timeRemaining = formatTimeRemaining(pkg.end_date);
                       const nextCollection = getTimeUntilNextCollection(pkg);
-                      const dailyEarnings = (pkg.invested_amount * packageDef.multiplier) / packageDef.duration;
                       const canCollect = canCollectEarnings(pkg);
                       
+                      // Calculate remaining days
+                      const endDate = new Date(pkg.end_date);
+                      const now = new Date();
+                      const remainingMs = endDate - now;
+                      const remainingDays = Math.max(0, Math.ceil(remainingMs / (1000 * 60 * 60 * 24)));
+                      
                       return (
-                        <Card key={pkg.id} className={`bg-gradient-to-br ${packageDef.gradient} p-1 relative overflow-hidden ${packageDef.shadowColor} shadow-xl hover:shadow-2xl transition-all duration-500`}>
-                          <div className="bg-gray-900/95 backdrop-blur rounded-lg p-4 sm:p-6 relative">
-                            {/* Professional Package Header */}
-                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-3 sm:space-y-0 mb-6">
-                              <div className="flex items-center space-x-4">
-                                <div className={`text-3xl sm:text-4xl p-3 rounded-xl bg-gradient-to-r ${packageDef.borderGradient} shadow-lg`}>
-                                  {packageDef.icon}
-                                </div>
+                        <div key={pkg.id} className={`p-4 rounded-lg bg-gradient-to-r ${packageDef.gradient} opacity-90`}>
+                          <div className="bg-gray-900/90 rounded-lg p-4">
+                            <div className="flex justify-between items-start mb-3">
+                              <div className="flex items-center space-x-3">
+                                <div className="text-3xl">{packageDef.icon}</div>
                                 <div>
-                                  <h3 className="text-xl sm:text-2xl font-bold mb-1" style={{color: packageDef.color}}>
-                                    {packageDef.name} #{index + 1}
-                                  </h3>
-                                  <p className="text-gray-300 text-sm font-semibold">İnvestisya: {formatAmount(pkg.invested_amount)} AZN</p>
-                                  <p className="text-green-400 text-xs bg-green-900/30 px-2 py-1 rounded-full inline-block mt-1">
-                                    💰 Gündelik: {formatAmount(dailyEarnings)} AZN
-                                  </p>
+                                  <h4 className="font-bold text-white" style={{color: packageDef.color}}>
+                                    {packageDef.name}
+                                  </h4>
+                                  <p className="text-sm text-gray-300">{formatAmount(pkg.invested_amount)} AZN</p>
                                 </div>
                               </div>
-                              <div className="flex flex-col space-y-2">
-                                <Badge className={`bg-gradient-to-r ${packageDef.borderGradient} text-white animate-pulse px-3 py-1 self-start font-semibold`}>
-                                  ✨ AKTİV
-                                </Badge>
-                                <Badge className="bg-blue-600/80 text-white text-xs self-start">
-                                  🔥 CANLI
-                                </Badge>
-                              </div>
-                            </div>
-
-                            {/* Professional Package Stats - Enhanced Design */}
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
-                              <div className="text-center bg-gradient-to-br from-green-900/50 to-green-800/30 rounded-xl p-3 border border-green-700/30">
-                                <div className="text-green-400 text-lg mb-1">🎯</div>
-                                <p className="text-xs sm:text-sm text-green-300 font-medium">Paket Sonu Gəlir</p>
-                                <p className="text-sm sm:text-lg font-bold text-green-400">
-                                  {formatAmount(totalExpectedEarnings)} AZN
-                                </p>
-                              </div>
-                              <div className="text-center bg-gradient-to-br from-yellow-900/50 to-yellow-800/30 rounded-xl p-3 border border-yellow-700/30">
-                                <div className="text-yellow-400 text-lg mb-1">💎</div>
-                                <p className="text-xs sm:text-sm text-yellow-300 font-medium">Cari Qazanc</p>
-                                <p className="text-sm sm:text-lg font-bold text-yellow-400">
-                                  {formatAmount(pkg.accumulated_earnings || 0)} AZN
-                                </p>
-                              </div>
-                              <div className="text-center bg-gradient-to-br from-blue-900/50 to-blue-800/30 rounded-xl p-3 border border-blue-700/30">
-                                <div className="text-blue-400 text-lg mb-1">⏰</div>
-                                <p className="text-xs sm:text-sm text-blue-300 font-medium">Paket Qalan Vaxt</p>
-                                <p className="text-sm sm:text-lg font-bold text-blue-400">
-                                  {timeRemaining}
-                                </p>
-                              </div>
-                              <div className="text-center bg-gradient-to-br from-purple-900/50 to-purple-800/30 rounded-xl p-3 border border-purple-700/30">
-                                <div className="text-purple-400 text-lg mb-1">📅</div>
-                                <p className="text-xs sm:text-sm text-purple-300 font-medium">Sonrakı Toplama</p>
-                                <p className="text-sm sm:text-lg font-bold text-purple-400">
-                                  {canCollect ? '✅ Hazır!' : `${nextCollection.hours}s ${nextCollection.minutes}d`}
-                                </p>
-                              </div>
+                              <Badge className="bg-green-600 animate-pulse">
+                                Aktiv
+                              </Badge>
                             </div>
                             
-                            {/* Professional Package Information */}
-                            <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 rounded-xl p-4 mb-6 border border-gray-600/30">
-                              <div className="grid grid-cols-2 gap-4 text-sm">
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-2xl">📈</span>
-                                  <div>
-                                    <span className="text-gray-300">Paket Müddəti:</span>
-                                    <div className="text-white font-semibold">{packageDef.duration} gün</div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-2xl">🔥</span>
-                                  <div>
-                                    <span className="text-gray-300">Toplam Gəlir:</span>
-                                    <div className="text-yellow-400 font-semibold">%{(packageDef.multiplier * 100).toFixed(0)}</div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-2xl">💰</span>
-                                  <div>
-                                    <span className="text-gray-300">Toplam Edilən:</span>
-                                    <div className="text-green-400 font-semibold">{formatAmount(pkg.total_earned || 0)} AZN</div>
-                                  </div>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-2xl">⚡</span>
-                                  <div>
-                                    <span className="text-gray-300">Tamamlanma:</span>
-                                    <div className="text-blue-400 font-semibold">{progress.toFixed(1)}%</div>
-                                  </div>
-                                </div>
+                            <div className="grid grid-cols-3 gap-3 text-center text-xs">
+                              <div>
+                                <p className="text-gray-400">Toplam Qazanc</p>
+                                <p className="font-bold text-yellow-400">{formatAmount(pkg.total_earned || 0)} AZN</p>
                               </div>
-                            </div>
-
-                            {/* Professional Progress Bar */}
-                            <div className="mb-6">
-                              <div className="flex justify-between text-xs sm:text-sm mb-3">
-                                <span className="font-semibold text-gray-300">💎 Qazanc Tamamlanması</span>
-                                <span className="font-bold text-yellow-400">{progress.toFixed(1)}% ({formatAmount(pkg.accumulated_earnings || 0)} / {formatAmount(totalExpectedEarnings)} AZN)</span>
+                              <div>
+                                <p className="text-gray-400">Qalan Gün</p>
+                                <p className="font-bold text-blue-400">{remainingDays} gün</p>
                               </div>
-                              <div className="relative">
-                                <Progress value={progress} className="h-4 bg-gray-800 border border-gray-600" />
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                  <span className="text-xs font-bold text-white drop-shadow-lg">
-                                    {progress.toFixed(1)}%
-                                  </span>
-                                </div>
+                              <div>
+                                <p className="text-gray-400">Sonrakı Toplama</p>
+                                <p className="font-bold text-purple-400">
+                                  {canCollect ? 'Hazır!' : `${nextCollection.hours}s ${nextCollection.minutes}d`}
+                                </p>
                               </div>
-                            </div>
-
-                            {/* Professional Collection Section - 12 Hour System */}
-                            <div className="flex flex-col space-y-4">
-                              <div className="flex justify-between items-center text-xs sm:text-sm bg-gray-800/50 rounded-lg p-3 border border-gray-600/30">
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-lg">🕐</span>
-                                  <span className="text-gray-300">Son toplama: {pkg.last_collection_time ? new Date(pkg.last_collection_time).toLocaleString() : 'Heç vaxt'}</span>
-                                </div>
-                                <div className="flex items-center space-x-2">
-                                  <span className="text-gray-300">Sistem:</span>
-                                  <Badge className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 font-semibold">
-                                    📅 Gündə 2 dəfə
-                                  </Badge>
-                                </div>
-                              </div>
-                              
-                              <div className="flex flex-col gap-3">
-                                <Button
-                                  onClick={() => handleCollectEarnings(pkg.id)}
-                                  disabled={!canCollect || pkg.accumulated_earnings <= 0}
-                                  className={`w-full py-4 text-base font-bold transition-all duration-300 ${
-                                    canCollect && pkg.accumulated_earnings > 0
-                                      ? `bg-gradient-to-r ${packageDef.borderGradient} hover:scale-105 shadow-lg ${packageDef.shadowColor} text-white`
-                                      : 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-                                  } disabled:opacity-50 disabled:cursor-not-allowed`}
-                                >
-                                  <Coins className="w-5 h-5 mr-2" />
-                                  {canCollect ? 
-                                    `💰 Qazanc Topla (${formatAmount(pkg.accumulated_earnings || 0)} AZN)` : 
-                                    `⏳ Gözlə (${nextCollection.hours}s ${nextCollection.minutes}d)`
-                                  }
-                                </Button>
-                              </div>
-                              
-                              {!canCollect && (
-                                <div className="border-2 border-dashed border-blue-500/50 rounded-xl p-4 text-center bg-gradient-to-br from-blue-900/20 to-indigo-900/20">
-                                  <div className="text-3xl mb-2">⏰</div>
-                                  <p className="text-sm text-blue-300 font-semibold mb-2">
-                                    Növbəti qazanc {nextCollection.hours} saat {nextCollection.minutes} dəqiqə sonra toplanacaq
-                                  </p>
-                                  <p className="text-xs text-blue-400">
-                                    💡 Səbirlə gözləyin - 12 saatda bir qazanc toplayın və gəlirinizi artırın
-                                  </p>
-                                </div>
-                              )}
                             </div>
                           </div>
-                        </Card>
+                        </div>
                       );
                     })}
                   </div>
                 )}
-              </div>
-
-              {/* Right Column - Live Data - Mobile adjusted */}
-              <div className="space-y-4 sm:space-y-6">
-                {/* Live Transactions - Mobile Responsive */}
-                <Card className="bg-gray-900 border-gray-700 p-4">
-                  <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 flex items-center">
-                    <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse mr-2"></div>
-                    <span className="text-sm sm:text-base">Canlı Əməliyyatlar</span>
-                  </h3>
-                  <div className="space-y-2 max-h-48 sm:max-h-64 overflow-y-auto">
-                    {liveTransactions.map((transaction) => (
-                      <div key={transaction.id} className="bg-gray-800 rounded p-2 text-sm border-l-2 border-l-green-400 hover:bg-gray-700 transition-colors">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center space-x-2">
-                            <span className="text-base">{transaction.icon}</span>
-                            <span className="font-medium text-xs sm:text-sm text-white truncate">{transaction.name}</span>
-                          </div>
-                          <Badge size="sm" className={`${transaction.color} text-white text-xs border-0`}>
-                            {transaction.type}
-                          </Badge>
-                        </div>
-                        <div className="flex justify-between text-xs text-gray-400 mt-1">
-                          <span className="font-bold text-green-400">+{formatAmount(transaction.amount)} AZN</span>
-                          <span>{transaction.timestamp.toLocaleTimeString()}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </Card>
-
-                {/* Quick Stats - Mobile Responsive */}
-                <Card className="bg-gray-900 border-gray-700 p-4">
-                  <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Statistika</h3>
-                  <div className="space-y-2 sm:space-y-3">
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-xs sm:text-sm">Toplam İnvestisiya:</span>
-                      <span className="font-bold text-blue-400 text-xs sm:text-sm">{formatAmount(user?.total_invested || 0)} AZN</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-xs sm:text-sm">Toplam Qazanc:</span>
-                      <span className="font-bold text-green-400 text-xs sm:text-sm">{formatAmount(user?.total_earned || 0)} AZN</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-xs sm:text-sm">Aktiv Paketlər:</span>
-                      <span className="font-bold text-purple-400 text-xs sm:text-sm">{activePackages.length}</span>
-                    </div>
-                    <Separator />
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-xs sm:text-sm">Depozit Balansı:</span>
-                      <span className="font-bold text-blue-400 text-xs sm:text-sm">{formatAmount(user?.balance || 0)} AZN</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-400 text-xs sm:text-sm">Çəkiləbilir Qazanc:</span>
-                      <span className="font-bold text-green-400 text-sm sm:text-base">{formatAmount(user?.total_earned || 0)} AZN</span>
-                    </div>
-                  </div>
-                </Card>
-
-                {/* Enhanced Company Information */}
-                <CompanyInfo />
-              </div>
-              
-              {/* Company Information */}
-              <CompanyInfo className="mt-6" />
+              </Card>
             </div>
           </TabsContent>
 
