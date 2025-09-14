@@ -14,7 +14,8 @@ const formatAmount = (amount) => {
   return amount.toLocaleString('az-AZ', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 };
 
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL;
+// For testing purposes, use local backend URL
+const API_BASE_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:8001' : process.env.REACT_APP_BACKEND_URL;
 
 const AdminPanel = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
