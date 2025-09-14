@@ -55,14 +55,21 @@ print(f"Testing InvestAZ Backend API at: {API_URL}")
 print("=" * 60)
 
 # Test data - Using realistic data as per requirements
+import random
+import time as time_module
+
+# Generate unique email addresses to avoid conflicts
+timestamp = int(time_module.time())
+random_suffix = random.randint(1000, 9999)
+
 test_user_data = {
-    "email": "aysel.mammadova@gmail.com",
+    "email": f"aysel.mammadova.{timestamp}.{random_suffix}@gmail.com",
     "name": "Aysel Mammadova", 
     "password": "securepass123"
 }
 
 collection_test_user_data = {
-    "email": "collection.test.user@example.com",
+    "email": f"collection.test.user.{timestamp}.{random_suffix}@example.com",
     "name": "Collection Test User",
     "password": "testpass123"
 }
