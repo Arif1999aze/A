@@ -173,6 +173,54 @@ const EnhancedInvestmentPlatform = () => {
     }
   }, [token]);
 
+  // Start countdown timers for active packages
+  useEffect(() => {
+    if (activePackages.length > 0) {
+      activePackages.forEach(pkg => {
+        if (!countdownTimers[pkg.id]) {
+          // Check if collection is available
+          const lastCollection = pkg.last_collection_time ? new Date(pkg.last_collection_time) : null;
+          const now = new Date();
+          const timeSinceLastCollection = lastCollection ? (now - lastCollection) / 1000 : Infinity;
+          
+          if (timeSinceLastCollection >= 20 * 60) { // 20 minutes passed
+            // Ready for collection, no countdown needed
+            if (autoCollectionEnabled && pkg.accumulated_earnings > 0) {
+              handleAutoCollection(pkg.id);
+            }
+          } else {
+            // Start countdown for remaining time
+            const remainingTime = (20 * 60) - timeSinceLastCollection;
+            startCountdownTimer(pkg.id, remainingTime);
+          }
+        }
+      });
+    }
+    
+    // Cleanup timers for packages that no longer exist
+    Object.keys(countdownTimers).forEach(packageId => {
+      if (!activePackages.find(pkg => pkg.id === packageId)) {
+        if (countdownTimers[packageId]) {
+          clearInterval(countdownTimers[packageId]);
+        }
+        setCountdownTimers(prev => {
+          const updated = { ...prev };
+          delete updated[packageId];
+          return updated;
+        });
+      }
+    });
+  }, [activePackages]);
+
+  // Cleanup timers on unmount
+  useEffect(() => {
+    return () => {
+      Object.values(countdownTimers).forEach(timer => {
+        if (timer) clearInterval(timer);
+      });
+    };
+  }, []);
+
   // Initialize platform
   const initializePlatform = () => {
     setMarketItems(marketItemsData);
