@@ -1658,7 +1658,9 @@ const WithdrawForm = ({ onWithdraw, maxAmount }) => {
 
 const DepositForm = ({ onDeposit }) => {
   const [amount, setAmount] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
+  const [name, setName] = useState('');
+  const [surname, setSurname] = useState('');
+  const [bank, setBank] = useState('');
   const [receipt, setReceipt] = useState(null);
 
   const handleSubmit = (e) => {
@@ -1671,10 +1673,12 @@ const DepositForm = ({ onDeposit }) => {
       return;
     }
     
-    if (cardNumber.length === 16) {
-      onDeposit(amountNum, cardNumber, receipt);
+    if (name && surname && bank) {
+      onDeposit(amountNum, name, surname, bank, receipt);
       setAmount('');
-      setCardNumber('');
+      setName('');
+      setSurname('');
+      setBank('');
       setReceipt(null);
     } else {
       alert('❌ Zəhmət olmasa bütün məlumatları düzgün daxil edin.');
@@ -1700,22 +1704,39 @@ const DepositForm = ({ onDeposit }) => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Kart Nömrəsi (16 rəqəm)</label>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Ad</label>
         <Input
           type="text"
-          value={cardNumber}
-          onChange={(e) => {
-            const value = e.target.value.replace(/\D/g, '');
-            if (value.length <= 16) {
-              setCardNumber(value);
-            }
-          }}
+          value={name}
+          onChange={(e) => setName(e.target.value)}
           className="bg-gray-800 border-gray-600 text-white"
-          placeholder="1234567890123456"
-          maxLength="16"
+          placeholder="Adınızı daxil edin"
           required
         />
-        <div className="text-xs text-gray-400 mt-1">{cardNumber.length}/16 rəqəm</div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Soyad</label>
+        <Input
+          type="text"
+          value={surname}
+          onChange={(e) => setSurname(e.target.value)}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="Soyadınızı daxil edin"
+          required
+        />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">Bank Adı</label>
+        <Input
+          type="text"
+          value={bank}
+          onChange={(e) => setBank(e.target.value)}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="Bank adını daxil edin (məs: Kapital Bank)"
+          required
+        />
       </div>
 
       <div>
