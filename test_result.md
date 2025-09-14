@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-## user_problem_statement: "The user reported a critical package purchase issue in the customer panel, particularly on Android devices. The error message was: 'musterı panelinde paket alımı hata veriyor ve diğer satın alma işlemleri dogru calıssın' (package purchase in customer panel gives error, other purchase operations should work correctly). Additionally, the user requested: 1) Complete removal of 'Gözləyən Əməliyyatlar' (Pending Transactions) section from customer page, 2) Implementation of new withdrawal/deposit window structure with specific fields (name, surname, bank, amount), 3) Fixing Android package purchase bugs with robust fetch function for cross-platform compatibility."
+## user_problem_statement: "User requested major changes to the investment platform: 1) Remove 20-minute automatic countdown timer and auto-collection toggle from package information, 2) Replace with 12-hour collection system (2 times per day), 3) Ensure all users can properly collect package earnings with correct calculation, 4) Display current earnings on screen when customer collects, 5) Show how much money the package has generated, 6) Redesign package collection page colors and theme to look like a real investment site"
 
 ## backend:
   - task: "Remove lisenziya references from backend"
