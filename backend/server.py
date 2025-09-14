@@ -58,12 +58,15 @@ security = HTTPBearer(auto_error=False)
 # Create the main app
 app = FastAPI(title="InvestAZ API", version="1.0.0")
 
-# Add CORS middleware
+# Add CORS middleware - Allow both local and production origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins for development
+    allow_origins=[
+        "http://localhost:3000",
+        "https://investaz-platform.preview.emergentagent.com"
+    ],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
