@@ -601,20 +601,20 @@ const EnhancedInvestmentPlatform = () => {
             </h3>
             <div className="max-w-2xl mx-auto space-y-2">
               {liveTransactions.map((transaction) => (
-                <div key={transaction.id} className="bg-gray-900 rounded-lg p-3 sm:p-4 border-l-4 border-l-green-400 animate-in slide-in-from-right">
+                <div key={transaction.id} className="bg-gray-900 rounded-lg p-3 sm:p-4 border-l-4 border-l-green-400 animate-in slide-in-from-right duration-500">
                   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="font-medium text-sm sm:text-base">{transaction.name}</span>
-                      <Badge className={
-                        transaction.type === 'depozit' ? 'bg-blue-600 text-xs' :
-                        transaction.type === 'qazanc' ? 'bg-green-600 text-xs' : 'bg-purple-600 text-xs'
-                      }>
+                      <span className="text-lg">{transaction.icon}</span>
+                      <span className="font-medium text-sm sm:text-base text-white">{transaction.name}</span>
+                      <Badge className={`${transaction.color} text-white text-xs border-0`}>
                         {transaction.type}
                       </Badge>
                     </div>
                     <div className="text-left sm:text-right">
-                      <p className="font-bold text-green-400 text-sm sm:text-base">+{formatAmount(transaction.amount)} AZN</p>
+                      <p className="font-bold text-green-400 text-sm sm:text-base animate-pulse">
+                        +{formatAmount(transaction.amount)} AZN
+                      </p>
                       <p className="text-xs text-gray-500">{transaction.timestamp.toLocaleTimeString()}</p>
                     </div>
                   </div>
