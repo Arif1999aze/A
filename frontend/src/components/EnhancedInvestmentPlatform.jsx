@@ -171,55 +171,40 @@ const EnhancedInvestmentPlatform = () => {
     }
   }, [token]);
 
-  // Start countdown timers for active packages
+  // Start collection status check for active packages
   useEffect(() => {
     if (activePackages.length > 0) {
       activePackages.forEach(pkg => {
-        if (!countdownTimers[pkg.id]) {
-          // Check if collection is available
-          const lastCollection = pkg.last_collection_time ? new Date(pkg.last_collection_time) : null;
-          const now = new Date();
-          
-          let timeSinceLastCollection = Infinity;
-          if (lastCollection && !isNaN(lastCollection.getTime())) {
-            timeSinceLastCollection = (now - lastCollection) / 1000; // Convert to seconds
+        // Check collection status every minute for each package
+        const checkInterval = setInterval(async () => {
+          try {
+            const response = await axios.get(`${API_BASE_URL}/api/packages/${pkg.id}/collection-status`, {
+              headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            // Package collection status updated in the background
+            // The can_collect status will be reflected when user refreshes
+          } catch (error) {
+            console.error('Collection status check error:', error);
           }
-          
-          const cooldownSeconds = 20 * 60; // 20 minutes in seconds
-          
-          if (timeSinceLastCollection >= cooldownSeconds) {
-            // Ready for collection, no countdown needed
-            if (autoCollectionEnabled && pkg.accumulated_earnings > 0) {
-              handleAutoCollection(pkg.id);
-            }
-          } else if (timeSinceLastCollection < cooldownSeconds && lastCollection) {
-            // Start countdown for remaining time
-            const remainingTime = cooldownSeconds - timeSinceLastCollection;
-            if (remainingTime > 0) {
-              startCountdownTimer(pkg.id, remainingTime);
-            }
-          } else {
-            // First time or invalid date, start fresh 20 minute timer
-            startCountdownTimer(pkg.id, cooldownSeconds);
-          }
-        }
+        }, 60000); // Check every minute
+
+        // Store interval for cleanup
+        if (!window.packageStatusCheckers) window.packageStatusCheckers = {};
+        window.packageStatusCheckers[pkg.id] = checkInterval;
       });
     }
     
-    // Cleanup timers for packages that no longer exist
-    Object.keys(countdownTimers).forEach(packageId => {
-      if (!activePackages.find(pkg => pkg.id === packageId)) {
-        if (countdownTimers[packageId] && typeof countdownTimers[packageId] === 'number') {
-          clearInterval(countdownTimers[packageId]);
+    // Cleanup intervals for non-existing packages
+    if (window.packageStatusCheckers) {
+      Object.keys(window.packageStatusCheckers).forEach(packageId => {
+        if (!activePackages.find(pkg => pkg.id === packageId)) {
+          clearInterval(window.packageStatusCheckers[packageId]);
+          delete window.packageStatusCheckers[packageId];
         }
-        setCountdownTimers(prev => {
-          const updated = { ...prev };
-          delete updated[packageId];
-          return updated;
-        });
-      }
-    });
-  }, [activePackages, autoCollectionEnabled]);
+      });
+    }
+  }, [activePackages, token]);
 
   // Cleanup timers on unmount
   useEffect(() => {
