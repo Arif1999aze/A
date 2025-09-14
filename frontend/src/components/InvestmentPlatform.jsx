@@ -338,21 +338,26 @@ const InvestmentPlatform = () => {
       });
       
       const { access_token } = response.data;
-      localStorage.setItem('token', access_token);
-      setToken(access_token);
-      setIsLoggedIn(true);
-      setRegisterOpen(false);
-      
-      // Show welcome bonus
-      alert('🎉 Qeydiyyat bonusu: 10 AZN hesabınıza əlavə edildi!');
-      
-      // Fetch user data
-      setTimeout(() => {
-        fetchUserData();
-        fetchUserPackages();
-        fetchUserTransactions();
-        fetchUserMessages();
-      }, 100);
+      // Validate token before storing
+      if (access_token && access_token.trim() && access_token.includes('.')) {
+        localStorage.setItem('token', access_token);
+        setToken(access_token);
+        setIsLoggedIn(true);
+        setRegisterOpen(false);
+        
+        // Show welcome bonus
+        alert('🎉 Qeydiyyat bonusu: 10 AZN hesabınıza əlavə edildi!');
+        
+        // Fetch user data
+        setTimeout(() => {
+          fetchUserData();
+          fetchUserPackages();
+          fetchUserTransactions();
+          fetchUserMessages();
+        }, 100);
+      } else {
+        throw new Error('Invalid token received');
+      }
       
     } catch (error) {
       alert('❌ Qeydiyyat zamanı xəta baş verdi. Bu email artıq mövcuddur.');
