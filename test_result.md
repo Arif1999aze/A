@@ -451,9 +451,7 @@
   run_ui: true
 
 ## test_plan:
-  current_focus:
-    - "Android Package Purchase Bug Fix"
-    - "Enhanced Withdrawal/Deposit Forms"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
