@@ -740,7 +740,7 @@ const EnhancedInvestmentPlatform = () => {
               className="bg-yellow-400 text-black hover:bg-yellow-500 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
             >
               <Gift className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              İndi Qoşul və 10 AZN Bonus Al!
+              İndi Qoşul və 50 AZN Bonus Al!
             </Button>
           </div>
         </div>
