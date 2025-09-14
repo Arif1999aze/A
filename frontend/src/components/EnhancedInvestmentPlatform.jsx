@@ -1052,7 +1052,7 @@ const EnhancedInvestmentPlatform = () => {
                               <div className="text-center bg-gray-800 rounded-lg p-3">
                                 <p className="text-xs sm:text-sm text-gray-400">Sonrakı Toplama</p>
                                 <p className="text-sm sm:text-lg font-bold text-purple-400">
-                                  {formatCountdown(countdownTime)}
+                                  {canCollect ? 'Hazır!' : `${nextCollection.hours}s ${nextCollection.minutes}d`}
                                 </p>
                               </div>
                             </div>
