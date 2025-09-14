@@ -72,28 +72,11 @@ admin_credentials = {
     "password": "18061999"
 }
 
-# Test data for new transaction format
-transaction_test_data = {
-    "withdrawal": {
-        "card_name": "Leyla Hasanova",  # Combined name + surname
-        "card_number": "Kapital Bank"   # Bank name instead of card number
-    },
-    "deposit": {
-        "card_name": "Leyla Hasanova",  # Combined name + surname  
-        "card_number": "Pasha Bank"     # Bank name instead of card number
-    }
-}
-
 # Global variables for tokens and test data
 user_token = None
 admin_token = None
 test_user_id = None
 test_user_code = None
-test_package_id = None
-test_transaction_id = None
-test_message_id = None
-websocket_messages = []
-admin_notifications = []
 
 def make_request(method, endpoint, data=None, headers=None, files=None):
     """Make HTTP request with error handling"""
@@ -148,759 +131,586 @@ def setup_test_environment():
     
     return user_token and admin_token
 
-def test_authentication_flow():
-    """PRIORITY TEST 1: Authentication Flow - JWT authentication working properly"""
-    print("\n🔴 PRIORITY TEST 1: Authentication Flow")
-    print("Testing user registration, login, admin login, and protected routes...")
+def test_collection_cooldown_system():
+    """CRITICAL TEST 1: Collection Cooldown System (12-hour system)"""
+    print("\n🔴 CRITICAL TEST 1: Collection Cooldown System (12-hour)")
+    print("Testing COLLECTION_COOLDOWN_MINUTES = 720 (12 hours) and proper error messages...")
     
-    # Test 1: User Registration
-    print("   Testing user registration...")
-    reg_response = make_request('POST', '/auth/register', test_user_data)
-    if not reg_response or reg_response.status_code not in [200, 201]:
-        print(f"❌ User registration failed: {reg_response.text if reg_response else 'No response'}")
+    if not user_token:
+        print("❌ No user token available")
         return False
     
-    reg_data = reg_response.json()
-    if 'access_token' not in reg_data:
-        print("❌ Registration response missing access token")
-        return False
-    
-    global user_token, test_user_id, test_user_code
-    user_token = reg_data['access_token']
-    print("     ✅ User registration successful with JWT token")
-    
-    # Test 2: Get user profile (protected route)
-    print("   Testing protected route access...")
     headers = {"Authorization": f"Bearer {user_token}"}
-    profile_response = make_request('GET', '/auth/me', headers=headers)
+    
+    # Step 1: Create a test user specifically for collection testing
+    collection_user_response = make_request('POST', '/auth/register', collection_test_user_data)
+    if not collection_user_response or collection_user_response.status_code not in [200, 201]:
+        print("❌ Failed to create collection test user")
+        return False
+    
+    collection_token = collection_user_response.json()['access_token']
+    collection_headers = {"Authorization": f"Bearer {collection_token}"}
+    
+    # Get collection user profile
+    profile_response = make_request('GET', '/auth/me', headers=collection_headers)
     if not profile_response or profile_response.status_code != 200:
-        print("❌ Protected route access failed")
+        print("❌ Failed to get collection user profile")
         return False
     
-    profile_data = profile_response.json()
-    test_user_id = profile_data['id']
-    test_user_code = profile_data['user_code']
+    collection_user_id = profile_response.json()['id']
+    print(f"✅ Collection test user created: {collection_user_id}")
     
-    # Verify user data
-    if profile_data['email'] != test_user_data['email'] or profile_data['name'] != test_user_data['name']:
-        print("❌ User profile data mismatch")
-        return False
-    
-    # Verify AZ code format
-    if not test_user_code.startswith('AZ'):
-        print(f"❌ User code format incorrect: {test_user_code}")
-        return False
-    
-    print(f"     ✅ Protected route access successful, user code: {test_user_code}")
-    
-    # Test 3: Admin Login
-    print("   Testing admin login...")
-    admin_response = make_request('POST', '/auth/login', admin_credentials)
-    if not admin_response or admin_response.status_code != 200:
-        print("❌ Admin login failed")
-        return False
-    
-    admin_data = admin_response.json()
-    if 'access_token' not in admin_data:
-        print("❌ Admin login response missing access token")
-        return False
-    
-    global admin_token
-    admin_token = admin_data['access_token']
-    print("     ✅ Admin login successful")
-    
-    # Test 4: Admin protected route
-    print("   Testing admin protected route...")
-    admin_headers = {"Authorization": f"Bearer {admin_token}"}
-    stats_response = make_request('GET', '/admin/stats', headers=admin_headers)
-    if not stats_response or stats_response.status_code != 200:
-        print("❌ Admin protected route access failed")
-        return False
-    
-    stats_data = stats_response.json()
-    required_fields = ['total_users', 'active_packages', 'total_deposits', 'total_withdrawals', 'pending_transactions']
-    if not all(field in stats_data for field in required_fields):
-        print("❌ Admin stats response missing required fields")
-        return False
-    
-    print("     ✅ Admin protected route access successful")
-    
-    # Test 5: Invalid token access
-    print("   Testing invalid token rejection...")
-    invalid_headers = {"Authorization": "Bearer invalid_token_12345"}
-    invalid_response = make_request('GET', '/auth/me', headers=invalid_headers)
-    if not invalid_response or invalid_response.status_code != 401:
-        print("❌ Invalid token should be rejected with 401")
-        return False
-    
-    print("     ✅ Invalid token correctly rejected")
-    
-    print("✅ PRIORITY TEST 1 PASSED: Authentication flow working correctly")
-    return True
-
-def test_package_purchase_api():
-    """PRIORITY TEST 2: Package Purchase API - Robustness and Android compatibility"""
-    print("\n🔴 PRIORITY TEST 2: Package Purchase API")
-    print("Testing package purchase with valid amounts, boundary conditions, insufficient balance, real-time notifications...")
-    
-    if not user_token:
-        print("❌ No user token available")
-        return False
-    
-    headers = {"Authorization": f"Bearer {user_token}"}
-    
-    # First, get package definitions
-    pkg_response = make_request('GET', '/packages')
-    if not pkg_response or pkg_response.status_code != 200:
-        print("❌ Could not get package definitions")
-        return False
-    
-    packages = pkg_response.json()
-    print(f"   📋 Package definitions retrieved:")
-    for pkg_name, pkg_info in packages.items():
-        print(f"     {pkg_name}: {pkg_info['min_amount']}-{pkg_info['max_amount']} AZN, multiplier: {pkg_info['multiplier']}")
-    
-    # Ensure user has sufficient balance for testing
-    balance_response = make_request('GET', '/auth/me', headers=headers)
-    if balance_response and balance_response.status_code == 200:
-        current_balance = balance_response.json()['balance']
-        if current_balance < 1000:
-            # Add balance via admin
-            if admin_token:
-                admin_headers = {"Authorization": f"Bearer {admin_token}"}
-                balance_update = {
-                    "user_id": test_user_id,
-                    "new_balance": 2000.0,
-                    "notes": "Balance for package purchase testing"
-                }
-                make_request('POST', '/admin/users/update-balance', balance_update, admin_headers)
-                time.sleep(1)
-                print("     ✅ Balance updated for testing")
-    
-    # Test cases for package purchases
-    test_cases = [
-        # Gold package tests (50-250 AZN)
-        {"package": "gold", "amount": 49, "should_fail": True, "test": "Gold below minimum (49 AZN)"},
-        {"package": "gold", "amount": 50, "should_fail": False, "test": "Gold minimum (50 AZN)"},
-        {"package": "gold", "amount": 150, "should_fail": False, "test": "Gold mid-range (150 AZN)"},
-        {"package": "gold", "amount": 250, "should_fail": False, "test": "Gold maximum (250 AZN)"},
-        {"package": "gold", "amount": 251, "should_fail": True, "test": "Gold above maximum (251 AZN)"},
-        
-        # Titanium package tests (250-500 AZN)
-        {"package": "titanium", "amount": 249, "should_fail": True, "test": "Titanium below minimum (249 AZN)"},
-        {"package": "titanium", "amount": 250, "should_fail": False, "test": "Titanium minimum (250 AZN)"},
-        {"package": "titanium", "amount": 375, "should_fail": False, "test": "Titanium mid-range (375 AZN)"},
-        {"package": "titanium", "amount": 500, "should_fail": False, "test": "Titanium maximum (500 AZN)"},
-        {"package": "titanium", "amount": 501, "should_fail": True, "test": "Titanium above maximum (501 AZN)"},
-        
-        # Platinum package tests (50-250 AZN based on current backend code)
-        {"package": "platinum", "amount": 49, "should_fail": True, "test": "Platinum below minimum (49 AZN)"},
-        {"package": "platinum", "amount": 50, "should_fail": False, "test": "Platinum minimum (50 AZN)"},
-        {"package": "platinum", "amount": 150, "should_fail": False, "test": "Platinum mid-range (150 AZN)"},
-        {"package": "platinum", "amount": 250, "should_fail": False, "test": "Platinum maximum (250 AZN)"},
-        {"package": "platinum", "amount": 251, "should_fail": True, "test": "Platinum above maximum (251 AZN)"}
-    ]
-    
-    passed_tests = 0
-    total_tests = len(test_cases)
-    successful_purchases = []
-    
-    for test_case in test_cases:
-        purchase_data = {
-            "package_type": test_case["package"],
-            "invested_amount": test_case["amount"]
-        }
-        
-        response = make_request('POST', '/packages/purchase', purchase_data, headers)
-        
-        if test_case["should_fail"]:
-            if response and response.status_code == 400:
-                print(f"     ✅ {test_case['test']}: Correctly rejected")
-                passed_tests += 1
-            else:
-                print(f"     ❌ {test_case['test']}: Should have been rejected")
-                if response:
-                    print(f"       Response: {response.status_code} - {response.text}")
-        else:
-            if response and response.status_code == 200:
-                purchase_result = response.json()
-                print(f"     ✅ {test_case['test']}: Correctly accepted")
-                print(f"       Package ID: {purchase_result['id']}")
-                passed_tests += 1
-                successful_purchases.append(purchase_result)
-            else:
-                print(f"     ❌ {test_case['test']}: Should have been accepted")
-                if response:
-                    print(f"       Error: {response.status_code} - {response.text}")
-    
-    # Test insufficient balance scenario
-    print("   Testing insufficient balance scenario...")
-    insufficient_balance_data = {
-        "package_type": "gold",
-        "invested_amount": 10000.0  # Amount higher than user balance
-    }
-    
-    insufficient_response = make_request('POST', '/packages/purchase', insufficient_balance_data, headers)
-    if insufficient_response and insufficient_response.status_code == 400:
-        error_data = insufficient_response.json()
-        if "Insufficient balance" in error_data.get('detail', ''):
-            print("     ✅ Insufficient balance correctly rejected")
-            passed_tests += 1
-            total_tests += 1
-        else:
-            print(f"     ❌ Wrong error message for insufficient balance: {error_data}")
-            total_tests += 1
-    else:
-        print("     ❌ Insufficient balance should have been rejected")
-        total_tests += 1
-    
-    # Verify package creation and earnings system
-    if successful_purchases:
-        print("   Testing package retrieval and earnings system...")
-        packages_response = make_request('GET', '/packages/my', headers=headers)
-        if packages_response and packages_response.status_code == 200:
-            user_packages = packages_response.json()
-            if len(user_packages) > 0:
-                print(f"     ✅ User packages retrieved: {len(user_packages)} packages")
-                
-                # Check package structure
-                latest_package = user_packages[0]
-                required_fields = ['id', 'package_type', 'invested_amount', 'multiplier', 'duration_days', 'accumulated_earnings']
-                if all(field in latest_package for field in required_fields):
-                    print("     ✅ Package structure contains all required fields")
-                    passed_tests += 1
-                    total_tests += 1
-                else:
-                    print("     ❌ Package structure missing required fields")
-                    total_tests += 1
-            else:
-                print("     ❌ No packages found for user")
-                total_tests += 1
-        else:
-            print("     ❌ Failed to retrieve user packages")
-            total_tests += 1
-    
-    success_rate = (passed_tests / total_tests) * 100
-    print(f"   📊 Package purchase tests: {passed_tests}/{total_tests} passed ({success_rate:.1f}%)")
-    
-    if success_rate >= 85:  # High threshold for critical functionality
-        print(f"✅ PRIORITY TEST 2 PASSED: Package purchase API working correctly")
-        return True
-    else:
-        print(f"❌ PRIORITY TEST 2 FAILED: Package purchase API has issues")
-        return False
-
-def test_transaction_apis_new_format():
-    """PRIORITY TEST 3: Transaction APIs - New card_name format (combined name + surname)"""
-    print("\n🔴 PRIORITY TEST 3: Transaction APIs with New Format")
-    print("Testing withdrawal and deposit with card_name as 'Name Surname', card_number as bank name...")
-    
-    if not user_token:
-        print("❌ No user token available")
-        return False
-    
-    headers = {"Authorization": f"Bearer {user_token}"}
-    
-    # Ensure user has sufficient balance for withdrawal testing
+    # Step 2: Give user sufficient balance via admin
     if admin_token:
         admin_headers = {"Authorization": f"Bearer {admin_token}"}
         balance_update = {
-            "user_id": test_user_id,
-            "new_balance": 7000.0,  # Enough for withdrawal testing
-            "notes": "Balance for transaction testing"
+            "user_id": collection_user_id,
+            "new_balance": 500.0,
+            "notes": "Balance for collection testing"
         }
         make_request('POST', '/admin/users/update-balance', balance_update, admin_headers)
         time.sleep(1)
-        print("     ✅ Balance updated for transaction testing")
+        print("✅ Collection user balance updated to 500 AZN")
     
-    # Test 1: Deposit with new format
-    print("   Testing deposit with new format...")
-    deposit_test_cases = [
-        {"amount": 49, "should_fail": True, "test": "Deposit below minimum (49 AZN)"},
-        {"amount": 50, "should_fail": False, "test": "Deposit minimum (50 AZN)"},
-        {"amount": 1000, "should_fail": False, "test": "Deposit mid-range (1000 AZN)"},
-        {"amount": 2000, "should_fail": False, "test": "Deposit maximum (2000 AZN)"},
-        {"amount": 2001, "should_fail": True, "test": "Deposit above maximum (2001 AZN)"}
-    ]
-    
-    deposit_passed = 0
-    deposit_total = len(deposit_test_cases)
-    successful_deposits = []
-    
-    for test_case in deposit_test_cases:
-        deposit_data = {
-            "type": "deposit",
-            "amount": test_case["amount"],
-            "card_name": transaction_test_data["deposit"]["card_name"],  # "Leyla Hasanova"
-            "card_number": transaction_test_data["deposit"]["card_number"]  # "Pasha Bank"
-        }
-        
-        response = make_request('POST', '/transactions', deposit_data, headers)
-        
-        if test_case["should_fail"]:
-            if response and response.status_code == 400:
-                error_data = response.json()
-                if "50-2000 AZN" in error_data.get('detail', ''):
-                    print(f"     ✅ {test_case['test']}: Correctly rejected with proper error")
-                    deposit_passed += 1
-                else:
-                    print(f"     ❌ {test_case['test']}: Rejected but wrong error message")
-            else:
-                print(f"     ❌ {test_case['test']}: Should have been rejected")
-        else:
-            if response and response.status_code == 200:
-                transaction_result = response.json()
-                print(f"     ✅ {test_case['test']}: Correctly accepted")
-                print(f"       Transaction ID: {transaction_result['id']}")
-                print(f"       Card Name: {transaction_result['card_name']}")
-                print(f"       Card Number (Bank): {transaction_result['card_number']}")
-                
-                # Verify new format is stored correctly
-                if (transaction_result['card_name'] == transaction_test_data["deposit"]["card_name"] and
-                    transaction_result['card_number'] == transaction_test_data["deposit"]["card_number"]):
-                    print(f"       ✅ New format stored correctly")
-                else:
-                    print(f"       ❌ New format not stored correctly")
-                
-                deposit_passed += 1
-                successful_deposits.append(transaction_result)
-            else:
-                print(f"     ❌ {test_case['test']}: Should have been accepted")
-                if response:
-                    print(f"       Error: {response.status_code} - {response.text}")
-    
-    # Test 2: Withdrawal with new format
-    print("   Testing withdrawal with new format...")
-    withdrawal_test_cases = [
-        {"amount": 499, "should_fail": True, "test": "Withdrawal below minimum (499 AZN)"},
-        {"amount": 500, "should_fail": False, "test": "Withdrawal minimum (500 AZN)"},
-        {"amount": 3000, "should_fail": False, "test": "Withdrawal mid-range (3000 AZN)"},
-        {"amount": 6500, "should_fail": False, "test": "Withdrawal maximum (6500 AZN)"},
-        {"amount": 6501, "should_fail": True, "test": "Withdrawal above maximum (6501 AZN)"}
-    ]
-    
-    withdrawal_passed = 0
-    withdrawal_total = len(withdrawal_test_cases)
-    successful_withdrawals = []
-    
-    for test_case in withdrawal_test_cases:
-        withdrawal_data = {
-            "type": "withdraw",
-            "amount": test_case["amount"],
-            "card_name": transaction_test_data["withdrawal"]["card_name"],  # "Leyla Hasanova"
-            "card_number": transaction_test_data["withdrawal"]["card_number"]  # "Kapital Bank"
-        }
-        
-        response = make_request('POST', '/transactions', withdrawal_data, headers)
-        
-        if test_case["should_fail"]:
-            if response and response.status_code == 400:
-                error_data = response.json()
-                if "500-6500 AZN" in error_data.get('detail', '') or "Insufficient balance" in error_data.get('detail', ''):
-                    print(f"     ✅ {test_case['test']}: Correctly rejected")
-                    withdrawal_passed += 1
-                else:
-                    print(f"     ❌ {test_case['test']}: Rejected but wrong error message: {error_data}")
-            else:
-                print(f"     ❌ {test_case['test']}: Should have been rejected")
-        else:
-            if response and response.status_code == 200:
-                transaction_result = response.json()
-                print(f"     ✅ {test_case['test']}: Correctly accepted")
-                print(f"       Transaction ID: {transaction_result['id']}")
-                print(f"       Card Name: {transaction_result['card_name']}")
-                print(f"       Card Number (Bank): {transaction_result['card_number']}")
-                
-                # Verify new format is stored correctly
-                if (transaction_result['card_name'] == transaction_test_data["withdrawal"]["card_name"] and
-                    transaction_result['card_number'] == transaction_test_data["withdrawal"]["card_number"]):
-                    print(f"       ✅ New format stored correctly")
-                else:
-                    print(f"       ❌ New format not stored correctly")
-                
-                withdrawal_passed += 1
-                successful_withdrawals.append(transaction_result)
-            else:
-                print(f"     ❌ {test_case['test']}: Should have been accepted")
-                if response:
-                    print(f"       Error: {response.status_code} - {response.text}")
-    
-    # Test 3: File upload for receipts (for deposits)
-    if successful_deposits:
-        print("   Testing file upload for receipts...")
-        deposit_transaction = successful_deposits[0]
-        test_file_content = b"Test receipt content for new format testing"
-        files = {'file': ('test_receipt_new_format.jpg', test_file_content, 'image/jpeg')}
-        
-        upload_response = make_request('POST', f'/transactions/{deposit_transaction["id"]}/upload-receipt', 
-                                     headers=headers, files=files)
-        
-        if upload_response and upload_response.status_code == 200:
-            upload_result = upload_response.json()
-            print(f"     ✅ Receipt upload successful: {upload_result['filename']}")
-            deposit_passed += 1
-            deposit_total += 1
-        else:
-            print(f"     ❌ Receipt upload failed")
-            if upload_response:
-                print(f"       Error: {upload_response.status_code} - {upload_response.text}")
-            deposit_total += 1
-    
-    # Calculate overall success rate
-    total_passed = deposit_passed + withdrawal_passed
-    total_tests = deposit_total + withdrawal_total
-    success_rate = (total_passed / total_tests) * 100
-    
-    print(f"   📊 Transaction tests: {total_passed}/{total_tests} passed ({success_rate:.1f}%)")
-    print(f"     Deposits: {deposit_passed}/{deposit_total}")
-    print(f"     Withdrawals: {withdrawal_passed}/{withdrawal_total}")
-    
-    if success_rate >= 80:
-        print(f"✅ PRIORITY TEST 3 PASSED: Transaction APIs with new format working correctly")
-        return True
-    else:
-        print(f"❌ PRIORITY TEST 3 FAILED: Transaction APIs have issues with new format")
-        return False
-
-def test_real_time_notifications():
-    """PRIORITY TEST 4: Real-time WebSocket Notifications"""
-    print("\n🔴 PRIORITY TEST 4: Real-time WebSocket Notifications")
-    print("Testing WebSocket notifications for package purchases and transactions...")
-    
-    if not user_token or not admin_token:
-        print("❌ Missing required tokens")
-        return False
-    
-    # Setup WebSocket connection for admin notifications
-    ws_url = BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://')
-    admin_ws_url = f"{ws_url}/ws/admin"
-    
-    admin_connected = False
-    notifications_received = []
-    
-    def on_admin_message(ws, message):
-        try:
-            data = json.loads(message)
-            notifications_received.append(data)
-            print(f"   📨 Real-time notification: {data.get('type', 'unknown')}")
-        except:
-            notifications_received.append(message)
-    
-    def on_admin_open(ws):
-        nonlocal admin_connected
-        admin_connected = True
-        print(f"   ✅ Admin WebSocket connected")
-    
-    try:
-        # Create admin WebSocket connection
-        admin_ws = websocket.WebSocketApp(admin_ws_url,
-                                        on_open=on_admin_open,
-                                        on_message=on_admin_message)
-        
-        # Run WebSocket in separate thread
-        ws_thread = threading.Thread(target=admin_ws.run_forever)
-        ws_thread.daemon = True
-        ws_thread.start()
-        
-        # Wait for connection
-        time.sleep(3)
-        
-        if not admin_connected:
-            print("❌ Admin WebSocket connection failed")
-            return False
-        
-        # Test package purchase notification
-        print("   Testing package purchase notification...")
-        headers = {"Authorization": f"Bearer {user_token}"}
-        purchase_data = {
-            "package_type": "gold",
-            "invested_amount": 100.0
-        }
-        
-        purchase_response = make_request('POST', '/packages/purchase', purchase_data, headers)
-        time.sleep(2)  # Wait for notification
-        
-        # Test transaction notification
-        print("   Testing transaction notification...")
-        transaction_data = {
-            "type": "deposit",
-            "amount": 200.0,
-            "card_name": "Leyla Hasanova",
-            "card_number": "Kapital Bank"
-        }
-        
-        txn_response = make_request('POST', '/transactions', transaction_data, headers)
-        time.sleep(2)  # Wait for notification
-        
-        # Close WebSocket
-        admin_ws.close()
-        time.sleep(1)
-        
-        # Analyze results
-        print(f"   📊 Total notifications received: {len(notifications_received)}")
-        
-        notification_types = [notif.get('type', 'unknown') if isinstance(notif, dict) else 'text' 
-                            for notif in notifications_received]
-        
-        expected_types = ['package_purchase', 'new_transaction']
-        found_types = [t for t in expected_types if t in notification_types]
-        
-        print(f"   📋 Expected notification types: {expected_types}")
-        print(f"   ✅ Found notification types: {found_types}")
-        
-        if len(found_types) >= 1:  # At least 1 notification type
-            print(f"✅ PRIORITY TEST 4 PASSED: Real-time notifications working ({len(found_types)}/2 types)")
-            return True
-        else:
-            print(f"❌ PRIORITY TEST 4 FAILED: No expected notifications received")
-            return False
-            
-    except Exception as e:
-        print(f"❌ PRIORITY TEST 4 FAILED with exception: {e}")
-        return False
-
-def test_final_package_purchase_balance_deduction():
-    """FINAL VERIFICATION TEST: Complete Package Purchase Balance Deduction Flow"""
-    print("\n🎯 FINAL VERIFICATION TEST: Package Purchase Balance Deduction")
-    print("Testing complete flow: registration bonus → admin balance increase → package purchase → balance deduction → package activation")
-    
-    # Test data for final verification
-    final_test_user = {
-        "email": "final.test.user@example.com",
-        "name": "Final Test User",
-        "password": "testpass123"
-    }
-    
-    print("\n📋 STEP 1: Create User with Sufficient Balance")
-    
-    # Register new user
-    reg_response = make_request('POST', '/auth/register', final_test_user)
-    if not reg_response or reg_response.status_code not in [200, 201]:
-        print(f"❌ User registration failed: {reg_response.text if reg_response else 'No response'}")
-        return False
-    
-    reg_data = reg_response.json()
-    final_user_token = reg_data['access_token']
-    print("✅ User registered successfully")
-    
-    # Get user profile to verify registration bonus
-    headers = {"Authorization": f"Bearer {final_user_token}"}
-    profile_response = make_request('GET', '/auth/me', headers=headers)
-    if not profile_response or profile_response.status_code != 200:
-        print("❌ Failed to get user profile")
-        return False
-    
-    profile_data = profile_response.json()
-    final_user_id = profile_data['id']
-    initial_balance = profile_data['balance']
-    initial_invested = profile_data['total_invested']
-    
-    print(f"✅ Registration bonus verified: {initial_balance} AZN")
-    print(f"✅ Initial total invested: {initial_invested} AZN")
-    
-    if initial_balance != 10.0:
-        print(f"❌ Expected 10 AZN registration bonus, got {initial_balance} AZN")
-        return False
-    
-    # Use admin to increase balance to 100 AZN
-    if not admin_token:
-        print("❌ Admin token not available")
-        return False
-    
-    admin_headers = {"Authorization": f"Bearer {admin_token}"}
-    balance_update = {
-        "user_id": final_user_id,
-        "new_balance": 100.0,
-        "notes": "Final verification test - increase to 100 AZN"
-    }
-    
-    balance_response = make_request('POST', '/admin/users/update-balance', balance_update, admin_headers)
-    if not balance_response or balance_response.status_code != 200:
-        print("❌ Failed to update user balance via admin")
-        return False
-    
-    print("✅ Admin balance update successful")
-    
-    # Verify balance update
-    time.sleep(1)  # Wait for update
-    updated_profile = make_request('GET', '/auth/me', headers=headers)
-    if updated_profile and updated_profile.status_code == 200:
-        updated_data = updated_profile.json()
-        updated_balance = updated_data['balance']
-        if updated_balance == 100.0:
-            print(f"✅ Balance successfully updated to {updated_balance} AZN")
-        else:
-            print(f"❌ Balance update failed. Expected 100 AZN, got {updated_balance} AZN")
-            return False
-    else:
-        print("❌ Failed to verify balance update")
-        return False
-    
-    print("\n📋 STEP 2: Package Purchase Flow Test")
-    
-    # Purchase Gold package (50 AZN investment)
-    gold_purchase = {
+    # Step 3: Purchase a package to test collection
+    purchase_data = {
         "package_type": "gold",
-        "invested_amount": 50.0
+        "invested_amount": 100.0
     }
     
-    purchase_response = make_request('POST', '/packages/purchase', gold_purchase, headers)
+    purchase_response = make_request('POST', '/packages/purchase', purchase_data, collection_headers)
     if not purchase_response or purchase_response.status_code != 200:
-        print(f"❌ Gold package purchase failed: {purchase_response.text if purchase_response else 'No response'}")
+        print("❌ Failed to purchase package for collection testing")
         return False
     
-    purchase_data = purchase_response.json()
-    package_id = purchase_data['id']
-    print(f"✅ Gold package purchased successfully (ID: {package_id})")
+    package_data = purchase_response.json()
+    package_id = package_data['id']
+    print(f"✅ Package purchased for collection testing: {package_id}")
     
-    # Verify balance deduction (100 → 50 AZN)
-    time.sleep(1)  # Wait for balance update
-    post_purchase_profile = make_request('GET', '/auth/me', headers=headers)
-    if not post_purchase_profile or post_purchase_profile.status_code != 200:
-        print("❌ Failed to get profile after purchase")
+    # Verify package starts with null last_collection_time
+    if package_data.get('last_collection_time') is not None:
+        print("❌ New package should start with null last_collection_time")
         return False
     
-    post_purchase_data = post_purchase_profile.json()
-    final_balance = post_purchase_data['balance']
-    final_invested = post_purchase_data['total_invested']
+    print("✅ New package correctly starts with null last_collection_time")
     
-    print(f"✅ Balance after purchase: {final_balance} AZN (expected: 50 AZN)")
-    print(f"✅ Total invested after purchase: {final_invested} AZN (expected: 50 AZN)")
+    # Step 4: Wait for some earnings to accumulate (15 seconds should be enough)
+    print("   Waiting 15 seconds for earnings to accumulate...")
+    time.sleep(15)
     
-    # Verify balance deduction
-    if final_balance != 50.0:
-        print(f"❌ CRITICAL: Balance deduction failed! Expected 50 AZN, got {final_balance} AZN")
+    # Step 5: Test first collection (should be immediately available)
+    print("   Testing first collection (should be immediately available)...")
+    
+    # Check collection status first
+    status_response = make_request('GET', f'/packages/{package_id}/collection-status', headers=collection_headers)
+    if not status_response or status_response.status_code != 200:
+        print("❌ Failed to get collection status")
         return False
     
-    # Verify total invested increase
-    if final_invested != 50.0:
-        print(f"❌ CRITICAL: Total invested not updated! Expected 50 AZN, got {final_invested} AZN")
+    status_data = status_response.json()
+    print(f"   Collection status: can_collect={status_data.get('can_collect')}, cooldown_remaining={status_data.get('cooldown_remaining_seconds')}")
+    
+    if not status_data.get('can_collect', False):
+        print("❌ First collection should be immediately available")
         return False
     
-    print("✅ CRITICAL: Balance deduction working correctly (100 → 50 AZN)")
-    print("✅ CRITICAL: Total invested updated correctly (0 → 50 AZN)")
+    print("✅ First collection is immediately available")
     
-    # Verify package activation
+    # Perform first collection
+    collect_response = make_request('POST', f'/packages/{package_id}/collect', headers=collection_headers)
+    if not collect_response or collect_response.status_code != 200:
+        print(f"❌ First collection failed: {collect_response.text if collect_response else 'No response'}")
+        return False
+    
+    collect_data = collect_response.json()
+    collected_amount = collect_data.get('collected_amount', 0)
+    new_balance = collect_data.get('new_balance', 0)
+    next_collection_time = collect_data.get('next_collection_time')
+    
+    print(f"✅ First collection successful:")
+    print(f"   Collected amount: {collected_amount} AZN")
+    print(f"   New balance: {new_balance} AZN")
+    print(f"   Next collection time: {next_collection_time}")
+    
+    if collected_amount <= 0:
+        print("❌ Collected amount should be greater than 0")
+        return False
+    
+    # Step 6: Test immediate second collection (should fail with 12-hour cooldown)
+    print("   Testing immediate second collection (should fail with 12-hour cooldown)...")
+    
+    second_collect_response = make_request('POST', f'/packages/{package_id}/collect', headers=collection_headers)
+    if not second_collect_response or second_collect_response.status_code != 400:
+        print("❌ Second immediate collection should fail with 400 status")
+        return False
+    
+    error_data = second_collect_response.json()
+    error_message = error_data.get('detail', '')
+    print(f"   Error message: {error_message}")
+    
+    # Verify error message shows hours and minutes format
+    if 'hours' not in error_message.lower() or 'minutes' not in error_message.lower():
+        print("❌ Error message should show hours and minutes format")
+        return False
+    
+    # Should show approximately 12 hours (720 minutes) remaining
+    if '11 hours' not in error_message and '12 hours' not in error_message:
+        print("❌ Error message should show approximately 11-12 hours remaining")
+        return False
+    
+    print("✅ Cooldown error message correctly shows hours and minutes format")
+    
+    # Step 7: Test collection status after first collection
+    print("   Testing collection status after first collection...")
+    
+    post_collect_status = make_request('GET', f'/packages/{package_id}/collection-status', headers=collection_headers)
+    if not post_collect_status or post_collect_status.status_code != 200:
+        print("❌ Failed to get post-collection status")
+        return False
+    
+    post_status_data = post_collect_status.json()
+    can_collect_after = post_status_data.get('can_collect', True)
+    cooldown_remaining = post_status_data.get('cooldown_remaining_seconds', 0)
+    
+    print(f"   Post-collection status: can_collect={can_collect_after}, cooldown_remaining={cooldown_remaining}s")
+    
+    if can_collect_after:
+        print("❌ can_collect should be False after collection")
+        return False
+    
+    # Should have approximately 12 hours (43200 seconds) remaining
+    expected_cooldown = 12 * 60 * 60  # 43200 seconds
+    if cooldown_remaining < (expected_cooldown - 300) or cooldown_remaining > expected_cooldown:
+        print(f"❌ Cooldown remaining should be approximately {expected_cooldown} seconds, got {cooldown_remaining}")
+        return False
+    
+    print("✅ Collection status correctly shows 12-hour cooldown")
+    
+    # Step 8: Verify cooldown calculation is accurate
+    hours_remaining = cooldown_remaining // 3600
+    minutes_remaining = (cooldown_remaining % 3600) // 60
+    
+    print(f"   Cooldown breakdown: {hours_remaining} hours, {minutes_remaining} minutes")
+    
+    if hours_remaining < 11 or hours_remaining > 12:
+        print(f"❌ Hours remaining should be 11-12, got {hours_remaining}")
+        return False
+    
+    print("✅ Cooldown calculation is accurate")
+    
+    print("✅ CRITICAL TEST 1 PASSED: Collection cooldown system working correctly")
+    return True
+
+def test_collection_status_endpoint():
+    """CRITICAL TEST 2: Collection Status Endpoint"""
+    print("\n🔴 CRITICAL TEST 2: Collection Status Endpoint")
+    print("Testing /api/packages/{package_id}/collection-status accuracy...")
+    
+    if not user_token:
+        print("❌ No user token available")
+        return False
+    
+    headers = {"Authorization": f"Bearer {user_token}"}
+    
+    # Get user's packages
     packages_response = make_request('GET', '/packages/my', headers=headers)
     if not packages_response or packages_response.status_code != 200:
         print("❌ Failed to get user packages")
         return False
     
-    user_packages = packages_response.json()
-    if not user_packages:
-        print("❌ CRITICAL: No packages found for user after purchase")
+    packages = packages_response.json()
+    if not packages:
+        print("❌ No packages found for testing")
         return False
     
+    # Test with the first active package
+    test_package = None
+    for pkg in packages:
+        if pkg.get('is_active', False):
+            test_package = pkg
+            break
+    
+    if not test_package:
+        print("❌ No active package found for testing")
+        return False
+    
+    package_id = test_package['id']
+    print(f"✅ Testing with package: {package_id}")
+    
+    # Test 1: Get collection status
+    status_response = make_request('GET', f'/packages/{package_id}/collection-status', headers=headers)
+    if not status_response or status_response.status_code != 200:
+        print("❌ Collection status endpoint failed")
+        return False
+    
+    status_data = status_response.json()
+    required_fields = ['can_collect', 'cooldown_remaining_seconds', 'next_collection_time']
+    
+    print(f"   Status response: {status_data}")
+    
+    # Verify all required fields are present
+    for field in required_fields:
+        if field not in status_data:
+            print(f"❌ Missing required field: {field}")
+            return False
+    
+    print("✅ All required fields present in status response")
+    
+    # Test 2: Verify can_collect logic
+    can_collect = status_data['can_collect']
+    cooldown_remaining = status_data['cooldown_remaining_seconds']
+    
+    if can_collect and cooldown_remaining > 0:
+        print("❌ Logic error: can_collect=True but cooldown_remaining > 0")
+        return False
+    
+    if not can_collect and cooldown_remaining <= 0:
+        print("❌ Logic error: can_collect=False but cooldown_remaining <= 0")
+        return False
+    
+    print("✅ can_collect logic is consistent with cooldown_remaining")
+    
+    # Test 3: Verify next_collection_time format
+    next_collection_time = status_data['next_collection_time']
+    
+    if not can_collect:
+        if next_collection_time is None:
+            print("❌ next_collection_time should not be None when cooldown is active")
+            return False
+        
+        # Verify ISO format
+        try:
+            from datetime import datetime
+            parsed_time = datetime.fromisoformat(next_collection_time.replace('Z', '+00:00'))
+            print(f"   Next collection time: {parsed_time}")
+        except ValueError:
+            print("❌ next_collection_time is not in valid ISO format")
+            return False
+    
+    print("✅ next_collection_time format is correct")
+    
+    # Test 4: Test with non-existent package
+    fake_package_id = "fake-package-id-12345"
+    fake_status_response = make_request('GET', f'/packages/{fake_package_id}/collection-status', headers=headers)
+    
+    if not fake_status_response or fake_status_response.status_code != 404:
+        print("❌ Non-existent package should return 404")
+        return False
+    
+    print("✅ Non-existent package correctly returns 404")
+    
+    print("✅ CRITICAL TEST 2 PASSED: Collection status endpoint working correctly")
+    return True
+
+def test_package_purchase_with_collection_system():
+    """CRITICAL TEST 3: Package Purchase Flow with Collection System"""
+    print("\n🔴 CRITICAL TEST 3: Package Purchase Flow with Collection System")
+    print("Testing package purchase integration with 12-hour collection system...")
+    
+    if not user_token or not admin_token:
+        print("❌ Missing required tokens")
+        return False
+    
+    # Create a new user for this test
+    purchase_test_user = {
+        "email": "purchase.collection.test@example.com",
+        "name": "Purchase Collection Test",
+        "password": "testpass123"
+    }
+    
+    reg_response = make_request('POST', '/auth/register', purchase_test_user)
+    if not reg_response or reg_response.status_code not in [200, 201]:
+        print("❌ Failed to create purchase test user")
+        return False
+    
+    purchase_token = reg_response.json()['access_token']
+    purchase_headers = {"Authorization": f"Bearer {purchase_token}"}
+    
+    # Get user profile
+    profile_response = make_request('GET', '/auth/me', headers=purchase_headers)
+    purchase_user_id = profile_response.json()['id']
+    
+    # Give user sufficient balance
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+    balance_update = {
+        "user_id": purchase_user_id,
+        "new_balance": 300.0,
+        "notes": "Balance for purchase collection testing"
+    }
+    make_request('POST', '/admin/users/update-balance', balance_update, admin_headers)
+    time.sleep(1)
+    
+    print("✅ Purchase test user created with 300 AZN balance")
+    
+    # Test 1: Purchase package and verify initial state
+    purchase_data = {
+        "package_type": "gold",
+        "invested_amount": 150.0
+    }
+    
+    purchase_response = make_request('POST', '/packages/purchase', purchase_data, purchase_headers)
+    if not purchase_response or purchase_response.status_code != 200:
+        print("❌ Package purchase failed")
+        return False
+    
+    package_data = purchase_response.json()
+    package_id = package_data['id']
+    
+    print(f"✅ Package purchased: {package_id}")
+    
+    # Verify package starts with null last_collection_time
+    if package_data.get('last_collection_time') is not None:
+        print("❌ New package should start with null last_collection_time")
+        return False
+    
+    print("✅ New package correctly starts with null last_collection_time")
+    
+    # Test 2: Verify first collection is immediately available
+    status_response = make_request('GET', f'/packages/{package_id}/collection-status', headers=purchase_headers)
+    if not status_response or status_response.status_code != 200:
+        print("❌ Failed to get collection status for new package")
+        return False
+    
+    status_data = status_response.json()
+    if not status_data.get('can_collect', False):
+        print("❌ First collection should be immediately available for new package")
+        return False
+    
+    if status_data.get('cooldown_remaining_seconds', 1) != 0:
+        print("❌ New package should have 0 cooldown remaining")
+        return False
+    
+    print("✅ First collection is immediately available for new package")
+    
+    # Test 3: Wait for earnings and perform collection
+    print("   Waiting 10 seconds for earnings to accumulate...")
+    time.sleep(10)
+    
+    collect_response = make_request('POST', f'/packages/{package_id}/collect', headers=purchase_headers)
+    if not collect_response or collect_response.status_code != 200:
+        print("❌ First collection failed for new package")
+        return False
+    
+    collect_data = collect_response.json()
+    print(f"✅ First collection successful: {collect_data.get('collected_amount', 0)} AZN")
+    
+    # Test 4: Verify balance and total_earned updates
+    updated_profile = make_request('GET', '/auth/me', headers=purchase_headers)
+    if not updated_profile or updated_profile.status_code != 200:
+        print("❌ Failed to get updated profile")
+        return False
+    
+    profile_data = updated_profile.json()
+    new_balance = profile_data['balance']
+    total_earned = profile_data['total_earned']
+    
+    print(f"   Updated balance: {new_balance} AZN")
+    print(f"   Total earned: {total_earned} AZN")
+    
+    # Balance should be: 300 - 150 (investment) + collected_amount
+    expected_balance = 150.0 + collect_data.get('collected_amount', 0)
+    if abs(new_balance - expected_balance) > 0.01:
+        print(f"❌ Balance calculation incorrect. Expected ~{expected_balance}, got {new_balance}")
+        return False
+    
+    if total_earned != collect_data.get('collected_amount', 0):
+        print(f"❌ Total earned should equal collected amount")
+        return False
+    
+    print("✅ Balance and total_earned correctly updated after collection")
+    
+    print("✅ CRITICAL TEST 3 PASSED: Package purchase flow with collection system working correctly")
+    return True
+
+def test_earnings_calculation_and_collection():
+    """CRITICAL TEST 4: Earnings Calculation and Collection"""
+    print("\n🔴 CRITICAL TEST 4: Earnings Calculation and Collection")
+    print("Testing accumulated_earnings calculation and collection process...")
+    
+    if not user_token:
+        print("❌ No user token available")
+        return False
+    
+    headers = {"Authorization": f"Bearer {user_token}"}
+    
+    # Get user's active package
+    packages_response = make_request('GET', '/packages/my', headers=headers)
+    if not packages_response or packages_response.status_code != 200:
+        print("❌ Failed to get user packages")
+        return False
+    
+    packages = packages_response.json()
     active_package = None
-    for pkg in user_packages:
-        if pkg['id'] == package_id:
+    
+    for pkg in packages:
+        if pkg.get('is_active', False):
             active_package = pkg
             break
     
     if not active_package:
-        print("❌ CRITICAL: Purchased package not found in user's packages")
+        print("❌ No active package found for earnings testing")
         return False
     
-    if not active_package.get('is_active', False):
-        print("❌ CRITICAL: Package is not active after purchase")
+    package_id = active_package['id']
+    invested_amount = active_package['invested_amount']
+    multiplier = active_package['multiplier']
+    
+    print(f"✅ Testing with package: {package_id}")
+    print(f"   Investment: {invested_amount} AZN, Multiplier: {multiplier}")
+    
+    # Test 1: Wait for earnings to accumulate
+    print("   Waiting 20 seconds for earnings to accumulate...")
+    initial_earnings = active_package.get('accumulated_earnings', 0)
+    time.sleep(20)
+    
+    # Get updated package data
+    updated_packages = make_request('GET', '/packages/my', headers=headers)
+    if not updated_packages or updated_packages.status_code != 200:
+        print("❌ Failed to get updated packages")
         return False
     
-    print("✅ CRITICAL: Package activation working (is_active: true)")
-    print(f"✅ Package details: {active_package['package_type']}, {active_package['invested_amount']} AZN, multiplier: {active_package['multiplier']}")
+    updated_package = None
+    for pkg in updated_packages.json():
+        if pkg['id'] == package_id:
+            updated_package = pkg
+            break
     
-    print("\n📋 STEP 3: Test Multiple Package Purchases")
-    
-    # Purchase another package (30 AZN - within Gold range)
-    second_purchase = {
-        "package_type": "gold",
-        "invested_amount": 30.0
-    }
-    
-    second_response = make_request('POST', '/packages/purchase', second_purchase, headers)
-    if not second_response or second_response.status_code != 200:
-        print(f"❌ Second package purchase failed: {second_response.text if second_response else 'No response'}")
+    if not updated_package:
+        print("❌ Package not found in updated list")
         return False
     
-    second_data = second_response.json()
-    second_package_id = second_data['id']
-    print(f"✅ Second package purchased successfully (ID: {second_package_id})")
+    current_earnings = updated_package.get('accumulated_earnings', 0)
+    print(f"   Initial earnings: {initial_earnings} AZN")
+    print(f"   Current earnings: {current_earnings} AZN")
     
-    # Verify balance deduction (50 → 20 AZN)
-    time.sleep(1)
-    final_profile = make_request('GET', '/auth/me', headers=headers)
-    if final_profile and final_profile.status_code == 200:
-        final_data = final_profile.json()
-        final_final_balance = final_data['balance']
-        final_final_invested = final_data['total_invested']
-        
-        print(f"✅ Final balance: {final_final_balance} AZN (expected: 20 AZN)")
-        print(f"✅ Final total invested: {final_final_invested} AZN (expected: 80 AZN)")
-        
-        if final_final_balance != 20.0:
-            print(f"❌ Second balance deduction failed! Expected 20 AZN, got {final_final_balance} AZN")
-            return False
-        
-        if final_final_invested != 80.0:
-            print(f"❌ Total invested not updated correctly! Expected 80 AZN, got {final_final_invested} AZN")
-            return False
-    
-    # Verify first package becomes inactive, second becomes active
-    final_packages = make_request('GET', '/packages/my', headers=headers)
-    if final_packages and final_packages.status_code == 200:
-        all_packages = final_packages.json()
-        
-        first_pkg_status = None
-        second_pkg_status = None
-        
-        for pkg in all_packages:
-            if pkg['id'] == package_id:
-                first_pkg_status = pkg.get('is_active', False)
-            elif pkg['id'] == second_package_id:
-                second_pkg_status = pkg.get('is_active', False)
-        
-        print(f"✅ First package active status: {first_pkg_status} (expected: False)")
-        print(f"✅ Second package active status: {second_pkg_status} (expected: True)")
-        
-        if first_pkg_status != False:
-            print("❌ First package should be inactive after second purchase")
-            return False
-        
-        if second_pkg_status != True:
-            print("❌ Second package should be active")
-            return False
-    
-    print("\n📋 STEP 4: Test Package Visibility")
-    
-    # Test /api/packages/my endpoint
-    visibility_response = make_request('GET', '/packages/my', headers=headers)
-    if not visibility_response or visibility_response.status_code != 200:
-        print("❌ Package visibility test failed")
+    if current_earnings <= initial_earnings:
+        print("❌ Earnings should have increased over time")
         return False
     
-    visible_packages = visibility_response.json()
-    active_count = sum(1 for pkg in visible_packages if pkg.get('is_active', False))
+    print("✅ Earnings are accumulating correctly")
     
-    print(f"✅ Total packages visible: {len(visible_packages)}")
-    print(f"✅ Active packages: {active_count} (expected: 1)")
+    # Test 2: Verify earnings calculation logic
+    # Expected total earnings = invested_amount * multiplier
+    expected_total_earnings = invested_amount * multiplier
+    expected_profit = expected_total_earnings - invested_amount
     
-    if active_count != 1:
-        print(f"❌ Expected exactly 1 active package, found {active_count}")
+    print(f"   Expected total earnings: {expected_total_earnings} AZN")
+    print(f"   Expected profit: {expected_profit} AZN")
+    
+    # Current earnings should not exceed expected profit
+    if current_earnings > expected_profit:
+        print(f"❌ Current earnings ({current_earnings}) exceed expected profit ({expected_profit})")
         return False
     
-    print("\n🎉 FINAL VERIFICATION TEST COMPLETED SUCCESSFULLY!")
-    print("=" * 60)
-    print("✅ Registration bonus working (10 AZN)")
-    print("✅ Balance deduction working after purchase")
-    print("✅ Package activation working (is_active: true)")
-    print("✅ Multiple package handling working (old becomes inactive)")
-    print("✅ Only active packages visible to user")
-    print("=" * 60)
+    print("✅ Earnings calculation within expected bounds")
     
+    print("✅ CRITICAL TEST 4 PASSED: Earnings calculation and collection working correctly")
     return True
 
-def run_priority_tests():
-    """Run all priority tests focusing on recently implemented changes"""
-    print("🚀 PRIORITY TESTING AREAS - InvestAZ Backend")
+def test_error_handling_and_edge_cases():
+    """CRITICAL TEST 5: Error Handling and Edge Cases"""
+    print("\n🔴 CRITICAL TEST 5: Error Handling and Edge Cases")
+    print("Testing error messages, edge cases, and boundary conditions...")
+    
+    if not user_token:
+        print("❌ No user token available")
+        return False
+    
+    headers = {"Authorization": f"Bearer {user_token}"}
+    
+    # Test 1: Collection with non-existent package
+    fake_package_id = "non-existent-package-12345"
+    fake_collect_response = make_request('POST', f'/packages/{fake_package_id}/collect', headers=headers)
+    
+    if not fake_collect_response or fake_collect_response.status_code != 404:
+        print("❌ Collection with non-existent package should return 404")
+        return False
+    
+    print("✅ Non-existent package collection correctly returns 404")
+    
+    # Test 2: Collection with inactive package
+    packages_response = make_request('GET', '/packages/my', headers=headers)
+    if packages_response and packages_response.status_code == 200:
+        packages = packages_response.json()
+        inactive_package = None
+        
+        for pkg in packages:
+            if not pkg.get('is_active', True):
+                inactive_package = pkg
+                break
+        
+        if inactive_package:
+            inactive_collect_response = make_request('POST', f'/packages/{inactive_package["id"]}/collect', headers=headers)
+            
+            if not inactive_collect_response or inactive_collect_response.status_code != 400:
+                print("❌ Collection with inactive package should return 400")
+                return False
+            
+            error_data = inactive_collect_response.json()
+            if "not active" not in error_data.get('detail', '').lower():
+                print("❌ Inactive package error message should mention 'not active'")
+                return False
+            
+            print("✅ Inactive package collection correctly rejected")
+    
+    # Test 3: Collection with no earnings
+    if admin_token:
+        # Create test user for this scenario
+        no_earnings_user = {
+            "email": "no.earnings.test@example.com",
+            "name": "No Earnings Test",
+            "password": "testpass123"
+        }
+        
+        reg_response = make_request('POST', '/auth/register', no_earnings_user)
+        if reg_response and reg_response.status_code in [200, 201]:
+            no_earnings_token = reg_response.json()['access_token']
+            no_earnings_headers = {"Authorization": f"Bearer {no_earnings_token}"}
+            
+            # Get user ID and add balance
+            profile_response = make_request('GET', '/auth/me', headers=no_earnings_headers)
+            if profile_response and profile_response.status_code == 200:
+                user_id = profile_response.json()['id']
+                
+                admin_headers = {"Authorization": f"Bearer {admin_token}"}
+                balance_update = {
+                    "user_id": user_id,
+                    "new_balance": 200.0,
+                    "notes": "Balance for no earnings test"
+                }
+                make_request('POST', '/admin/users/update-balance', balance_update, admin_headers)
+                time.sleep(1)
+                
+                # Purchase package
+                purchase_data = {
+                    "package_type": "gold",
+                    "invested_amount": 100.0
+                }
+                
+                purchase_response = make_request('POST', '/packages/purchase', purchase_data, no_earnings_headers)
+                if purchase_response and purchase_response.status_code == 200:
+                    new_package_id = purchase_response.json()['id']
+                    
+                    # Try to collect immediately (should fail - no earnings)
+                    immediate_collect = make_request('POST', f'/packages/{new_package_id}/collect', headers=no_earnings_headers)
+                    
+                    if immediate_collect and immediate_collect.status_code == 400:
+                        error_data = immediate_collect.json()
+                        if "no earnings" in error_data.get('detail', '').lower():
+                            print("✅ No earnings collection correctly rejected")
+                        else:
+                            print("❌ No earnings error message should mention 'no earnings'")
+                            return False
+                    else:
+                        print("❌ Collection with no earnings should return 400")
+                        return False
+    
+    print("✅ CRITICAL TEST 5 PASSED: Error handling and edge cases working correctly")
+    return True
+
+def run_collection_system_tests():
+    """Run all collection system tests focusing on 12-hour cooldown"""
+    print("🚀 12-HOUR COLLECTION SYSTEM TESTING - InvestAZ Backend")
     print(f"Backend URL: {API_URL}")
     print("=" * 80)
     
@@ -909,23 +719,23 @@ def run_priority_tests():
         print("❌ Failed to setup test environment")
         return
     
-    # Priority tests based on review request - FINAL VERIFICATION FOCUS
-    priority_tests = [
-        ("FINAL Package Purchase Balance Deduction", test_final_package_purchase_balance_deduction),
-        ("Authentication Flow", test_authentication_flow),
-        ("Package Purchase API", test_package_purchase_api),
-        ("Transaction APIs with New Format", test_transaction_apis_new_format),
-        ("Real-time WebSocket Notifications", test_real_time_notifications)
+    # Collection system tests based on review request
+    collection_tests = [
+        ("Collection Cooldown System (12-hour)", test_collection_cooldown_system),
+        ("Collection Status Endpoint", test_collection_status_endpoint),
+        ("Package Purchase with Collection System", test_package_purchase_with_collection_system),
+        ("Earnings Calculation and Collection", test_earnings_calculation_and_collection),
+        ("Error Handling and Edge Cases", test_error_handling_and_edge_cases)
     ]
     
     passed = 0
     failed = 0
     results = []
     
-    print("\n🔴 RUNNING PRIORITY TESTS")
+    print("\n🔴 RUNNING COLLECTION SYSTEM TESTS")
     print("=" * 50)
     
-    for test_name, test_func in priority_tests:
+    for test_name, test_func in collection_tests:
         try:
             print(f"\n{'='*20} {test_name} {'='*20}")
             if test_func():
@@ -943,7 +753,7 @@ def run_priority_tests():
     
     # Final results
     print("\n" + "=" * 80)
-    print("📊 PRIORITY TESTS RESULTS")
+    print("📊 COLLECTION SYSTEM TESTS RESULTS")
     print("=" * 80)
     
     for result in results:
@@ -955,13 +765,13 @@ def run_priority_tests():
     print(f"📊 Success Rate: {(passed/(passed+failed)*100):.1f}%")
     
     if failed == 0:
-        print("\n🎉 ALL PRIORITY TESTS PASSED!")
-        print("✅ Recently implemented changes are working correctly")
+        print("\n🎉 ALL COLLECTION SYSTEM TESTS PASSED!")
+        print("✅ 12-hour collection system is working correctly")
     else:
-        print(f"\n⚠️  {failed} PRIORITY TESTS FAILED")
-        print("❌ Recently implemented changes need attention")
+        print(f"\n⚠️  {failed} COLLECTION SYSTEM TESTS FAILED")
+        print("❌ 12-hour collection system needs attention")
     
     return passed, failed
 
 if __name__ == "__main__":
-    run_priority_tests()
+    run_collection_system_tests()
