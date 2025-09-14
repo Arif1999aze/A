@@ -205,9 +205,13 @@ const AdminPanel = () => {
 
   const handleLogin = async (username, password) => {
     try {
+      // Use the correct admin credentials for API
+      const loginEmail = username === 'Batu' ? 'admin@investaz.com' : username;
+      const loginPassword = password === '18061999' ? '18061999' : password;
+      
       const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
-        email: username,
-        password: password
+        email: loginEmail,
+        password: loginPassword
       });
       
       const newToken = response.data.access_token;
@@ -218,7 +222,8 @@ const AdminPanel = () => {
       setupAdminWebSocket();
       showNotification('✅ Admin panelinə daxil oldunuz', 'success');
     } catch (error) {
-      alert('❌ Yanlış istifadəçi adı və ya şifrə');
+      console.error('Admin login error:', error);
+      showNotification('❌ Yanlış istifadəçi adı və ya şifrə', 'error');
     }
   };
 
