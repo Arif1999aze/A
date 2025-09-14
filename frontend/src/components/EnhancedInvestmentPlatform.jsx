@@ -349,7 +349,12 @@ const EnhancedInvestmentPlatform = () => {
       "İlham B.", "Sevda H.", "Murad T.", "Ülviyyə K.", "Vüsal E.", "Nərgiz F."
     ];
     
-    const amounts = [75, 120, 89, 156, 203, 95, 310, 178, 245, 134, 267, 198, 87, 345, 156, 289, 123, 234, 167, 298];
+    // Enhanced amounts range: 50-2500 AZN for better engagement
+    const amounts = [
+      52, 89, 134, 187, 245, 298, 356, 423, 489, 567, 634, 712, 798, 856, 923, 
+      1045, 1156, 1234, 1387, 1456, 1523, 1634, 1789, 1856, 1923, 2034, 2156, 
+      2245, 2334, 2423, 2487
+    ];
     const types = [
       { name: "depozit", color: "bg-blue-500", icon: "💰" },
       { name: "qazanc", color: "bg-green-500", icon: "📈" },
