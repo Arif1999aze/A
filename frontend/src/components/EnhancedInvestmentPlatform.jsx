@@ -1571,7 +1571,7 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
       setBankName('');
       
       onTransactionUpdate();
-      showNotification('✅ Çıxarış sorğusu uğurla göndərildi! Admin tərəfindən emal ediləcək.', 'success');
+      showNotification('✅ Çıxarışınız uğurlu! 30 dəqiqə hesabınıza köçürüləcəkdir.', 'success');
     } catch (error) {
       console.error('Çıxarış xətası:', error);
       showNotification(error.response?.data?.detail || '❌ Çıxarış zamanı xəta baş verdi', 'error');
