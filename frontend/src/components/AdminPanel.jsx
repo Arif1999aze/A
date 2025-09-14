@@ -267,22 +267,39 @@ const AdminPanel = () => {
       const loginEmail = username === 'Batu' ? 'admin@investaz.com' : username;
       const loginPassword = password === '18061999' ? '18061999' : password;
       
+      console.log('🔐 Admin girişi başladılır...', {loginEmail});
+      
       const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         email: loginEmail,
         password: loginPassword
       });
       
       const newToken = response.data.access_token;
-      localStorage.setItem('admin_token', newToken);
+      console.log('🔑 Token alındı:', newToken.substring(0, 20) + '...');
+      
+      // Set token first, then localStorage
       setToken(newToken);
+      localStorage.setItem('admin_token', newToken);
+      
+      // Force login state immediately
       setIsLoggedIn(true);
       
-      console.log('✅ Admin girişi uğurlu');
+      console.log('✅ Admin girişi uğurlu, panel yüklənir...');
       showNotification('✅ Admin panelinə daxil oldunuz', 'success');
+      
+      // Initialize admin panel after successful login
+      setTimeout(() => {
+        initializeAdminPanel();
+      }, 100);
       
     } catch (error) {
       console.error('❌ Admin girişi xətası:', error);
       showNotification('❌ Yanlış istifadəçi adı və ya şifrə', 'error');
+      
+      // Clear any stored tokens on error
+      localStorage.removeItem('admin_token');
+      setToken(null);
+      setIsLoggedIn(false);
     }
   };
 
