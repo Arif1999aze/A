@@ -971,13 +971,16 @@ const EnhancedInvestmentPlatform = () => {
                   <div className="space-y-4">
                     {activePackages.map((pkg, index) => {
                       const packageDef = packageDefinitions[pkg.package_type];
-                      const progress = (pkg.accumulated_earnings / (pkg.invested_amount * packageDef.multiplier)) * 100;
+                      const totalExpectedEarnings = pkg.invested_amount * packageDef.multiplier;
+                      const progress = (pkg.accumulated_earnings / totalExpectedEarnings) * 100;
                       const timeRemaining = formatTimeRemaining(pkg.end_date);
+                      const countdownTime = countdownTimers[pkg.id] || 0;
+                      const dailyEarnings = (pkg.invested_amount * packageDef.multiplier) / packageDef.duration;
                       
                       return (
                         <Card key={pkg.id} className={`bg-gradient-to-r ${packageDef.gradient} p-1 relative`}>
                           <div className="bg-gray-900 rounded-lg p-4 sm:p-6">
-                            {/* Package Header - Mobile Responsive */}
+                            {/* Package Header - Enhanced */}
                             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-3 sm:space-y-0 mb-4">
                               <div className="flex items-center space-x-3">
                                 <div className="text-2xl sm:text-3xl">{packageDef.icon}</div>
@@ -985,49 +988,74 @@ const EnhancedInvestmentPlatform = () => {
                                   <h3 className="text-lg sm:text-xl font-bold" style={{color: packageDef.color}}>
                                     {packageDef.name} #{index + 1}
                                   </h3>
-                                  <p className="text-gray-400 text-sm">İnvestisiya: {formatAmount(pkg.invested_amount)} AZN</p>
+                                  <p className="text-gray-400 text-sm">İnvestisya: {formatAmount(pkg.invested_amount)} AZN</p>
+                                  <p className="text-green-400 text-xs">Gündelik gəlir: {formatAmount(dailyEarnings)} AZN</p>
                                 </div>
                               </div>
-                              <Badge className="bg-green-600 animate-pulse self-start">
-                                Aktiv
-                              </Badge>
+                              <div className="flex flex-col space-y-2">
+                                <Badge className="bg-green-600 animate-pulse self-start">
+                                  Aktiv
+                                </Badge>
+                              </div>
                             </div>
 
-                            {/* Package Stats - Mobile Grid */}
+                            {/* Enhanced Package Stats - More Detailed */}
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
-                              <div className="text-center">
-                                <p className="text-xs sm:text-sm text-gray-400">Toplam Qazanc</p>
+                              <div className="text-center bg-gray-800 rounded-lg p-3">
+                                <p className="text-xs sm:text-sm text-gray-400">Paket Sonu Gəlir</p>
                                 <p className="text-sm sm:text-lg font-bold text-green-400">
-                                  {formatAmount(pkg.total_earned || 0)} AZN
+                                  {formatAmount(totalExpectedEarnings)} AZN
                                 </p>
                               </div>
-                              <div className="text-center">
+                              <div className="text-center bg-gray-800 rounded-lg p-3">
                                 <p className="text-xs sm:text-sm text-gray-400">Cari Qazanc</p>
                                 <p className="text-sm sm:text-lg font-bold text-yellow-400">
                                   {formatAmount(pkg.accumulated_earnings || 0)} AZN
                                 </p>
                               </div>
-                              <div className="text-center">
-                                <p className="text-xs sm:text-sm text-gray-400">Qalan Vaxt</p>
+                              <div className="text-center bg-gray-800 rounded-lg p-3">
+                                <p className="text-xs sm:text-sm text-gray-400">Paket Qalan Vaxt</p>
                                 <p className="text-sm sm:text-lg font-bold text-blue-400">
                                   {timeRemaining}
                                 </p>
                               </div>
-                              <div className="text-center">
-                                <p className="text-xs sm:text-sm text-gray-400">Gəlir %</p>
+                              <div className="text-center bg-gray-800 rounded-lg p-3">
+                                <p className="text-xs sm:text-sm text-gray-400">Sonrakı Toplama</p>
                                 <p className="text-sm sm:text-lg font-bold text-purple-400">
-                                  %{(progress).toFixed(1)}
+                                  {formatCountdown(countdownTime)}
                                 </p>
+                              </div>
+                            </div>
+                            
+                            {/* Additional Package Information */}
+                            <div className="bg-gray-800 rounded-lg p-3 mb-4">
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <span className="text-gray-400">Paket Müddəti:</span>
+                                  <div className="text-white font-semibold">{packageDef.duration} gün</div>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Gün Sayı:</span>
+                                  <div className="text-white font-semibold">%{(packageDef.multiplier * 100).toFixed(0)} gəlir</div>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Toplam Edilən:</span>
+                                  <div className="text-green-400 font-semibold">{formatAmount(pkg.total_earned || 0)} AZN</div>
+                                </div>
+                                <div>
+                                  <span className="text-gray-400">Tamamlanma:</span>
+                                  <div className="text-blue-400 font-semibold">{progress.toFixed(1)}%</div>
+                                </div>
                               </div>
                             </div>
 
                             {/* Progress Bar */}
                             <div className="mb-4">
                               <div className="flex justify-between text-xs sm:text-sm mb-2">
-                                <span>Tamamlanma</span>
-                                <span>{progress.toFixed(1)}%</span>
+                                <span>Qazanc Tamamlanması</span>
+                                <span>{progress.toFixed(1)}% ({formatAmount(pkg.accumulated_earnings || 0)} / {formatAmount(totalExpectedEarnings)} AZN)</span>
                               </div>
-                              <Progress value={progress} className="h-2" />
+                              <Progress value={progress} className="h-3" />
                             </div>
 
                             {/* Collection Button - Mobile Responsive */}
