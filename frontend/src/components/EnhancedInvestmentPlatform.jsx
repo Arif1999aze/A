@@ -1329,26 +1329,35 @@ const EnhancedInvestmentPlatform = () => {
 
                       {selectedPackage === key && (
                         <div className="space-y-3 sm:space-y-4 animate-in slide-in-from-top">
-                          <Input
-                            type="number"
-                            placeholder={`Məbləğ (${pkg.minAmount}-${pkg.maxAmount} AZN)`}
-                            value={investmentAmount}
-                            onChange={(e) => {
-                              console.log('Amount changed:', e.target.value);
-                              setInvestmentAmount(e.target.value);
-                            }}
-                            min={pkg.minAmount}
-                            max={pkg.maxAmount}
-                            className="bg-gray-800 border-gray-600 text-white text-center text-lg"
-                          />
+                          <div className="bg-gradient-to-r from-gray-800/80 to-gray-700/60 rounded-xl p-4 border border-gray-600/50">
+                            <Input
+                              type="number"
+                              placeholder={`Məbləğ (${pkg.minAmount}-${pkg.maxAmount} AZN)`}
+                              value={investmentAmount}
+                              onChange={(e) => {
+                                console.log('Amount changed:', e.target.value);
+                                setInvestmentAmount(e.target.value);
+                              }}
+                              min={pkg.minAmount}
+                              max={pkg.maxAmount}
+                              className="bg-gray-900/80 border-gray-500 text-white text-center text-lg font-bold placeholder-gray-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                            />
+                          </div>
                           
-                          {/* Amount validation display */}
+                          {/* Enhanced Amount validation display */}
                           {investmentAmount && (
                             <div className="text-center text-sm">
                               {parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount ? (
-                                <p className="text-red-400">⚠️ Məbləğ {pkg.minAmount}-{pkg.maxAmount} AZN arası olmalıdır</p>
+                                <div className="bg-red-900/50 border border-red-600/50 rounded-lg p-3">
+                                  <p className="text-red-300 font-semibold">⚠️ Məbləğ {pkg.minAmount}-{pkg.maxAmount} AZN arası olmalıdır</p>
+                                </div>
                               ) : (
-                                <p className="text-green-400">✅ Məbləğ uyğundur</p>
+                                <div className="bg-green-900/50 border border-green-600/50 rounded-lg p-3">
+                                  <p className="text-green-300 font-semibold">✅ Məbləğ uyğundur</p>
+                                  <p className="text-xs text-green-400 mt-1">
+                                    Gözlənilən gəlir: {formatAmount(parseFloat(investmentAmount) * pkg.multiplier)} AZN
+                                  </p>
+                                </div>
                               )}
                             </div>
                           )}
@@ -1359,17 +1368,26 @@ const EnhancedInvestmentPlatform = () => {
                               handlePackagePurchase(key);
                             }}
                             disabled={!investmentAmount || parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount || !user}
-                            className="w-full bg-yellow-400 text-black hover:bg-yellow-500 py-3 text-base font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                            className={`w-full py-4 text-base font-bold transition-all duration-300 ${
+                              !investmentAmount || parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount || !user
+                                ? 'bg-gray-600 cursor-not-allowed'
+                                : `bg-gradient-to-r ${pkg.borderGradient} hover:scale-105 shadow-lg ${pkg.shadowColor}`
+                            } text-white disabled:opacity-50`}
                           >
-                            <Package className="w-4 h-4 mr-2" />
-                            {!user ? 'Giriş Edin' : 'Paketi Al'}
+                            <Package className="w-5 h-5 mr-2" />
+                            {!user ? '🔒 Giriş Edin' : '💰 Paketi Al'}
                           </Button>
                           
-                          {/* Balance check */}
+                          {/* Enhanced Balance check */}
                           {user && investmentAmount && parseFloat(investmentAmount) > (user.balance || 0) && (
-                            <p className="text-red-400 text-sm text-center">
-                              ⚠️ Balansınız kifayət etmir (Cari: {formatAmount(user.balance || 0)} AZN)
-                            </p>
+                            <div className="bg-red-900/50 border border-red-600/50 rounded-lg p-3">
+                              <p className="text-red-300 text-sm text-center font-semibold">
+                                ⚠️ Balansınız kifayət etmir
+                              </p>
+                              <p className="text-xs text-red-400 text-center mt-1">
+                                Cari: {formatAmount(user.balance || 0)} AZN | Lazım: {formatAmount(parseFloat(investmentAmount))} AZN
+                              </p>
+                            </div>
                           )}
                         </div>
                       )}
@@ -1381,9 +1399,13 @@ const EnhancedInvestmentPlatform = () => {
                             setSelectedPackage(key);
                           }}
                           variant="outline"
-                          className="w-full border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black py-3"
+                          className={`w-full border-2 hover:scale-105 transition-all duration-300 py-4 text-base font-bold ${
+                            key === 'gold' ? 'border-yellow-400 text-yellow-400 hover:bg-yellow-400' :
+                            key === 'titanium' ? 'border-indigo-400 text-indigo-400 hover:bg-indigo-400' :
+                            'border-emerald-400 text-emerald-400 hover:bg-emerald-400'
+                          } hover:text-black`}
                         >
-                          Paketi Seç
+                          ✨ Paketi Seç
                         </Button>
                       )}
                     </div>
