@@ -576,10 +576,72 @@ const EnhancedInvestmentPlatform = () => {
       });
       
       await fetchUserData();
-      showNotification('✅ Qazanc balansa əlavə edildi!', 'success');
+      showNotification('✅ Qazanc toplam balansa əlavə edildi!', 'success');
+      
+      // Restart countdown timer for this package
+      startCountdownTimer(packageId);
+      
     } catch (error) {
       showNotification(error.response?.data?.detail || '❌ Qazanc toplama xətası', 'error');
     }
+  };
+
+  // Countdown timer management
+  const startCountdownTimer = (packageId) => {
+    // Clear existing timer
+    if (countdownTimers[packageId]) {
+      clearInterval(countdownTimers[packageId]);
+    }
+    
+    let timeLeft = 20 * 60; // 20 minutes in seconds
+    
+    const timer = setInterval(() => {
+      timeLeft--;
+      
+      setCountdownTimers(prev => ({
+        ...prev,
+        [packageId]: timeLeft
+      }));
+      
+      // Auto-collect when timer reaches 0
+      if (timeLeft <= 0 && autoCollectionEnabled) {
+        clearInterval(timer);
+        handleAutoCollection(packageId);
+      }
+    }, 1000);
+    
+    setCountdownTimers(prev => ({
+      ...prev,
+      [packageId]: timeLeft
+    }));
+  };
+
+  // Auto-collection function
+  const handleAutoCollection = async (packageId) => {
+    try {
+      await axios.post(`${API_BASE_URL}/api/packages/${packageId}/collect`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      await fetchUserData();
+      showNotification('🎉 Qazanc avtomatik olaraq balansa əlavə edildi!', 'success');
+      
+      // Restart timer for next collection
+      startCountdownTimer(packageId);
+      
+    } catch (error) {
+      console.error('Auto-collection error:', error);
+      // Retry after 30 seconds if failed
+      setTimeout(() => startCountdownTimer(packageId), 30000);
+    }
+  };
+  
+  // Format countdown time
+  const formatCountdown = (seconds) => {
+    if (seconds <= 0) return '00:00';
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   // Handle send message
