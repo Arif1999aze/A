@@ -1330,13 +1330,35 @@ const PackageConfirmation = ({ package: pkg, amount, expectedProfit, onConfirm, 
 const SupportForm = ({ onSend, messages }) => {
   const [message, setMessage] = useState('');
 
+  // Check if user can send message (no unanswered messages)
+  const canSendMessage = () => {
+    const userMessages = messages.filter(m => !m.is_from_admin);
+    const adminMessages = messages.filter(m => m.is_from_admin);
+    
+    if (userMessages.length === 0) return true; // First message
+    
+    // Find the latest user message
+    const latestUserMessage = userMessages.reduce((latest, msg) => 
+      new Date(msg.created_date) > new Date(latest.created_date) ? msg : latest
+    );
+    
+    // Check if there's an admin reply after the latest user message
+    const hasAdminReplyAfter = adminMessages.some(msg => 
+      new Date(msg.created_date) > new Date(latestUserMessage.created_date)
+    );
+    
+    return hasAdminReplyAfter;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (message.trim()) {
+    if (message.trim() && canSendMessage()) {
       onSend(message);
       setMessage('');
     }
   };
+
+  const canSend = canSendMessage();
 
   return (
     <div className="space-y-4">
@@ -1356,16 +1378,29 @@ const SupportForm = ({ onSend, messages }) => {
         ))}
       </div>
 
+      {!canSend && (
+        <div className="bg-yellow-900/50 border border-yellow-600 rounded-lg p-3">
+          <p className="text-yellow-200 text-sm">
+            ⏳ Admin cavab verənə qədər yeni mesaj göndərə bilməzsiniz.
+          </p>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="space-y-3">
         <Input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Mesajınızı yazın..."
+          placeholder={canSend ? "Mesajınızı yazın..." : "Admin cavab verənə qədər gözləyin..."}
           className="bg-gray-800 border-gray-600 text-white"
+          disabled={!canSend}
         />
-        <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
+        <Button 
+          type="submit" 
+          className="w-full bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={!canSend || !message.trim()}
+        >
           <MessageCircle className="w-4 h-4 mr-2" />
-          Göndər
+          {canSend ? 'Göndər' : 'Admin cavabı gözlənilir...'}
         </Button>
       </form>
     </div>
