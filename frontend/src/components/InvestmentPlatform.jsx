@@ -375,7 +375,7 @@ const InvestmentPlatform = () => {
         setRegisterOpen(false);
         
         // Show welcome bonus
-        alert('🎉 Qeydiyyat bonusu: 10 AZN hesabınıza əlavə edildi!');
+        alert('🎉 Qeydiyyat bonusu: 50 AZN hesabınıza əlavə edildi!');
         
         // Fetch user data
         setTimeout(() => {
