@@ -974,7 +974,7 @@ const EnhancedInvestmentPlatform = () => {
       {/* Main Content - Mobile Responsive */}
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
         <Tabs value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="bg-gray-900 mb-4 sm:mb-6 grid grid-cols-2 sm:grid-cols-5 h-auto">
+          <TabsList className="bg-gray-900 mb-4 sm:mb-6 grid grid-cols-3 sm:grid-cols-6 h-auto">
             <TabsTrigger 
               value="dashboard" 
               className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
@@ -1002,6 +1002,13 @@ const EnhancedInvestmentPlatform = () => {
             >
               <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
               Əməliyyatlar
+            </TabsTrigger>
+            <TabsTrigger 
+              value="tracking" 
+              className="data-[state=active]:bg-yellow-400 data-[state=active]:text-black text-xs sm:text-sm py-2 px-2 sm:px-4"
+            >
+              <Activity className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+              Tarixçə
             </TabsTrigger>
             <TabsTrigger 
               value="support" 
