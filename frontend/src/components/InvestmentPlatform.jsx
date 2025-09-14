@@ -1668,7 +1668,7 @@ const DepositForm = ({ onDeposit }) => {
           className="bg-gray-800 border-gray-600 text-white"
           placeholder="0.00"
           min="50"
-          max="2500"
+          max="2000"
           step="0.01"
           required
         />
