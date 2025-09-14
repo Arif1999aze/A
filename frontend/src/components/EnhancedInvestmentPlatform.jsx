@@ -1077,24 +1077,36 @@ const EnhancedInvestmentPlatform = () => {
                               </div>
                             </div>
                             
-                            {/* Additional Package Information */}
-                            <div className="bg-gray-800 rounded-lg p-3 mb-4">
+                            {/* Professional Package Information */}
+                            <div className="bg-gradient-to-r from-gray-800/50 to-gray-700/30 rounded-xl p-4 mb-6 border border-gray-600/30">
                               <div className="grid grid-cols-2 gap-4 text-sm">
-                                <div>
-                                  <span className="text-gray-400">Paket Müddəti:</span>
-                                  <div className="text-white font-semibold">{packageDef.duration} gün</div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-2xl">📈</span>
+                                  <div>
+                                    <span className="text-gray-300">Paket Müddəti:</span>
+                                    <div className="text-white font-semibold">{packageDef.duration} gün</div>
+                                  </div>
                                 </div>
-                                <div>
-                                  <span className="text-gray-400">Gün Sayı:</span>
-                                  <div className="text-white font-semibold">%{(packageDef.multiplier * 100).toFixed(0)} gəlir</div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-2xl">🔥</span>
+                                  <div>
+                                    <span className="text-gray-300">Toplam Gəlir:</span>
+                                    <div className="text-yellow-400 font-semibold">%{(packageDef.multiplier * 100).toFixed(0)}</div>
+                                  </div>
                                 </div>
-                                <div>
-                                  <span className="text-gray-400">Toplam Edilən:</span>
-                                  <div className="text-green-400 font-semibold">{formatAmount(pkg.total_earned || 0)} AZN</div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-2xl">💰</span>
+                                  <div>
+                                    <span className="text-gray-300">Toplam Edilən:</span>
+                                    <div className="text-green-400 font-semibold">{formatAmount(pkg.total_earned || 0)} AZN</div>
+                                  </div>
                                 </div>
-                                <div>
-                                  <span className="text-gray-400">Tamamlanma:</span>
-                                  <div className="text-blue-400 font-semibold">{progress.toFixed(1)}%</div>
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-2xl">⚡</span>
+                                  <div>
+                                    <span className="text-gray-300">Tamamlanma:</span>
+                                    <div className="text-blue-400 font-semibold">{progress.toFixed(1)}%</div>
+                                  </div>
                                 </div>
                               </div>
                             </div>
