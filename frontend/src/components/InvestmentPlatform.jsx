@@ -306,18 +306,23 @@ const InvestmentPlatform = () => {
       });
       
       const { access_token } = response.data;
-      localStorage.setItem('token', access_token);
-      setToken(access_token);
-      setIsLoggedIn(true);
-      setLoginOpen(false);
-      
-      // Fetch user data
-      setTimeout(() => {
-        fetchUserData();
-        fetchUserPackages();
-        fetchUserTransactions();
-        fetchUserMessages();
-      }, 100);
+      // Validate token before storing
+      if (access_token && access_token.trim() && access_token.includes('.')) {
+        localStorage.setItem('token', access_token);
+        setToken(access_token);
+        setIsLoggedIn(true);
+        setLoginOpen(false);
+        
+        // Fetch user data
+        setTimeout(() => {
+          fetchUserData();
+          fetchUserPackages();
+          fetchUserTransactions();
+          fetchUserMessages();
+        }, 100);
+      } else {
+        throw new Error('Invalid token received');
+      }
       
     } catch (error) {
       alert('❌ Email və ya şifrə yanlışdır.');
