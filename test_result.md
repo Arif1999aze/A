@@ -452,7 +452,8 @@
 
 ## test_plan:
   current_focus:
-    - "InvestAZ Enhanced Investment Platform - Complete Rebuild Testing"
+    - "Android Package Purchase Bug Fix"
+    - "Enhanced Withdrawal/Deposit Forms"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
