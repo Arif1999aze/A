@@ -124,6 +124,7 @@ manager = ConnectionManager()
 class TransactionType(str, Enum):
     DEPOSIT = "deposit"
     WITHDRAW = "withdraw"
+    MARKET_PURCHASE = "market_purchase"
 
 class TransactionStatus(str, Enum):
     PENDING = "pending"
