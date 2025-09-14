@@ -94,8 +94,19 @@ package_id = purchase_response.json()['id']
 print(f"Package purchased: {package_id}")
 
 # Step 4: Wait for earnings
-print("4. Waiting 10 seconds for earnings...")
-time.sleep(10)
+print("4. Waiting 30 seconds for earnings...")
+time.sleep(30)
+
+# Check package details to see earnings
+print("4.1. Checking package details...")
+packages_response = make_request('GET', '/packages/my', headers=user_headers)
+if packages_response and packages_response.status_code == 200:
+    packages = packages_response.json()
+    for pkg in packages:
+        if pkg['id'] == package_id:
+            print(f"Package earnings: {pkg.get('accumulated_earnings', 0)} AZN")
+            print(f"Package details: invested={pkg['invested_amount']}, multiplier={pkg['multiplier']}")
+            break
 
 # Step 5: Test collection status
 print("5. Checking collection status...")
