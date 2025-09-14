@@ -652,9 +652,9 @@ const InvestmentPlatform = () => {
                           <Bell className="w-4 h-4 mr-2" />
                           Bildirişlər
                         </span>
-                        {(pendingTransactions.length > 0 || messages.filter(m => !m.is_read).length > 0) && (
+                        {messages.filter(m => !m.is_read).length > 0 && (
                           <Badge className="bg-red-600 text-white text-xs">
-                            {pendingTransactions.length + messages.filter(m => !m.is_read).length}
+                            {messages.filter(m => !m.is_read).length}
                           </Badge>
                         )}
                       </button>
