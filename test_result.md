@@ -261,17 +261,41 @@
         - agent: "testing"
         - comment: "✅ NEW FEATURE: Admin message deletion working. DELETE /api/admin/messages/{id} endpoint functional."
 
-  - task: "Real-time Package Earnings System"
+  - task: "Admin Panel Real-time Notifications"
     implemented: true
-    working: true
+    working: false
+    file: "server.py"
+    stuck_count: 1
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+        - agent: "user"
+        - comment: "❌ USER REPORT: Admin panel not receiving ANY notifications. Need complete rebuild of real-time system for admin panel to automatically receive user registrations and transaction updates."
+
+  - task: "Investment Package Limits Update"
+    implemented: false
+    working: "NA"
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
-        - working: true
-        - agent: "testing"
-        - comment: "✅ NEW FEATURE: Real-time earnings calculation working. Updates every 10 seconds, earnings collection updates balance immediately, WebSocket earnings updates confirmed."
+        - working: "NA"
+        - agent: "user"
+        - comment: "❌ USER REQUEST: Update package limits - Package 1: 50-250 AZN, Package 2: 250-500 AZN, Package 3: 500-2000 AZN"
+
+  - task: "Support System Message Restriction"
+    implemented: false
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: "NA"
+        - agent: "user"
+        - comment: "❌ USER REQUEST: Customer can only send ONE message until admin responds. Need to implement message blocking system."
 
 ## frontend:
   - task: "Remove 'lisenziya' word from frontend"
