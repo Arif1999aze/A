@@ -680,6 +680,116 @@ async def upload_receipt(
     
     return {"message": "Receipt uploaded successfully", "filename": filename}
 
+# Admin Transaction Approval Endpoints
+@api_router.post("/admin/transactions/{transaction_id}/approve")
+async def approve_transaction(transaction_id: str, current_user: User = Depends(get_current_user)):
+    # Verify admin access
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Get transaction
+    transaction = await db.transactions.find_one({"id": transaction_id})
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    if transaction["status"] != "pending":
+        raise HTTPException(status_code=400, detail="Transaction already processed")
+    
+    # Update transaction status
+    await db.transactions.update_one(
+        {"id": transaction_id},
+        {"$set": {"status": "approved", "approved_date": datetime.now(timezone.utc)}}
+    )
+    
+    # Get user
+    user = await db.users.find_one({"id": transaction["user_id"]})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Process transaction based on type
+    if transaction["type"] == "deposit":
+        # Add to user balance
+        new_balance = user["balance"] + transaction["amount"]
+        await db.users.update_one(
+            {"id": transaction["user_id"]},
+            {"$set": {"balance": new_balance}}
+        )
+        
+        # Notify user
+        await manager.send_to_user(transaction["user_id"], json.dumps({
+            "type": "deposit_approved",
+            "amount": transaction["amount"],
+            "new_balance": new_balance
+        }))
+        
+    elif transaction["type"] == "withdraw":
+        # Money already deducted from earnings, just notify user
+        await manager.send_to_user(transaction["user_id"], json.dumps({
+            "type": "withdrawal_approved",
+            "amount": transaction["amount"]
+        }))
+    
+    return {"message": "Transaction approved successfully"}
+
+@api_router.post("/admin/transactions/{transaction_id}/reject")
+async def reject_transaction(
+    transaction_id: str, 
+    rejection_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    # Verify admin access
+    if not current_user.is_admin:
+        raise HTTPException(status_code=403, detail="Admin access required")
+    
+    # Get transaction
+    transaction = await db.transactions.find_one({"id": transaction_id})
+    if not transaction:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+    
+    if transaction["status"] != "pending":
+        raise HTTPException(status_code=400, detail="Transaction already processed")
+    
+    # Update transaction status
+    rejection_reason = rejection_data.get("reason", "Admin tərəfindən imtina")
+    await db.transactions.update_one(
+        {"id": transaction_id},
+        {"$set": {
+            "status": "rejected", 
+            "rejected_date": datetime.now(timezone.utc),
+            "rejection_reason": rejection_reason
+        }}
+    )
+    
+    # Get user
+    user = await db.users.find_one({"id": transaction["user_id"]})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # If withdrawal was rejected, return money to earnings
+    if transaction["type"] == "withdraw":
+        new_total_earned = user.get("total_earned", 0) + transaction["amount"]
+        await db.users.update_one(
+            {"id": transaction["user_id"]},
+            {"$set": {"total_earned": new_total_earned}}
+        )
+        
+        # Notify user
+        await manager.send_to_user(transaction["user_id"], json.dumps({
+            "type": "withdrawal_rejected",
+            "amount": transaction["amount"],
+            "reason": rejection_reason,
+            "new_total_earned": new_total_earned
+        }))
+    else:
+        # Deposit rejection notification
+        await manager.send_to_user(transaction["user_id"], json.dumps({
+            "type": "deposit_rejected",
+            "amount": transaction["amount"],
+            "reason": rejection_reason
+        }))
+    
+    return {"message": "Transaction rejected successfully", "reason": rejection_reason}
+
 @api_router.get("/transactions/my", response_model=List[Transaction])
 async def get_my_transactions(current_user: User = Depends(get_current_user)):
     # Remove _id from results to prevent serialization issues
