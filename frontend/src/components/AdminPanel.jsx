@@ -331,6 +331,23 @@ const AdminPanel = () => {
     }
   };
 
+  // Check for new notifications
+  const checkForNewNotifications = () => {
+    // Simulate checking for new admin notifications
+    const notificationTypes = [
+      { type: 'info', message: '💰 Yeni depozit sorğusu var' },
+      { type: 'warning', message: '🏦 Çıxarış təsdiq gözləyir' },
+      { type: 'message', message: '📩 Yeni dəstək mesajı' },
+      { type: 'info', message: '📦 Yeni paket alımı' }
+    ];
+    
+    // Randomly add notifications (simulate real-time)
+    if (Math.random() > 0.95 && notifications.length < 5) { // 5% chance, max 5 notifications
+      const randomNotification = notificationTypes[Math.floor(Math.random() * notificationTypes.length)];
+      showNotification(randomNotification.message, randomNotification.type);
+    }
+  };
+
   // Start enhanced auto-refresh every 3 seconds for admin panel (more aggressive)
   const startAutoRefresh = () => {
     if (refreshInterval.current) {
