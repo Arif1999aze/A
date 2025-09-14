@@ -1672,7 +1672,7 @@ const DepositForm = ({ onDeposit }) => {
           step="0.01"
           required
         />
-        <div className="text-xs text-gray-400 mt-1">Minimum: 50 AZN, Maksimum: 2500 AZN</div>
+        <div className="text-xs text-gray-400 mt-1">Minimum: 50 AZN, Maksimum: 2000 AZN</div>
       </div>
 
       <div>
