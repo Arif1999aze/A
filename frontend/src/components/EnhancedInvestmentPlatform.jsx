@@ -1228,6 +1228,9 @@ const EnhancedInvestmentPlatform = () => {
                 {/* Enhanced Company Information */}
                 <CompanyInfo />
               </div>
+              
+              {/* Company Information */}
+              <CompanyInfo className="mt-6" />
             </div>
           </TabsContent>
 
