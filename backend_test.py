@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend API Tests for InvestAZ Platform - CRITICAL NEW FEATURES TESTING
-Focus on user-reported issues:
-1. Admin Panel Real-time Notifications (WebSocket /ws/admin)
-2. Updated Investment Package Limits (Gold: 50-250, Titanium: 250-500, Platinum: 500-2000)
-3. Support System Message Restriction (one message until admin replies)
-4. Updated Deposit Limits (50-2000 AZN)
-5. Real-time WebSocket System for all admin notifications
+Comprehensive Backend API Tests for InvestAZ Platform - PRIORITY TESTING AREAS
+Focus on recently implemented changes:
+1. Package Purchase API - Test /api/packages/purchase endpoint for robustness and Android compatibility
+2. Transaction APIs - Test withdrawal and deposit endpoints with new card_name format (combined name + surname)
+3. Authentication Flow - Verify JWT authentication is working properly
+
+SPECIFIC TEST SCENARIOS:
+- Package Purchase Tests: Valid amounts, boundary conditions, insufficient balance, real-time notifications
+- Transaction Tests: New format with card_name as "Name Surname", card_number as bank name
+- Authentication Tests: User registration, login, admin login, protected routes
 """
 
 import requests
