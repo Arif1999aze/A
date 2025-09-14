@@ -331,7 +331,7 @@ const AdminPanel = () => {
     }
   };
 
-  // Start auto-refresh
+  // Start auto-refresh every 10 seconds for admin panel
   const startAutoRefresh = () => {
     if (refreshInterval.current) {
       clearInterval(refreshInterval.current);
@@ -339,10 +339,24 @@ const AdminPanel = () => {
     
     refreshInterval.current = setInterval(() => {
       if (isLoggedIn && isConnected) {
+        console.log('🔄 Admin panel avtomatik yenilənir...');
         refreshAllData();
       }
-    }, 15000); // Every 15 seconds
+    }, 10000); // Every 10 seconds
   };
+  
+  // Page visibility refresh for admin panel
+  useEffect(() => {
+    const handleAdminVisibilityChange = () => {
+      if (!document.hidden && isLoggedIn) {
+        console.log('👁️ Admin panel görünür, məlumatlar yenilənir...');
+        refreshAllData();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleAdminVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleAdminVisibilityChange);
+  }, [isLoggedIn]);
 
   // Refresh all data
   const refreshAllData = async () => {
