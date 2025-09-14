@@ -759,6 +759,7 @@ const EnhancedInvestmentPlatform = () => {
       </div>
     );
   }
+  }
 
   // Login/Register screens
   if (!isLoggedIn) {
