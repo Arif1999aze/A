@@ -512,8 +512,8 @@ def test_package_purchase_with_collection_system():
     print("✅ First collection is immediately available for new package")
     
     # Test 3: Wait for earnings and perform collection
-    print("   Waiting 10 seconds for earnings to accumulate...")
-    time.sleep(10)
+    print("   Waiting 60 seconds for earnings to accumulate...")
+    time.sleep(60)
     
     collect_response = make_request('POST', f'/packages/{package_id}/collect', headers=purchase_headers)
     if not collect_response or collect_response.status_code != 200:
