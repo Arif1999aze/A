@@ -1163,7 +1163,6 @@ const InvestmentPlatform = () => {
             <DialogTitle className="text-white">Bildirişlər</DialogTitle>
           </DialogHeader>
           <NotificationsView 
-            pendingTransactions={pendingTransactions}
             messages={messages}
           />
         </DialogContent>
