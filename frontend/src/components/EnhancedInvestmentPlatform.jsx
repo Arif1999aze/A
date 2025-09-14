@@ -482,8 +482,18 @@ const EnhancedInvestmentPlatform = () => {
       console.log('🔄 İstifadəçi məlumatları yenilənir...');
       await fetchUserData();
       
-      // Success notification
-      showNotification(`🎉 ${pkg.name} uğurla alındı! ${formatAmount(amount)} AZN investisiya edildi.`, 'success');
+      // Success notification with detailed package info
+      const dailyEarnings = (amount * pkg.multiplier) / pkg.duration;
+      const totalEarnings = amount * pkg.multiplier;
+      
+      showNotification(
+        `🎉 ${pkg.name} uğurla alındı!\n` +
+        `💰 İnvestisiya: ${formatAmount(amount)} AZN\n` +
+        `📈 Gündelik gəlir: ${formatAmount(dailyEarnings)} AZN\n` +
+        `🏆 Toplam gəlir: ${formatAmount(totalEarnings)} AZN\n` +
+        `⏰ 20 dəqiqədə bir qazanc toplayın!`, 
+        'success'
+      );
       
       // Switch to dashboard after short delay
       setTimeout(() => {
