@@ -404,7 +404,7 @@
 
 ## test_plan:
   current_focus:
-    - "InvestAZ Admin Panel - Complete Rebuild"
+    - "InvestAZ Enhanced Investment Platform - Complete Rebuild Testing"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
