@@ -1848,6 +1848,9 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
             <TabsTrigger value="withdraw" className="data-[state=active]:bg-blue-600 flex-1">
               🏦 Çıxarış
             </TabsTrigger>
+            <TabsTrigger value="tracking" className="data-[state=active]:bg-yellow-600 flex-1">
+              📊 Əməliyyatlar
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="deposit">
