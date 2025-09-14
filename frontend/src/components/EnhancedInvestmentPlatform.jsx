@@ -1258,43 +1258,72 @@ const EnhancedInvestmentPlatform = () => {
                 {Object.entries(packageDefinitions).map(([key, pkg]) => (
                   <Card 
                     key={key} 
-                    className={`bg-gradient-to-b ${pkg.gradient} p-1 hover:scale-105 transition-transform cursor-pointer ${
-                      selectedPackage === key ? 'ring-2 ring-yellow-400' : ''
+                    className={`bg-gradient-to-br ${pkg.gradient} p-1 hover:scale-105 transition-all duration-500 cursor-pointer ${pkg.shadowColor} shadow-xl hover:shadow-2xl ${
+                      selectedPackage === key ? 'ring-4 ring-yellow-400 ring-opacity-70' : ''
                     }`}
                     onClick={() => {
                       console.log('Package selected:', key);
                       setSelectedPackage(key);
                     }}
                   >
-                    <div className="bg-gray-900 rounded-lg p-4 sm:p-6 h-full">
+                    <div className="bg-gray-900/95 backdrop-blur rounded-lg p-4 sm:p-6 h-full relative overflow-hidden">
+                      {/* Professional Badge */}
+                      {selectedPackage === key && (
+                        <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                          ✨ SEÇİLİB
+                        </div>
+                      )}
+                      
                       <div className="text-center mb-4 sm:mb-6">
-                        <div className="text-4xl sm:text-5xl mb-3">{pkg.icon}</div>
-                        <h3 className="text-xl sm:text-2xl font-bold mb-2 text-white drop-shadow-lg" 
+                        <div className={`text-5xl sm:text-6xl mb-4 p-4 rounded-2xl bg-gradient-to-r ${pkg.borderGradient} inline-block shadow-lg transform hover:rotate-6 transition-transform`}>
+                          {pkg.icon}
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-bold mb-3 text-white drop-shadow-lg" 
                             style={{
                               color: pkg.color,
-                              textShadow: `0 0 10px ${pkg.color}40`
+                              textShadow: `0 0 20px ${pkg.color}60`
                             }}>
                           {pkg.name}
                         </h3>
-                        <p className="text-gray-400 text-sm leading-relaxed">{pkg.description}</p>
+                        <p className="text-gray-300 text-sm leading-relaxed mb-4 bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
+                          {pkg.description}
+                        </p>
+                        
+                        {/* Features List */}
+                        <div className="space-y-2 mb-4">
+                          {pkg.features.map((feature, idx) => (
+                            <div key={idx} className="flex items-center space-x-2 text-xs text-gray-300 bg-gray-800/30 rounded-lg p-2">
+                              <CheckCircle className="w-3 h-3 text-green-400" />
+                              <span>{feature}</span>
+                            </div>
+                          ))}
+                        </div>
                       </div>
 
                       <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-300">İnvestisiya Limiti:</span>
-                          <span className="font-bold text-white text-sm">{pkg.minAmount}-{pkg.maxAmount} AZN</span>
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+                          <span className="text-sm text-gray-300 font-medium">İnvestisiya Limiti:</span>
+                          <span className="font-bold text-white text-sm bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+                            {pkg.minAmount}-{pkg.maxAmount} AZN
+                          </span>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-300">Gündəlik Gəlir:</span>
-                          <span className="font-bold text-green-400 text-sm">%{pkg.dailyReturn}</span>
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+                          <span className="text-sm text-gray-300 font-medium">Gündəlik Gəlir:</span>
+                          <span className="font-bold text-green-400 text-sm bg-green-900/30 px-2 py-1 rounded-full">
+                            %{pkg.dailyReturn}
+                          </span>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-300">Müddət:</span>
-                          <span className="font-bold text-white text-sm">{pkg.duration} gün</span>
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+                          <span className="text-sm text-gray-300 font-medium">Müddət:</span>
+                          <span className="font-bold text-blue-400 text-sm bg-blue-900/30 px-2 py-1 rounded-full">
+                            {pkg.duration} gün
+                          </span>
                         </div>
-                        <div className="flex justify-between items-center">
-                          <span className="text-sm text-gray-300">Toplam Gəlir:</span>
-                          <span className="font-bold text-yellow-400 text-sm">%{(pkg.multiplier * 100).toFixed(0)}</span>
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded-lg p-3 border border-yellow-700/30">
+                          <span className="text-sm text-gray-300 font-medium">Toplam Gəlir:</span>
+                          <span className="font-bold text-yellow-400 text-sm bg-yellow-900/30 px-2 py-1 rounded-full animate-pulse">
+                            %{(pkg.multiplier * 100).toFixed(0)}
+                          </span>
                         </div>
                       </div>
 
