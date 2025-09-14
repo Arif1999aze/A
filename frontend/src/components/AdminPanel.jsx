@@ -1278,27 +1278,145 @@ const AdminPanel = () => {
                 value={newBalance}
                 onChange={(e) => setNewBalance(e.target.value)}
                 className="bg-gray-800 border-gray-600 text-white"
-                placeholder="Yeni balans"
+                placeholder="0.00"
+                step="0.01"
               />
             </div>
             
             <div className="flex space-x-2">
-              <Button
-                onClick={() => setBalanceEditUser(null)}
-                variant="outline"
-                className="flex-1"
-              >
-                Ləğv Et
-              </Button>
-              <Button
+              <Button 
                 onClick={() => updateUserBalance(balanceEditUser?.id, newBalance)}
-                className="flex-1 bg-green-600 hover:bg-green-700"
-                disabled={!newBalance || isNaN(parseFloat(newBalance))}
+                className="bg-green-600 hover:bg-green-700 flex-1"
               >
-                Yenilə
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Təsdiq Et
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => setBalanceEditUser(null)}
+                className="border-gray-600 text-gray-400"
+              >
+                İmtina
               </Button>
             </div>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Customer Details Dialog */}
+      <Dialog open={!!selectedCustomer} onOpenChange={() => setSelectedCustomer(null)}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="text-white text-xl">
+              🧑‍💼 {selectedCustomer?.name} - Müştəri Detayları
+            </DialogTitle>
+          </DialogHeader>
+          
+          {selectedCustomer && (
+            <div className="space-y-6">
+              {/* Customer Info Header */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-gray-800 rounded-lg">
+                <div className="text-center">
+                  <p className="text-xs text-gray-400">Müştəri Kodu</p>
+                  <Badge className="bg-purple-600 text-white font-bold">
+                    {selectedCustomer.user_code}
+                  </Badge>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-gray-400">Depozit Balansı</p>
+                  <p className="text-lg font-bold text-blue-400">
+                    {formatAmount(selectedCustomer.balance)} AZN
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-gray-400">Toplam Qazanc</p>
+                  <p className="text-lg font-bold text-green-400">
+                    {formatAmount(selectedCustomer.total_earned || 0)} AZN
+                  </p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs text-gray-400">Qoşulma Tarixi</p>
+                  <p className="text-sm text-white">
+                    {new Date(selectedCustomer.join_date).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+
+              {/* Customer Transactions */}
+              <div>
+                <h3 className="text-lg font-semibold text-yellow-400 mb-4">📊 Son Əməliyyatlar</h3>
+                <div className="space-y-3 max-h-60 overflow-y-auto">
+                  {transactions
+                    .filter(t => t.user_id === selectedCustomer.id)
+                    .slice(0, 10)
+                    .map(transaction => (
+                      <div key={transaction.id} className="bg-gray-800 rounded-lg p-3 flex justify-between items-center">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                            transaction.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'
+                          }`}>
+                            {transaction.type === 'deposit' ? '💰' : '🏦'}
+                          </div>
+                          <div>
+                            <p className="text-white font-medium">
+                              {transaction.type === 'deposit' ? 'Depozit' : 'Çıxarış'}
+                            </p>
+                            <p className="text-xs text-gray-400">
+                              {new Date(transaction.created_date).toLocaleDateString()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-white font-bold">
+                            {formatAmount(transaction.amount)} AZN
+                          </p>
+                          <Badge className={
+                            transaction.status === 'approved' ? 'bg-green-600' :
+                            transaction.status === 'rejected' ? 'bg-red-600' : 'bg-yellow-600'
+                          }>
+                            {transaction.status === 'approved' ? '✅ Təsdiq' :
+                             transaction.status === 'rejected' ? '❌ İmtina' : '🕐 Gözləyir'}
+                          </Badge>
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+
+              {/* Quick Actions */}
+              <div className="flex flex-wrap gap-3 p-4 bg-gray-800 rounded-lg">
+                <h4 className="w-full text-sm font-semibold text-gray-300 mb-2">🛠️ Sürətli Əməliyyatlar</h4>
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    setBalanceEditUser(selectedCustomer);
+                    setNewBalance(selectedCustomer.balance.toString());
+                    setSelectedCustomer(null);
+                  }}
+                  className="bg-yellow-600 hover:bg-yellow-700 text-black"
+                >
+                  <Edit className="w-4 h-4 mr-2" />
+                  Balans Yenilə
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-red-600 text-red-400 hover:bg-red-600 hover:text-white"
+                >
+                  <XCircle className="w-4 h-4 mr-2" />
+                  Hesabı Blokla
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="border-blue-600 text-blue-400 hover:bg-blue-600 hover:text-white"
+                >
+                  <MessageCircle className="w-4 h-4 mr-2" />
+                  Mesaj Göndər
+                </Button>
+              </div>
+            </div>
+          )}
         </DialogContent>
       </Dialog>
 
