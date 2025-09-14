@@ -1153,8 +1153,12 @@ const EnhancedInvestmentPlatform = () => {
                     </div>
                     <Separator />
                     <div className="flex justify-between">
-                      <span className="text-gray-400 text-xs sm:text-sm">Cari Balans:</span>
-                      <span className="font-bold text-yellow-400 text-sm sm:text-base">{formatAmount(user?.balance || 0)} AZN</span>
+                      <span className="text-gray-400 text-xs sm:text-sm">Depozit Balansı:</span>
+                      <span className="font-bold text-blue-400 text-xs sm:text-sm">{formatAmount(user?.balance || 0)} AZN</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-400 text-xs sm:text-sm">Çəkiləbilir Qazanc:</span>
+                      <span className="font-bold text-green-400 text-sm sm:text-base">{formatAmount(user?.total_earned || 0)} AZN</span>
                     </div>
                   </div>
                 </Card>
