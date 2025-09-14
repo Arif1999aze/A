@@ -1534,6 +1534,105 @@ const EnhancedInvestmentPlatform = () => {
               </Card>
             </div>
           </TabsContent>
+
+          {/* Transaction Tracking Tab */}
+          <TabsContent value="tracking">
+            <div className="space-y-4">
+              <div className="text-center mb-6">
+                <h3 className="text-lg font-bold text-yellow-400 mb-2">📊 Əməliyyat Tarixçəsi</h3>
+                <p className="text-gray-400 text-sm">Depozit və çıxarış əməliyyatlarınızın statusu</p>
+              </div>
+              
+              {/* Mock transaction history for now - will be connected to real data later */}
+              <div className="space-y-3">
+                <Card className="bg-gray-800 border-gray-700 p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center">
+                        💰
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">Depozit</h4>
+                        <p className="text-sm text-gray-400">250.00 AZN</p>
+                        <p className="text-xs text-gray-500">Bu gün, 14:30</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-yellow-600 animate-pulse">
+                      🕐 Gözləyir
+                    </Badge>
+                  </div>
+                  <div className="mt-3 text-xs text-gray-400">
+                    Admin tərəfindən yoxlanılır
+                  </div>
+                </Card>
+
+                <Card className="bg-gray-800 border-gray-700 p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                        🏦
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">Çıxarış</h4>
+                        <p className="text-sm text-gray-400">150.00 AZN</p>
+                        <p className="text-xs text-gray-500">Dünən, 09:15</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-green-600">
+                      ✅ Təsdiqləndi
+                    </Badge>
+                  </div>
+                  <div className="mt-3 text-xs text-green-400">
+                    30 dəqiqə ərzində hesabınıza köçürüldü
+                  </div>
+                </Card>
+
+                <Card className="bg-gray-800 border-gray-700 p-4">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+                        ❌
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">Depozit</h4>
+                        <p className="text-sm text-gray-400">500.00 AZN</p>
+                        <p className="text-xs text-gray-500">3 gün əvvəl, 16:45</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-red-600">
+                      ❌ İmtina
+                    </Badge>
+                  </div>
+                  <div className="mt-3 text-xs text-red-400">
+                    Dekont oxunmur, yenidən göndərin
+                  </div>
+                </Card>
+              </div>
+              
+              <div className="bg-blue-900/30 border border-blue-600 rounded-lg p-4 mt-6">
+                <div className="flex items-start space-x-3">
+                  <div className="text-2xl">💡</div>
+                  <div>
+                    <h4 className="text-blue-200 font-medium mb-2">Əməliyyat Statusları</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center space-x-2">
+                        <Badge className="bg-yellow-600">🕐 Gözləyir</Badge>
+                        <span className="text-blue-200">Admin yoxlaması gözlənilir</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge className="bg-green-600">✅ Təsdiqləndi</Badge>
+                        <span className="text-blue-200">Əməliyyat uğurla tamamlandı</span>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Badge className="bg-red-600">❌ İmtina</Badge>
+                        <span className="text-blue-200">Səbəbini oxuyub düzəldin</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </TabsContent>
         </Tabs>
       </div>
     </div>
