@@ -430,6 +430,45 @@ const AdminPanel = () => {
     }
   };
 
+  // Transaction Approval Functions
+  const handleApproveTransaction = async (transactionId) => {
+    try {
+      await axios.post(`${API_BASE_URL}/api/admin/transactions/${transactionId}/approve`, {}, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      showNotification('✅ Əməliyyat təsdiqləndi!', 'success');
+      
+      // Refresh data
+      await fetchTransactions();
+      await fetchStats();
+      
+    } catch (error) {
+      showNotification(error.response?.data?.detail || '❌ Təsdiq xətası', 'error');
+    }
+  };
+
+  const handleRejectTransaction = async (transactionId) => {
+    try {
+      const reason = prompt('İmtina səbəbi (istəyə bağlı):');
+      
+      await axios.post(`${API_BASE_URL}/api/admin/transactions/${transactionId}/reject`, {
+        reason: reason || 'Admin tərəfindən imtina'
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      showNotification('❌ Əməliyyat imtina edildi!', 'warning');
+      
+      // Refresh data
+      await fetchTransactions();
+      await fetchStats();
+      
+    } catch (error) {
+      showNotification(error.response?.data?.detail || '❌ İmtina xətası', 'error');
+    }
+  };
+
   const fetchMessages = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/api/admin/messages`, {
