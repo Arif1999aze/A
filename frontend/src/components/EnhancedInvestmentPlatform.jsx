@@ -1058,19 +1058,43 @@ const EnhancedInvestmentPlatform = () => {
                               <Progress value={progress} className="h-3" />
                             </div>
 
-                            {/* Collection Button - Mobile Responsive */}
-                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
-                              <div className="text-xs sm:text-sm text-gray-400">
-                                Son toplama: {pkg.last_collection ? new Date(pkg.last_collection).toLocaleString() : 'Heç vaxt'}
+                            {/* Enhanced Collection Section */}
+                            <div className="flex flex-col space-y-3">
+                              <div className="flex justify-between items-center text-xs sm:text-sm text-gray-400">
+                                <span>Son toplama: {pkg.last_collection ? new Date(pkg.last_collection).toLocaleString() : 'Heç vaxt'}</span>
+                                <span>Auto-toplama: {autoCollectionEnabled ? '✅ Aktiv' : '❌ Deaktiv'}</span>
                               </div>
-                              <Button
-                                onClick={() => handleCollectEarnings(pkg.id)}
-                                disabled={!pkg.can_collect || pkg.accumulated_earnings <= 0}
-                                className="bg-green-600 hover:bg-green-700 disabled:opacity-50 w-full sm:w-auto"
-                              >
-                                <Coins className="w-4 h-4 mr-2" />
-                                Qazanc Topla ({formatAmount(pkg.accumulated_earnings || 0)} AZN)
-                              </Button>
+                              
+                              <div className="flex flex-col sm:flex-row gap-3">
+                                <Button
+                                  onClick={() => handleCollectEarnings(pkg.id)}
+                                  disabled={!pkg.can_collect || pkg.accumulated_earnings <= 0 || countdownTime > 0}
+                                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 flex-1"
+                                >
+                                  <Coins className="w-4 h-4 mr-2" />
+                                  {countdownTime > 0 ? 
+                                    `Qazanc Topla (${formatCountdown(countdownTime)})` : 
+                                    `Qazanc Topla (${formatAmount(pkg.accumulated_earnings || 0)} AZN)`
+                                  }
+                                </Button>
+                                
+                                <Button
+                                  onClick={() => setAutoCollectionEnabled(!autoCollectionEnabled)}
+                                  variant="outline"
+                                  className="border-gray-600 text-gray-300 hover:bg-gray-800"
+                                >
+                                  <Timer className="w-4 h-4 mr-2" />
+                                  {autoCollectionEnabled ? 'Auto OFF' : 'Auto ON'}
+                                </Button>
+                              </div>
+                              
+                              {countdownTime > 0 && (
+                                <div className="bg-blue-900/50 border border-blue-600 rounded-lg p-3 text-center">
+                                  <p className="text-blue-300 text-sm">
+                                    🕐 Növbəti qazanc {formatCountdown(countdownTime)} sonra {autoCollectionEnabled ? 'avtomatik' : 'əl ilə'} toplanacaq
+                                  </p>
+                                </div>
+                              )}
                             </div>
                           </div>
                         </Card>
