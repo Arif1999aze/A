@@ -1669,8 +1669,8 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
       return;
     }
 
-    if (user?.balance < amountNum) {
-      showNotification(`❌ Balansınız kifayət etmir. Cari balans: ${formatAmount(user.balance)} AZN`, 'error');
+    if (user?.total_earned < amountNum) {
+      showNotification(`❌ Qazancınız kifayət etmir. Çəkiləbilir qazanc: ${formatAmount(user.total_earned || 0)} AZN`, 'error');
       return;
     }
 
