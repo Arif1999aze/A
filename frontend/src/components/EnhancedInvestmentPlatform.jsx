@@ -844,68 +844,240 @@ const EnhancedInvestmentPlatform = () => {
           </div>
         </div>
 
-        {/* Deposit Modal */}
+        {/* Deposit Modal - Enhanced */}
         <Dialog open={showDepositModal} onOpenChange={setShowDepositModal}>
-          <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+          <DialogContent className="bg-gray-900 border-gray-700 max-w-lg">
             <DialogHeader>
-              <DialogTitle className="text-white text-center">💰 Depozit</DialogTitle>
+              <DialogTitle className="text-white text-center flex items-center justify-center">
+                <DollarSign className="w-5 h-5 mr-2 text-green-400" />
+                💰 Depozit Əməliyyatı
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="text-center p-4 bg-green-900/30 border border-green-600 rounded-lg">
-                <p className="text-green-300 text-sm">
+                <p className="text-green-300 text-sm mb-2">
                   💡 Balansınızı artırmaq üçün depozit edin
                 </p>
+                <p className="text-green-400 font-bold text-lg">
+                  Cari Balans: {formatAmount(user?.balance || 0)} AZN
+                </p>
               </div>
-              <Button 
-                onClick={() => setShowDepositModal(false)}
-                className="w-full"
-              >
-                Bağla
-              </Button>
+              
+              {/* Deposit Form */}
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm text-gray-400 mb-1 block">Ad Soyad</label>
+                  <Input 
+                    placeholder="Adınızı və soyadınızı daxil edin"
+                    className="bg-gray-800 border-gray-600 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-1 block">Bank</label>
+                  <Input 
+                    placeholder="Bank adını daxil edin"
+                    className="bg-gray-800 border-gray-600 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-1 block">Məbləğ (AZN)</label>
+                  <Input 
+                    type="number"
+                    placeholder="Depozit məbləğini daxil edin"
+                    className="bg-gray-800 border-gray-600 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-1 block">Qəbz Şəkli</label>
+                  <Input 
+                    type="file"
+                    accept="image/*"
+                    className="bg-gray-800 border-gray-600 text-white"
+                  />
+                </div>
+              </div>
+              
+              <div className="flex space-x-3">
+                <Button 
+                  onClick={() => setShowDepositModal(false)}
+                  variant="outline"
+                  className="flex-1 border-gray-600"
+                >
+                  İmtina
+                </Button>
+                <Button 
+                  className="flex-1 bg-green-600 hover:bg-green-700"
+                >
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Depozit Et
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
 
-        {/* Withdraw Modal */}
+        {/* Withdraw Modal - Enhanced */}
         <Dialog open={showWithdrawModal} onOpenChange={setShowWithdrawModal}>
-          <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+          <DialogContent className="bg-gray-900 border-gray-700 max-w-lg">
             <DialogHeader>
-              <DialogTitle className="text-white text-center">🏦 Çıxarış</DialogTitle>
+              <DialogTitle className="text-white text-center flex items-center justify-center">
+                <Activity className="w-5 h-5 mr-2 text-purple-400" />
+                🏦 Çıxarış Əməliyyatı
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="text-center p-4 bg-purple-900/30 border border-purple-600 rounded-lg">
-                <p className="text-purple-300 text-sm">
-                  💰 Çəkiləbilir Qazanc: {formatAmount(user?.total_earned || 0)} AZN
+                <p className="text-purple-300 text-sm mb-2">
+                  💰 Çəkiləbilir Qazanc
                 </p>
-                <p className="text-purple-400 text-xs mt-1">
+                <p className="text-purple-400 font-bold text-xl mb-2">
+                  {formatAmount(user?.total_earned || 0)} AZN
+                </p>
+                <p className="text-purple-400 text-xs bg-purple-800/50 px-2 py-1 rounded-full inline-block">
                   ⏰ 30 dəqiqə hesabınıza köçürüləcəkdir
                 </p>
               </div>
-              <Button 
-                onClick={() => setShowWithdrawModal(false)}
-                className="w-full"
-              >
-                Bağla
-              </Button>
+              
+              {/* Withdraw Form */}
+              <div className="space-y-3">
+                <div>
+                  <label className="text-sm text-gray-400 mb-1 block">Ad Soyad</label>
+                  <Input 
+                    placeholder="Adınızı və soyadınızı daxil edin"
+                    className="bg-gray-800 border-gray-600 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-1 block">Bank</label>
+                  <Input 
+                    placeholder="Bank adını daxil edin"
+                    className="bg-gray-800 border-gray-600 text-white"
+                  />
+                </div>
+                <div>
+                  <label className="text-sm text-gray-400 mb-1 block">Çıxarış Məbləği (AZN)</label>
+                  <Input 
+                    type="number"
+                    placeholder={`Maksimum: ${formatAmount(user?.total_earned || 0)} AZN`}
+                    className="bg-gray-800 border-gray-600 text-white"
+                    max={user?.total_earned || 0}
+                  />
+                </div>
+              </div>
+              
+              <div className="flex space-x-3">
+                <Button 
+                  onClick={() => setShowWithdrawModal(false)}
+                  variant="outline"
+                  className="flex-1 border-gray-600"
+                >
+                  İmtina
+                </Button>
+                <Button 
+                  className="flex-1 bg-purple-600 hover:bg-purple-700"
+                >
+                  <Activity className="w-4 h-4 mr-2" />
+                  Çıxarış Et
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
 
-        {/* Tracking Modal */}
+        {/* Tracking Modal - Enhanced */}
         <Dialog open={showTrackingModal} onOpenChange={setShowTrackingModal}>
-          <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+          <DialogContent className="bg-gray-900 border-gray-700 max-w-4xl max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle className="text-white text-center">📊 Tarixçə</DialogTitle>
+              <DialogTitle className="text-white text-center flex items-center justify-center">
+                <BarChart3 className="w-5 h-5 mr-2 text-yellow-400" />
+                📊 Əməliyyat Tarixçəsi
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
               <div className="text-center p-4 bg-yellow-900/30 border border-yellow-600 rounded-lg">
                 <p className="text-yellow-300 text-sm">
-                  📈 Əməliyyat tarixçənizi burada görə bilərsiniz
+                  📈 Bütün depozit və çıxarış əməliyyatlarınızı burada görə bilərsiniz
                 </p>
               </div>
+              
+              {/* Transaction History */}
+              <div className="space-y-3">
+                <Card className="bg-gray-800 border-gray-700 p-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                        <DollarSign className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">Depozit</h4>
+                        <p className="text-sm text-gray-400">500.00 AZN</p>
+                        <p className="text-xs text-gray-500">Bu gün, 14:30</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-green-600 animate-pulse">
+                      Təsdiqləndi
+                    </Badge>
+                  </div>
+                </Card>
+
+                <Card className="bg-gray-800 border-gray-700 p-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
+                        <Activity className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">Çıxarış</h4>
+                        <p className="text-sm text-gray-400">150.00 AZN</p>
+                        <p className="text-xs text-gray-500">Dünən, 09:15</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-green-600">
+                      Tamamlandı
+                    </Badge>
+                  </div>
+                </Card>
+
+                <Card className="bg-gray-800 border-gray-700 p-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center">
+                        <DollarSign className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">Depozit</h4>
+                        <p className="text-sm text-gray-400">200.00 AZN</p>
+                        <p className="text-xs text-gray-500">2 gün əvvəl, 16:45</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-yellow-600 animate-pulse">
+                      Gözləyir
+                    </Badge>
+                  </div>
+                </Card>
+                
+                <Card className="bg-gray-800 border-gray-700 p-4">
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <Package className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h4 className="font-semibold text-white">Paket Alımı</h4>
+                        <p className="text-sm text-gray-400">Gold Premium - 250.00 AZN</p>
+                        <p className="text-xs text-gray-500">3 gün əvvəl, 11:20</p>
+                      </div>
+                    </div>
+                    <Badge className="bg-green-600">
+                      Aktiv
+                    </Badge>
+                  </div>
+                </Card>
+              </div>
+              
               <Button 
                 onClick={() => setShowTrackingModal(false)}
-                className="w-full"
+                className="w-full mt-4"
               >
                 Bağla
               </Button>
