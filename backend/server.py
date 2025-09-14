@@ -629,6 +629,46 @@ async def send_message(
     message_data: MessageCreate,
     current_user: User = Depends(get_current_user)
 ):
+    # Check if user has any pending/unanswered messages
+    existing_unanswered = await db.messages.find_one({
+        "user_id": current_user.id,
+        "is_from_admin": False,
+        "$or": [
+            # No admin reply exists for this user's message
+            {"$and": [
+                {"user_id": current_user.id},
+                {"is_from_admin": False}
+            ]}
+        ]
+    })
+    
+    # Check if there's an admin reply to any of user's messages
+    has_recent_admin_reply = await db.messages.find_one({
+        "user_id": current_user.id,
+        "is_from_admin": True
+    })
+    
+    # If user has sent message and no admin reply exists, block new message
+    if existing_unanswered and not has_recent_admin_reply:
+        # Find if there's an admin reply after the user's last message
+        user_last_message = await db.messages.find_one(
+            {"user_id": current_user.id, "is_from_admin": False},
+            sort=[("created_date", -1)]
+        )
+        
+        if user_last_message:
+            admin_reply_after = await db.messages.find_one({
+                "user_id": current_user.id,
+                "is_from_admin": True,
+                "created_date": {"$gt": user_last_message["created_date"]}
+            })
+            
+            if not admin_reply_after:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="Admin cavab verənə qədər yeni mesaj göndərə bilməzsiniz."
+                )
+    
     message = Message(
         user_id=current_user.id,
         content=message_data.content,
