@@ -839,6 +839,54 @@ const EnhancedInvestmentPlatform = () => {
           </div>
         </div>
 
+        {/* Profile Modal */}
+        <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+          <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-white text-center">👤 Profil Tənzimləmələri</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              {/* Profile Info Display */}
+              <div className="space-y-3">
+                <div className="bg-gray-800/50 rounded-lg p-3">
+                  <label className="text-xs text-gray-400">Ad Soyad</label>
+                  <p className="font-semibold text-white">{user?.name}</p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-3">
+                  <label className="text-xs text-gray-400">Email</label>
+                  <p className="font-semibold text-white">{user?.email}</p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-3">
+                  <label className="text-xs text-gray-400">İstifadəçi Kodu</label>
+                  <p className="font-semibold text-purple-400">{user?.user_code}</p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-3">
+                  <label className="text-xs text-gray-400">Referral Numarası</label>
+                  <p className="font-semibold text-yellow-400">REF-{user?.user_code || '000000'}</p>
+                </div>
+              </div>
+              
+              {/* Action Buttons */}
+              <div className="flex space-x-3">
+                <Button 
+                  onClick={() => setShowProfileModal(false)}
+                  variant="outline"
+                  className="flex-1 border-gray-600"
+                >
+                  Bağla
+                </Button>
+                <Button 
+                  onClick={handleLogout}
+                  className="flex-1 bg-red-600 hover:bg-red-700"
+                >
+                  <LogOut className="w-4 h-4 mr-2" />
+                  Çıxış
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {/* Login Dialog */}
         <Dialog open={showLogin} onOpenChange={setShowLogin}>
           <DialogContent className="bg-gray-900 border-gray-700">
