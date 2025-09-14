@@ -625,6 +625,15 @@ async def create_transaction(
             "new_balance": user_doc["balance"]  # Send both for frontend sync
         }))
     
+    # Notify admins about new transaction
+    await manager.broadcast_to_admins(json.dumps({
+        "type": "new_transaction",
+        "user_name": current_user.name,
+        "user_code": current_user.user_code,
+        "transaction_type": transaction_data.type.value,
+        "amount": transaction_data.amount
+    }))
+    
     return transaction
 
 @api_router.post("/transactions/{transaction_id}/upload-receipt")
