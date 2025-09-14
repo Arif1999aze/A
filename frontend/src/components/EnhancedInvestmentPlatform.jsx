@@ -625,10 +625,7 @@ const EnhancedInvestmentPlatform = () => {
       });
       
       await fetchUserData();
-      showNotification('✅ Qazanc toplam balansa əlavə edildi!', 'success');
-      
-      // Restart countdown timer for this package
-      startCountdownTimer(packageId);
+      showNotification('✅ Qazanc çəkiləbilir balansa əlavə edildi!', 'success');
       
     } catch (error) {
       showNotification(error.response?.data?.detail || '❌ Qazanc toplama xətası', 'error');
