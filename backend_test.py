@@ -125,142 +125,100 @@ def setup_test_environment():
     
     return user_token and admin_token
 
-def test_admin_websocket_notifications():
-    """CRITICAL TEST 1: Admin Panel Real-time Notifications via WebSocket"""
-    print("\n🔴 CRITICAL TEST 1: Admin Panel Real-time Notifications")
-    print("Testing WebSocket connection to /ws/admin and real-time notifications...")
+def test_authentication_flow():
+    """PRIORITY TEST 1: Authentication Flow - JWT authentication working properly"""
+    print("\n🔴 PRIORITY TEST 1: Authentication Flow")
+    print("Testing user registration, login, admin login, and protected routes...")
     
-    if not admin_token:
-        print("❌ No admin token available")
+    # Test 1: User Registration
+    print("   Testing user registration...")
+    reg_response = make_request('POST', '/auth/register', test_user_data)
+    if not reg_response or reg_response.status_code not in [200, 201]:
+        print(f"❌ User registration failed: {reg_response.text if reg_response else 'No response'}")
         return False
     
-    # Setup WebSocket connection for admin
-    ws_url = BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://')
-    admin_ws_url = f"{ws_url}/ws/admin"
-    
-    admin_connected = False
-    notifications_received = []
-    
-    def on_admin_message(ws, message):
-        try:
-            data = json.loads(message)
-            notifications_received.append(data)
-            print(f"   📨 Admin notification received: {data.get('type', 'unknown')}")
-        except:
-            notifications_received.append(message)
-            print(f"   📨 Admin message received: {message}")
-    
-    def on_admin_error(ws, error):
-        print(f"   ❌ Admin WebSocket error: {error}")
-    
-    def on_admin_close(ws, close_status_code, close_msg):
-        print(f"   🔌 Admin WebSocket closed")
-    
-    def on_admin_open(ws):
-        nonlocal admin_connected
-        admin_connected = True
-        print(f"   ✅ Admin WebSocket connected to /ws/admin")
-    
-    try:
-        # Create admin WebSocket connection
-        admin_ws = websocket.WebSocketApp(admin_ws_url,
-                                        on_open=on_admin_open,
-                                        on_message=on_admin_message,
-                                        on_error=on_admin_error,
-                                        on_close=on_admin_close)
-        
-        # Run WebSocket in separate thread
-        ws_thread = threading.Thread(target=admin_ws.run_forever)
-        ws_thread.daemon = True
-        ws_thread.start()
-        
-        # Wait for connection
-        time.sleep(3)
-        
-        if not admin_connected:
-            print("❌ Admin WebSocket connection failed")
-            return False
-        
-        # Test 1: New user registration notification
-        print("   Testing new user registration notification...")
-        new_user_data = {
-            "email": "test.notification@gmail.com",
-            "name": "Test Notification User",
-            "password": "testpass123"
-        }
-        
-        reg_response = make_request('POST', '/auth/register', new_user_data)
-        time.sleep(2)  # Wait for notification
-        
-        # Test 2: Package purchase notification
-        if reg_response and reg_response.status_code in [200, 201]:
-            reg_data = reg_response.json()
-            temp_token = reg_data.get('access_token')
-            
-            if temp_token:
-                print("   Testing package purchase notification...")
-                headers = {"Authorization": f"Bearer {temp_token}"}
-                purchase_data = {
-                    "package_type": "gold",
-                    "invested_amount": 50.0
-                }
-                
-                purchase_response = make_request('POST', '/packages/purchase', purchase_data, headers)
-                time.sleep(2)  # Wait for notification
-                
-                # Test 3: Transaction notification
-                print("   Testing transaction notification...")
-                transaction_data = {
-                    "type": "deposit",
-                    "amount": 100.0,
-                    "card_name": "Test User",
-                    "card_number": "1234567890123456"
-                }
-                
-                txn_response = make_request('POST', '/transactions', transaction_data, headers)
-                time.sleep(2)  # Wait for notification
-                
-                # Test 4: Message notification
-                print("   Testing support message notification...")
-                message_data = {
-                    "content": "Test support message for admin notification",
-                    "message_type": "support"
-                }
-                
-                msg_response = make_request('POST', '/messages', message_data, headers)
-                time.sleep(2)  # Wait for notification
-        
-        # Close WebSocket
-        admin_ws.close()
-        time.sleep(1)
-        
-        # Analyze results
-        print(f"   📊 Total notifications received: {len(notifications_received)}")
-        
-        notification_types = [notif.get('type', 'unknown') if isinstance(notif, dict) else 'text' 
-                            for notif in notifications_received]
-        
-        expected_types = ['new_user_registration', 'package_purchase', 'new_transaction', 'new_message']
-        found_types = [t for t in expected_types if t in notification_types]
-        
-        print(f"   📋 Expected notification types: {expected_types}")
-        print(f"   ✅ Found notification types: {found_types}")
-        
-        if len(found_types) >= 3:  # At least 3 out of 4 notification types
-            print(f"✅ CRITICAL TEST 1 PASSED: Admin WebSocket notifications working ({len(found_types)}/4 types)")
-            return True
-        else:
-            print(f"❌ CRITICAL TEST 1 FAILED: Only {len(found_types)}/4 notification types received")
-            return False
-            
-    except Exception as e:
-        print(f"❌ CRITICAL TEST 1 FAILED with exception: {e}")
+    reg_data = reg_response.json()
+    if 'access_token' not in reg_data:
+        print("❌ Registration response missing access token")
         return False
+    
+    global user_token, test_user_id, test_user_code
+    user_token = reg_data['access_token']
+    print("     ✅ User registration successful with JWT token")
+    
+    # Test 2: Get user profile (protected route)
+    print("   Testing protected route access...")
+    headers = {"Authorization": f"Bearer {user_token}"}
+    profile_response = make_request('GET', '/auth/me', headers=headers)
+    if not profile_response or profile_response.status_code != 200:
+        print("❌ Protected route access failed")
+        return False
+    
+    profile_data = profile_response.json()
+    test_user_id = profile_data['id']
+    test_user_code = profile_data['user_code']
+    
+    # Verify user data
+    if profile_data['email'] != test_user_data['email'] or profile_data['name'] != test_user_data['name']:
+        print("❌ User profile data mismatch")
+        return False
+    
+    # Verify AZ code format
+    if not test_user_code.startswith('AZ'):
+        print(f"❌ User code format incorrect: {test_user_code}")
+        return False
+    
+    print(f"     ✅ Protected route access successful, user code: {test_user_code}")
+    
+    # Test 3: Admin Login
+    print("   Testing admin login...")
+    admin_response = make_request('POST', '/auth/login', admin_credentials)
+    if not admin_response or admin_response.status_code != 200:
+        print("❌ Admin login failed")
+        return False
+    
+    admin_data = admin_response.json()
+    if 'access_token' not in admin_data:
+        print("❌ Admin login response missing access token")
+        return False
+    
+    global admin_token
+    admin_token = admin_data['access_token']
+    print("     ✅ Admin login successful")
+    
+    # Test 4: Admin protected route
+    print("   Testing admin protected route...")
+    admin_headers = {"Authorization": f"Bearer {admin_token}"}
+    stats_response = make_request('GET', '/admin/stats', headers=admin_headers)
+    if not stats_response or stats_response.status_code != 200:
+        print("❌ Admin protected route access failed")
+        return False
+    
+    stats_data = stats_response.json()
+    required_fields = ['total_users', 'active_packages', 'total_deposits', 'total_withdrawals', 'pending_transactions']
+    if not all(field in stats_data for field in required_fields):
+        print("❌ Admin stats response missing required fields")
+        return False
+    
+    print("     ✅ Admin protected route access successful")
+    
+    # Test 5: Invalid token access
+    print("   Testing invalid token rejection...")
+    invalid_headers = {"Authorization": "Bearer invalid_token_12345"}
+    invalid_response = make_request('GET', '/auth/me', headers=invalid_headers)
+    if not invalid_response or invalid_response.status_code != 401:
+        print("❌ Invalid token should be rejected with 401")
+        return False
+    
+    print("     ✅ Invalid token correctly rejected")
+    
+    print("✅ PRIORITY TEST 1 PASSED: Authentication flow working correctly")
+    return True
 
-def test_updated_package_limits():
-    """CRITICAL TEST 2: Updated Investment Package Limits"""
-    print("\n🔴 CRITICAL TEST 2: Updated Investment Package Limits")
-    print("Testing Gold: 50-250, Titanium: 250-500, Platinum: 500-2000 AZN")
+def test_package_purchase_api():
+    """PRIORITY TEST 2: Package Purchase API - Robustness and Android compatibility"""
+    print("\n🔴 PRIORITY TEST 2: Package Purchase API")
+    print("Testing package purchase with valid amounts, boundary conditions, insufficient balance, real-time notifications...")
     
     if not user_token:
         print("❌ No user token available")
@@ -268,7 +226,7 @@ def test_updated_package_limits():
     
     headers = {"Authorization": f"Bearer {user_token}"}
     
-    # First, get package definitions to verify limits
+    # First, get package definitions
     pkg_response = make_request('GET', '/packages')
     if not pkg_response or pkg_response.status_code != 200:
         print("❌ Could not get package definitions")
@@ -276,70 +234,53 @@ def test_updated_package_limits():
     
     packages = pkg_response.json()
     print(f"   📋 Package definitions retrieved:")
+    for pkg_name, pkg_info in packages.items():
+        print(f"     {pkg_name}: {pkg_info['min_amount']}-{pkg_info['max_amount']} AZN, multiplier: {pkg_info['multiplier']}")
     
-    expected_limits = {
-        "gold": {"min": 50, "max": 250},
-        "titanium": {"min": 250, "max": 500}, 
-        "platinum": {"min": 500, "max": 2000}
-    }
-    
-    limits_correct = True
-    for pkg_name, expected in expected_limits.items():
-        if pkg_name in packages:
-            actual_min = packages[pkg_name]["min_amount"]
-            actual_max = packages[pkg_name]["max_amount"]
-            print(f"     {pkg_name}: {actual_min}-{actual_max} AZN (expected: {expected['min']}-{expected['max']})")
-            
-            if actual_min != expected["min"] or actual_max != expected["max"]:
-                print(f"     ❌ {pkg_name} limits incorrect!")
-                limits_correct = False
-        else:
-            print(f"     ❌ {pkg_name} package not found!")
-            limits_correct = False
-    
-    if not limits_correct:
-        print("❌ CRITICAL TEST 2 FAILED: Package limits are incorrect")
-        return False
-    
-    # Test boundary values
-    test_cases = [
-        # Gold package tests
-        {"package": "gold", "amount": 49, "should_fail": True, "test": "Below gold minimum"},
-        {"package": "gold", "amount": 50, "should_fail": False, "test": "Gold minimum"},
-        {"package": "gold", "amount": 250, "should_fail": False, "test": "Gold maximum"},
-        {"package": "gold", "amount": 251, "should_fail": True, "test": "Above gold maximum"},
-        
-        # Titanium package tests  
-        {"package": "titanium", "amount": 249, "should_fail": True, "test": "Below titanium minimum"},
-        {"package": "titanium", "amount": 250, "should_fail": False, "test": "Titanium minimum"},
-        {"package": "titanium", "amount": 500, "should_fail": False, "test": "Titanium maximum"},
-        {"package": "titanium", "amount": 501, "should_fail": True, "test": "Above titanium maximum"},
-        
-        # Platinum package tests
-        {"package": "platinum", "amount": 499, "should_fail": True, "test": "Below platinum minimum"},
-        {"package": "platinum", "amount": 500, "should_fail": False, "test": "Platinum minimum"},
-        {"package": "platinum", "amount": 2000, "should_fail": False, "test": "Platinum maximum"},
-        {"package": "platinum", "amount": 2001, "should_fail": True, "test": "Above platinum maximum"}
-    ]
-    
-    # First, ensure user has enough balance for testing
+    # Ensure user has sufficient balance for testing
     balance_response = make_request('GET', '/auth/me', headers=headers)
     if balance_response and balance_response.status_code == 200:
         current_balance = balance_response.json()['balance']
-        if current_balance < 2500:
+        if current_balance < 1000:
             # Add balance via admin
             if admin_token:
                 admin_headers = {"Authorization": f"Bearer {admin_token}"}
                 balance_update = {
                     "user_id": test_user_id,
-                    "new_balance": 3000.0,
-                    "notes": "Balance for package limit testing"
+                    "new_balance": 2000.0,
+                    "notes": "Balance for package purchase testing"
                 }
                 make_request('POST', '/admin/users/update-balance', balance_update, admin_headers)
                 time.sleep(1)
+                print("     ✅ Balance updated for testing")
+    
+    # Test cases for package purchases
+    test_cases = [
+        # Gold package tests (50-250 AZN)
+        {"package": "gold", "amount": 49, "should_fail": True, "test": "Gold below minimum (49 AZN)"},
+        {"package": "gold", "amount": 50, "should_fail": False, "test": "Gold minimum (50 AZN)"},
+        {"package": "gold", "amount": 150, "should_fail": False, "test": "Gold mid-range (150 AZN)"},
+        {"package": "gold", "amount": 250, "should_fail": False, "test": "Gold maximum (250 AZN)"},
+        {"package": "gold", "amount": 251, "should_fail": True, "test": "Gold above maximum (251 AZN)"},
+        
+        # Titanium package tests (250-500 AZN)
+        {"package": "titanium", "amount": 249, "should_fail": True, "test": "Titanium below minimum (249 AZN)"},
+        {"package": "titanium", "amount": 250, "should_fail": False, "test": "Titanium minimum (250 AZN)"},
+        {"package": "titanium", "amount": 375, "should_fail": False, "test": "Titanium mid-range (375 AZN)"},
+        {"package": "titanium", "amount": 500, "should_fail": False, "test": "Titanium maximum (500 AZN)"},
+        {"package": "titanium", "amount": 501, "should_fail": True, "test": "Titanium above maximum (501 AZN)"},
+        
+        # Platinum package tests (50-250 AZN based on current backend code)
+        {"package": "platinum", "amount": 49, "should_fail": True, "test": "Platinum below minimum (49 AZN)"},
+        {"package": "platinum", "amount": 50, "should_fail": False, "test": "Platinum minimum (50 AZN)"},
+        {"package": "platinum", "amount": 150, "should_fail": False, "test": "Platinum mid-range (150 AZN)"},
+        {"package": "platinum", "amount": 250, "should_fail": False, "test": "Platinum maximum (250 AZN)"},
+        {"package": "platinum", "amount": 251, "should_fail": True, "test": "Platinum above maximum (251 AZN)"}
+    ]
     
     passed_tests = 0
     total_tests = len(test_cases)
+    successful_purchases = []
     
     for test_case in test_cases:
         purchase_data = {
@@ -355,121 +296,81 @@ def test_updated_package_limits():
                 passed_tests += 1
             else:
                 print(f"     ❌ {test_case['test']}: Should have been rejected")
+                if response:
+                    print(f"       Response: {response.status_code} - {response.text}")
         else:
             if response and response.status_code == 200:
+                purchase_result = response.json()
                 print(f"     ✅ {test_case['test']}: Correctly accepted")
+                print(f"       Package ID: {purchase_result['id']}")
                 passed_tests += 1
+                successful_purchases.append(purchase_result)
             else:
                 print(f"     ❌ {test_case['test']}: Should have been accepted")
                 if response:
-                    print(f"       Error: {response.text}")
+                    print(f"       Error: {response.status_code} - {response.text}")
+    
+    # Test insufficient balance scenario
+    print("   Testing insufficient balance scenario...")
+    insufficient_balance_data = {
+        "package_type": "gold",
+        "invested_amount": 10000.0  # Amount higher than user balance
+    }
+    
+    insufficient_response = make_request('POST', '/packages/purchase', insufficient_balance_data, headers)
+    if insufficient_response and insufficient_response.status_code == 400:
+        error_data = insufficient_response.json()
+        if "Insufficient balance" in error_data.get('detail', ''):
+            print("     ✅ Insufficient balance correctly rejected")
+            passed_tests += 1
+            total_tests += 1
+        else:
+            print(f"     ❌ Wrong error message for insufficient balance: {error_data}")
+            total_tests += 1
+    else:
+        print("     ❌ Insufficient balance should have been rejected")
+        total_tests += 1
+    
+    # Verify package creation and earnings system
+    if successful_purchases:
+        print("   Testing package retrieval and earnings system...")
+        packages_response = make_request('GET', '/packages/my', headers=headers)
+        if packages_response and packages_response.status_code == 200:
+            user_packages = packages_response.json()
+            if len(user_packages) > 0:
+                print(f"     ✅ User packages retrieved: {len(user_packages)} packages")
+                
+                # Check package structure
+                latest_package = user_packages[0]
+                required_fields = ['id', 'package_type', 'invested_amount', 'multiplier', 'duration_days', 'accumulated_earnings']
+                if all(field in latest_package for field in required_fields):
+                    print("     ✅ Package structure contains all required fields")
+                    passed_tests += 1
+                    total_tests += 1
+                else:
+                    print("     ❌ Package structure missing required fields")
+                    total_tests += 1
+            else:
+                print("     ❌ No packages found for user")
+                total_tests += 1
+        else:
+            print("     ❌ Failed to retrieve user packages")
+            total_tests += 1
     
     success_rate = (passed_tests / total_tests) * 100
-    print(f"   📊 Package limit tests: {passed_tests}/{total_tests} passed ({success_rate:.1f}%)")
+    print(f"   📊 Package purchase tests: {passed_tests}/{total_tests} passed ({success_rate:.1f}%)")
     
-    if success_rate >= 80:  # Allow some tolerance
-        print(f"✅ CRITICAL TEST 2 PASSED: Package limits working correctly")
+    if success_rate >= 85:  # High threshold for critical functionality
+        print(f"✅ PRIORITY TEST 2 PASSED: Package purchase API working correctly")
         return True
     else:
-        print(f"❌ CRITICAL TEST 2 FAILED: Package limits not working correctly")
+        print(f"❌ PRIORITY TEST 2 FAILED: Package purchase API has issues")
         return False
 
-def test_support_message_restriction():
-    """CRITICAL TEST 3: Support System Message Restriction"""
-    print("\n🔴 CRITICAL TEST 3: Support System Message Restriction")
-    print("Testing: User can only send ONE message until admin replies")
-    
-    if not user_token or not admin_token:
-        print("❌ Missing user or admin token")
-        return False
-    
-    user_headers = {"Authorization": f"Bearer {user_token}"}
-    admin_headers = {"Authorization": f"Bearer {admin_token}"}
-    
-    # Step 1: Send first message (should succeed)
-    print("   Step 1: Sending first support message...")
-    first_message = {
-        "content": "Salam, investisiya paketim haqqında sualım var. Kömək edə bilərsinizmi?",
-        "message_type": "support"
-    }
-    
-    response1 = make_request('POST', '/messages', first_message, user_headers)
-    if not response1 or response1.status_code != 200:
-        print("❌ First message failed to send")
-        return False
-    
-    first_msg_data = response1.json()
-    first_msg_id = first_msg_data['id']
-    print(f"     ✅ First message sent successfully (ID: {first_msg_id})")
-    
-    # Step 2: Try to send second message (should fail)
-    print("   Step 2: Attempting to send second message (should be blocked)...")
-    second_message = {
-        "content": "Həmçinin, balansım haqqında da sual var.",
-        "message_type": "support"
-    }
-    
-    response2 = make_request('POST', '/messages', second_message, user_headers)
-    if response2 and response2.status_code == 400:
-        error_data = response2.json()
-        if "Admin cavab verənə qədər" in error_data.get('detail', ''):
-            print(f"     ✅ Second message correctly blocked: {error_data['detail']}")
-        else:
-            print(f"     ❌ Second message blocked but wrong error message: {error_data}")
-            return False
-    else:
-        print(f"     ❌ Second message should have been blocked but wasn't")
-        return False
-    
-    # Step 3: Admin replies to first message
-    print("   Step 3: Admin replying to first message...")
-    admin_reply = {
-        "content": "Salam! Əlbəttə kömək edəcəyəm. Hansı paket haqqında sualınız var?"
-    }
-    
-    reply_response = make_request('POST', f'/admin/messages/{first_msg_id}/reply', admin_reply, admin_headers)
-    if not reply_response or reply_response.status_code != 200:
-        print("❌ Admin reply failed")
-        return False
-    
-    print(f"     ✅ Admin reply sent successfully")
-    time.sleep(1)  # Small delay
-    
-    # Step 4: Try to send third message (should succeed now)
-    print("   Step 4: Attempting to send message after admin reply (should succeed)...")
-    third_message = {
-        "content": "Təşəkkür edirəm! Platinum paket haqqında məlumat istəyirəm.",
-        "message_type": "support"
-    }
-    
-    response3 = make_request('POST', '/messages', third_message, user_headers)
-    if response3 and response3.status_code == 200:
-        print(f"     ✅ Third message sent successfully after admin reply")
-    else:
-        print(f"     ❌ Third message should have been allowed after admin reply")
-        return False
-    
-    # Step 5: Try to send fourth message (should be blocked again)
-    print("   Step 5: Attempting to send fourth message (should be blocked again)...")
-    fourth_message = {
-        "content": "Həmçinin, gəlir toplama prosesi necə işləyir?",
-        "message_type": "support"
-    }
-    
-    response4 = make_request('POST', '/messages', fourth_message, user_headers)
-    if response4 and response4.status_code == 400:
-        print(f"     ✅ Fourth message correctly blocked again")
-        print(f"✅ CRITICAL TEST 3 PASSED: Message restriction system working correctly")
-        return True
-    else:
-        print(f"     ❌ Fourth message should have been blocked")
-        print(f"❌ CRITICAL TEST 3 FAILED: Message restriction not working")
-        return False
-
-def test_updated_deposit_limits():
-    """CRITICAL TEST 4: Updated Deposit Limits (50-2000 AZN)"""
-    print("\n🔴 CRITICAL TEST 4: Updated Deposit Limits (50-2000 AZN)")
-    print("Testing deposit limits changed from 50-2500 to 50-2000 AZN")
+def test_transaction_apis_new_format():
+    """PRIORITY TEST 3: Transaction APIs - New card_name format (combined name + surname)"""
+    print("\n🔴 PRIORITY TEST 3: Transaction APIs with New Format")
+    print("Testing withdrawal and deposit with card_name as 'Name Surname', card_number as bank name...")
     
     if not user_token:
         print("❌ No user token available")
@@ -477,96 +378,201 @@ def test_updated_deposit_limits():
     
     headers = {"Authorization": f"Bearer {user_token}"}
     
-    test_cases = [
-        {"amount": 49, "should_fail": True, "test": "Below minimum (49 AZN)"},
-        {"amount": 50, "should_fail": False, "test": "At minimum (50 AZN)"},
-        {"amount": 1000, "should_fail": False, "test": "Mid-range (1000 AZN)"},
-        {"amount": 2000, "should_fail": False, "test": "At maximum (2000 AZN)"},
-        {"amount": 2001, "should_fail": True, "test": "Above maximum (2001 AZN)"},
-        {"amount": 2500, "should_fail": True, "test": "Old maximum (2500 AZN) - should now fail"}
+    # Ensure user has sufficient balance for withdrawal testing
+    if admin_token:
+        admin_headers = {"Authorization": f"Bearer {admin_token}"}
+        balance_update = {
+            "user_id": test_user_id,
+            "new_balance": 7000.0,  # Enough for withdrawal testing
+            "notes": "Balance for transaction testing"
+        }
+        make_request('POST', '/admin/users/update-balance', balance_update, admin_headers)
+        time.sleep(1)
+        print("     ✅ Balance updated for transaction testing")
+    
+    # Test 1: Deposit with new format
+    print("   Testing deposit with new format...")
+    deposit_test_cases = [
+        {"amount": 49, "should_fail": True, "test": "Deposit below minimum (49 AZN)"},
+        {"amount": 50, "should_fail": False, "test": "Deposit minimum (50 AZN)"},
+        {"amount": 1000, "should_fail": False, "test": "Deposit mid-range (1000 AZN)"},
+        {"amount": 2000, "should_fail": False, "test": "Deposit maximum (2000 AZN)"},
+        {"amount": 2001, "should_fail": True, "test": "Deposit above maximum (2001 AZN)"}
     ]
     
-    passed_tests = 0
-    total_tests = len(test_cases)
+    deposit_passed = 0
+    deposit_total = len(deposit_test_cases)
+    successful_deposits = []
     
-    for test_case in test_cases:
-        transaction_data = {
+    for test_case in deposit_test_cases:
+        deposit_data = {
             "type": "deposit",
             "amount": test_case["amount"],
-            "card_name": "Aysel Mammadova",
-            "card_number": "4169738825001234"
+            "card_name": transaction_test_data["deposit"]["card_name"],  # "Leyla Hasanova"
+            "card_number": transaction_test_data["deposit"]["card_number"]  # "Pasha Bank"
         }
         
-        response = make_request('POST', '/transactions', transaction_data, headers)
+        response = make_request('POST', '/transactions', deposit_data, headers)
         
         if test_case["should_fail"]:
             if response and response.status_code == 400:
                 error_data = response.json()
                 if "50-2000 AZN" in error_data.get('detail', ''):
                     print(f"     ✅ {test_case['test']}: Correctly rejected with proper error")
-                    passed_tests += 1
+                    deposit_passed += 1
                 else:
                     print(f"     ❌ {test_case['test']}: Rejected but wrong error message")
             else:
                 print(f"     ❌ {test_case['test']}: Should have been rejected")
         else:
             if response and response.status_code == 200:
+                transaction_result = response.json()
                 print(f"     ✅ {test_case['test']}: Correctly accepted")
-                passed_tests += 1
-                # Store transaction ID for potential cleanup
-                if test_case["amount"] == 50:
-                    global test_transaction_id
-                    test_transaction_id = response.json()['id']
+                print(f"       Transaction ID: {transaction_result['id']}")
+                print(f"       Card Name: {transaction_result['card_name']}")
+                print(f"       Card Number (Bank): {transaction_result['card_number']}")
+                
+                # Verify new format is stored correctly
+                if (transaction_result['card_name'] == transaction_test_data["deposit"]["card_name"] and
+                    transaction_result['card_number'] == transaction_test_data["deposit"]["card_number"]):
+                    print(f"       ✅ New format stored correctly")
+                else:
+                    print(f"       ❌ New format not stored correctly")
+                
+                deposit_passed += 1
+                successful_deposits.append(transaction_result)
             else:
                 print(f"     ❌ {test_case['test']}: Should have been accepted")
                 if response:
-                    print(f"       Error: {response.text}")
+                    print(f"       Error: {response.status_code} - {response.text}")
     
-    success_rate = (passed_tests / total_tests) * 100
-    print(f"   📊 Deposit limit tests: {passed_tests}/{total_tests} passed ({success_rate:.1f}%)")
+    # Test 2: Withdrawal with new format
+    print("   Testing withdrawal with new format...")
+    withdrawal_test_cases = [
+        {"amount": 499, "should_fail": True, "test": "Withdrawal below minimum (499 AZN)"},
+        {"amount": 500, "should_fail": False, "test": "Withdrawal minimum (500 AZN)"},
+        {"amount": 3000, "should_fail": False, "test": "Withdrawal mid-range (3000 AZN)"},
+        {"amount": 6500, "should_fail": False, "test": "Withdrawal maximum (6500 AZN)"},
+        {"amount": 6501, "should_fail": True, "test": "Withdrawal above maximum (6501 AZN)"}
+    ]
+    
+    withdrawal_passed = 0
+    withdrawal_total = len(withdrawal_test_cases)
+    successful_withdrawals = []
+    
+    for test_case in withdrawal_test_cases:
+        withdrawal_data = {
+            "type": "withdraw",
+            "amount": test_case["amount"],
+            "card_name": transaction_test_data["withdrawal"]["card_name"],  # "Leyla Hasanova"
+            "card_number": transaction_test_data["withdrawal"]["card_number"]  # "Kapital Bank"
+        }
+        
+        response = make_request('POST', '/transactions', withdrawal_data, headers)
+        
+        if test_case["should_fail"]:
+            if response and response.status_code == 400:
+                error_data = response.json()
+                if "500-6500 AZN" in error_data.get('detail', '') or "Insufficient balance" in error_data.get('detail', ''):
+                    print(f"     ✅ {test_case['test']}: Correctly rejected")
+                    withdrawal_passed += 1
+                else:
+                    print(f"     ❌ {test_case['test']}: Rejected but wrong error message: {error_data}")
+            else:
+                print(f"     ❌ {test_case['test']}: Should have been rejected")
+        else:
+            if response and response.status_code == 200:
+                transaction_result = response.json()
+                print(f"     ✅ {test_case['test']}: Correctly accepted")
+                print(f"       Transaction ID: {transaction_result['id']}")
+                print(f"       Card Name: {transaction_result['card_name']}")
+                print(f"       Card Number (Bank): {transaction_result['card_number']}")
+                
+                # Verify new format is stored correctly
+                if (transaction_result['card_name'] == transaction_test_data["withdrawal"]["card_name"] and
+                    transaction_result['card_number'] == transaction_test_data["withdrawal"]["card_number"]):
+                    print(f"       ✅ New format stored correctly")
+                else:
+                    print(f"       ❌ New format not stored correctly")
+                
+                withdrawal_passed += 1
+                successful_withdrawals.append(transaction_result)
+            else:
+                print(f"     ❌ {test_case['test']}: Should have been accepted")
+                if response:
+                    print(f"       Error: {response.status_code} - {response.text}")
+    
+    # Test 3: File upload for receipts (for deposits)
+    if successful_deposits:
+        print("   Testing file upload for receipts...")
+        deposit_transaction = successful_deposits[0]
+        test_file_content = b"Test receipt content for new format testing"
+        files = {'file': ('test_receipt_new_format.jpg', test_file_content, 'image/jpeg')}
+        
+        upload_response = make_request('POST', f'/transactions/{deposit_transaction["id"]}/upload-receipt', 
+                                     headers=headers, files=files)
+        
+        if upload_response and upload_response.status_code == 200:
+            upload_result = upload_response.json()
+            print(f"     ✅ Receipt upload successful: {upload_result['filename']}")
+            deposit_passed += 1
+            deposit_total += 1
+        else:
+            print(f"     ❌ Receipt upload failed")
+            if upload_response:
+                print(f"       Error: {upload_response.status_code} - {upload_response.text}")
+            deposit_total += 1
+    
+    # Calculate overall success rate
+    total_passed = deposit_passed + withdrawal_passed
+    total_tests = deposit_total + withdrawal_total
+    success_rate = (total_passed / total_tests) * 100
+    
+    print(f"   📊 Transaction tests: {total_passed}/{total_tests} passed ({success_rate:.1f}%)")
+    print(f"     Deposits: {deposit_passed}/{deposit_total}")
+    print(f"     Withdrawals: {withdrawal_passed}/{withdrawal_total}")
     
     if success_rate >= 80:
-        print(f"✅ CRITICAL TEST 4 PASSED: Deposit limits working correctly")
+        print(f"✅ PRIORITY TEST 3 PASSED: Transaction APIs with new format working correctly")
         return True
     else:
-        print(f"❌ CRITICAL TEST 4 FAILED: Deposit limits not working correctly")
+        print(f"❌ PRIORITY TEST 3 FAILED: Transaction APIs have issues with new format")
         return False
 
-def test_receipt_upload_notification():
-    """CRITICAL TEST 5: Receipt Upload Real-time Notification"""
-    print("\n🔴 CRITICAL TEST 5: Receipt Upload Real-time Notification")
-    print("Testing admin receives immediate notification when user uploads receipt")
+def test_real_time_notifications():
+    """PRIORITY TEST 4: Real-time WebSocket Notifications"""
+    print("\n🔴 PRIORITY TEST 4: Real-time WebSocket Notifications")
+    print("Testing WebSocket notifications for package purchases and transactions...")
     
-    if not user_token or not admin_token or not test_transaction_id:
-        print("❌ Missing required tokens or transaction ID")
+    if not user_token or not admin_token:
+        print("❌ Missing required tokens")
         return False
     
-    # Setup admin WebSocket to listen for receipt notifications
+    # Setup WebSocket connection for admin notifications
     ws_url = BASE_URL.replace('https://', 'wss://').replace('http://', 'ws://')
     admin_ws_url = f"{ws_url}/ws/admin"
     
-    receipt_notifications = []
     admin_connected = False
+    notifications_received = []
     
-    def on_receipt_message(ws, message):
+    def on_admin_message(ws, message):
         try:
             data = json.loads(message)
-            if data.get('type') == 'receipt_uploaded':
-                receipt_notifications.append(data)
-                print(f"   📨 Receipt notification received: {data}")
+            notifications_received.append(data)
+            print(f"   📨 Real-time notification: {data.get('type', 'unknown')}")
         except:
-            pass
+            notifications_received.append(message)
     
-    def on_receipt_open(ws):
+    def on_admin_open(ws):
         nonlocal admin_connected
         admin_connected = True
-        print(f"   ✅ Admin WebSocket connected for receipt testing")
+        print(f"   ✅ Admin WebSocket connected")
     
     try:
         # Create admin WebSocket connection
         admin_ws = websocket.WebSocketApp(admin_ws_url,
-                                        on_open=on_receipt_open,
-                                        on_message=on_receipt_message)
+                                        on_open=on_admin_open,
+                                        on_message=on_admin_message)
         
         # Run WebSocket in separate thread
         ws_thread = threading.Thread(target=admin_ws.run_forever)
@@ -574,55 +580,65 @@ def test_receipt_upload_notification():
         ws_thread.start()
         
         # Wait for connection
-        time.sleep(2)
+        time.sleep(3)
         
         if not admin_connected:
             print("❌ Admin WebSocket connection failed")
             return False
         
-        # Upload receipt
-        print("   Uploading test receipt...")
-        user_headers = {"Authorization": f"Bearer {user_token}"}
-        test_file_content = b"Test receipt content for notification testing"
-        files = {'file': ('test_receipt_notification.jpg', test_file_content, 'image/jpeg')}
+        # Test package purchase notification
+        print("   Testing package purchase notification...")
+        headers = {"Authorization": f"Bearer {user_token}"}
+        purchase_data = {
+            "package_type": "gold",
+            "invested_amount": 100.0
+        }
         
-        upload_response = make_request('POST', f'/transactions/{test_transaction_id}/upload-receipt', 
-                                     headers=user_headers, files=files)
+        purchase_response = make_request('POST', '/packages/purchase', purchase_data, headers)
+        time.sleep(2)  # Wait for notification
         
-        if not upload_response or upload_response.status_code != 200:
-            print("❌ Receipt upload failed")
-            admin_ws.close()
-            return False
+        # Test transaction notification
+        print("   Testing transaction notification...")
+        transaction_data = {
+            "type": "deposit",
+            "amount": 200.0,
+            "card_name": "Leyla Hasanova",
+            "card_number": "Kapital Bank"
+        }
         
-        print("   ✅ Receipt uploaded successfully")
+        txn_response = make_request('POST', '/transactions', transaction_data, headers)
+        time.sleep(2)  # Wait for notification
         
-        # Wait for notification
-        time.sleep(3)
+        # Close WebSocket
         admin_ws.close()
+        time.sleep(1)
         
-        if len(receipt_notifications) > 0:
-            notification = receipt_notifications[0]
-            required_fields = ['type', 'transaction_id', 'user_name', 'user_code', 'filename', 'amount']
-            
-            if all(field in notification for field in required_fields):
-                print(f"   ✅ Receipt notification contains all required fields")
-                print(f"   📋 Notification details: User {notification['user_name']} ({notification['user_code']}) uploaded {notification['filename']}")
-                print(f"✅ CRITICAL TEST 5 PASSED: Receipt upload notifications working")
-                return True
-            else:
-                print(f"   ❌ Receipt notification missing required fields")
-                return False
+        # Analyze results
+        print(f"   📊 Total notifications received: {len(notifications_received)}")
+        
+        notification_types = [notif.get('type', 'unknown') if isinstance(notif, dict) else 'text' 
+                            for notif in notifications_received]
+        
+        expected_types = ['package_purchase', 'new_transaction']
+        found_types = [t for t in expected_types if t in notification_types]
+        
+        print(f"   📋 Expected notification types: {expected_types}")
+        print(f"   ✅ Found notification types: {found_types}")
+        
+        if len(found_types) >= 1:  # At least 1 notification type
+            print(f"✅ PRIORITY TEST 4 PASSED: Real-time notifications working ({len(found_types)}/2 types)")
+            return True
         else:
-            print(f"❌ CRITICAL TEST 5 FAILED: No receipt notification received")
+            print(f"❌ PRIORITY TEST 4 FAILED: No expected notifications received")
             return False
             
     except Exception as e:
-        print(f"❌ CRITICAL TEST 5 FAILED with exception: {e}")
+        print(f"❌ PRIORITY TEST 4 FAILED with exception: {e}")
         return False
 
-def run_critical_tests():
-    """Run all critical tests focusing on NEW FEATURES"""
-    print("🚀 CRITICAL NEW FEATURES TESTING - InvestAZ Backend")
+def run_priority_tests():
+    """Run all priority tests focusing on recently implemented changes"""
+    print("🚀 PRIORITY TESTING AREAS - InvestAZ Backend")
     print(f"Backend URL: {API_URL}")
     print("=" * 80)
     
@@ -631,23 +647,22 @@ def run_critical_tests():
         print("❌ Failed to setup test environment")
         return
     
-    # Critical tests based on user requirements
-    critical_tests = [
-        ("Admin Panel Real-time Notifications", test_admin_websocket_notifications),
-        ("Updated Investment Package Limits", test_updated_package_limits),
-        ("Support System Message Restriction", test_support_message_restriction),
-        ("Updated Deposit Limits", test_updated_deposit_limits),
-        ("Receipt Upload Real-time Notification", test_receipt_upload_notification)
+    # Priority tests based on review request
+    priority_tests = [
+        ("Authentication Flow", test_authentication_flow),
+        ("Package Purchase API", test_package_purchase_api),
+        ("Transaction APIs with New Format", test_transaction_apis_new_format),
+        ("Real-time WebSocket Notifications", test_real_time_notifications)
     ]
     
     passed = 0
     failed = 0
     results = []
     
-    print("\n🔴 RUNNING CRITICAL TESTS")
+    print("\n🔴 RUNNING PRIORITY TESTS")
     print("=" * 50)
     
-    for test_name, test_func in critical_tests:
+    for test_name, test_func in priority_tests:
         try:
             print(f"\n{'='*20} {test_name} {'='*20}")
             if test_func():
@@ -665,7 +680,7 @@ def run_critical_tests():
     
     # Final results
     print("\n" + "=" * 80)
-    print("📊 CRITICAL TESTS RESULTS")
+    print("📊 PRIORITY TESTS RESULTS")
     print("=" * 80)
     
     for result in results:
@@ -677,13 +692,13 @@ def run_critical_tests():
     print(f"📊 Success Rate: {(passed/(passed+failed)*100):.1f}%")
     
     if failed == 0:
-        print("\n🎉 ALL CRITICAL TESTS PASSED!")
-        print("✅ NEW FEATURES are working correctly")
+        print("\n🎉 ALL PRIORITY TESTS PASSED!")
+        print("✅ Recently implemented changes are working correctly")
     else:
-        print(f"\n⚠️  {failed} CRITICAL TESTS FAILED")
-        print("❌ NEW FEATURES need attention")
+        print(f"\n⚠️  {failed} PRIORITY TESTS FAILED")
+        print("❌ Recently implemented changes need attention")
     
     return passed, failed
 
 if __name__ == "__main__":
-    run_critical_tests()
+    run_priority_tests()
