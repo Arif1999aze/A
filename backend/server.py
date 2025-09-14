@@ -311,8 +311,8 @@ PACKAGE_DEFINITIONS = {
     "platinum": {"name": "Platinum Paket", "min_amount": 50, "max_amount": 250, "multiplier": 3.0, "duration": 30}
 }
 
-# Collection cooldown time (30 minutes)
-COLLECTION_COOLDOWN_MINUTES = 30
+# Collection cooldown time (20 minutes)
+COLLECTION_COOLDOWN_MINUTES = 20
 
 # Authentication endpoints
 @api_router.post("/auth/register", response_model=Token)
