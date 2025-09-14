@@ -408,6 +408,42 @@
         - agent: "testing"
         - comment: "✅ FULLY INTEGRATED: All frontend components connected to backend APIs. Registration, login, package purchases, transactions, messaging all working with real API calls. No mock data remaining."
 
+  - task: "Android Package Purchase Bug Fix"
+    implemented: true
+    working: false
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+        - agent: "main"
+        - comment: "✅ IMPLEMENTED: Enhanced confirmPackagePurchase function with robust fetch method, 30-second timeout, proper error handling, CORS support, and mobile-specific error messages. Replaced axios with native fetch for better Android compatibility. Added comprehensive error handling for network issues and server errors."
+
+  - task: "Remove Gözləyən Əməliyyatlar (Pending Transactions)"
+    implemented: true
+    working: true
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "main"
+        - comment: "✅ COMPLETED: Fully removed 'Gözləyən Əməliyyatlar' section from customer panel. Removed menu button, dialog, PendingTransactionsView component, and updated NotificationsView to only show messages. Updated notification badges to exclude pending transactions count."
+
+  - task: "Enhanced Withdrawal/Deposit Forms"
+    implemented: true
+    working: false
+    file: "InvestmentPlatform.jsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+        - agent: "main"
+        - comment: "✅ IMPLEMENTED: Updated withdrawal and deposit forms with new structure. Forms now include separate fields: Name, Surname, Bank Name (instead of card details). Updated handleWithdraw and handleDeposit functions to accept new parameters and combine name/surname into card_name field for backend compatibility."
+
 ## metadata:
   created_by: "main_agent"
   version: "1.0"
