@@ -890,50 +890,48 @@ const EnhancedInvestmentPlatform = () => {
         ))}
       </div>
 
-      {/* Header - Mobile Responsive */}
-      <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur">
+      {/* Professional Header with Profile Menu */}
+      <div className="border-b border-gray-800 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 backdrop-blur shadow-lg">
         <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
-            <div className="flex items-center justify-between sm:justify-start space-x-4">
-              <h1 className="text-xl sm:text-2xl font-bold text-yellow-400">InvestAZ</h1>
-              <Badge className="bg-purple-600 text-xs">
-                {user?.user_code}
-              </Badge>
+          <div className="flex justify-between items-center">
+            {/* Professional Logo */}
+            <div className="flex items-center space-x-3">
+              <div className="relative">
+                <div className="w-12 h-12 bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 rounded-full flex items-center justify-center shadow-lg">
+                  <span className="text-black font-bold text-lg">AZ</span>
+                </div>
+                <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-400 rounded-full animate-pulse"></div>
+              </div>
+              <div>
+                <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+                  InvestAZ
+                </h1>
+                <p className="text-xs text-gray-400">Professional Investment Platform</p>
+              </div>
             </div>
             
-            {/* Enhanced Balance Info - Separated balances */}
-            <div className="flex justify-between sm:justify-end items-center space-x-3 sm:space-x-6">
-              <div className="text-center sm:text-right bg-gray-800 rounded-lg p-2">
-                <p className="text-xs sm:text-sm text-gray-400">Depozit Balansı</p>
-                <p className="text-sm sm:text-lg font-bold text-blue-400">{formatAmount(user?.balance || 0)} AZN</p>
-                <p className="text-xs text-gray-500">Paket alımı üçün</p>
-              </div>
+            {/* User Info and Profile Menu */}
+            <div className="flex items-center space-x-4">
+              {/* User Code Badge */}
+              <Badge className="bg-gradient-to-r from-purple-500 to-purple-700 text-white px-3 py-1 hidden sm:flex">
+                👤 {user?.user_code}
+              </Badge>
               
-              <div className="text-center sm:text-right bg-gray-800 rounded-lg p-2">
-                <p className="text-xs sm:text-sm text-gray-400">Çəkiləbilir Qazanc</p>
-                <p className="text-sm sm:text-lg font-bold text-green-400">{formatAmount(user?.total_earned || 0)} AZN</p>
-                <p className="text-xs text-gray-500">Çıxarış üçün</p>
+              {/* Profile Menu Button */}
+              <div className="relative">
+                <Button 
+                  onClick={() => setShowProfileModal(true)}
+                  variant="outline" 
+                  size="sm"
+                  className="border-gray-600 text-gray-300 hover:bg-gray-700 p-2"
+                >
+                  <div className="flex flex-col space-y-1">
+                    <div className="w-4 h-0.5 bg-current"></div>
+                    <div className="w-4 h-0.5 bg-current"></div>
+                    <div className="w-4 h-0.5 bg-current"></div>
+                  </div>
+                </Button>
               </div>
-
-              <Button 
-                onClick={handleLogout}
-                variant="outline" 
-                size="sm"
-                className="border-red-600 text-red-400 hidden sm:flex"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Çıxış
-              </Button>
-              
-              {/* Mobile logout */}
-              <Button 
-                onClick={handleLogout}
-                variant="outline" 
-                size="sm"
-                className="border-red-600 text-red-400 sm:hidden px-2"
-              >
-                <LogOut className="w-4 h-4" />
-              </Button>
             </div>
           </div>
         </div>
