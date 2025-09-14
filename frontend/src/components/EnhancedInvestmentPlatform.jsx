@@ -924,18 +924,18 @@ const EnhancedInvestmentPlatform = () => {
                   </h3>
                   <div className="space-y-2 max-h-48 sm:max-h-64 overflow-y-auto">
                     {liveTransactions.map((transaction) => (
-                      <div key={transaction.id} className="bg-gray-800 rounded p-2 text-sm">
+                      <div key={transaction.id} className="bg-gray-800 rounded p-2 text-sm border-l-2 border-l-green-400 hover:bg-gray-700 transition-colors">
                         <div className="flex justify-between items-center">
-                          <span className="font-medium text-xs sm:text-sm truncate">{transaction.name}</span>
-                          <Badge size="sm" className={`text-xs ${
-                            transaction.type === 'depozit' ? 'bg-blue-600' :
-                            transaction.type === 'qazanc' ? 'bg-green-600' : 'bg-purple-600'
-                          }`}>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-base">{transaction.icon}</span>
+                            <span className="font-medium text-xs sm:text-sm text-white truncate">{transaction.name}</span>
+                          </div>
+                          <Badge size="sm" className={`${transaction.color} text-white text-xs border-0`}>
                             {transaction.type}
                           </Badge>
                         </div>
                         <div className="flex justify-between text-xs text-gray-400 mt-1">
-                          <span>{formatAmount(transaction.amount)} AZN</span>
+                          <span className="font-bold text-green-400">+{formatAmount(transaction.amount)} AZN</span>
                           <span>{transaction.timestamp.toLocaleTimeString()}</span>
                         </div>
                       </div>
