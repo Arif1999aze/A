@@ -1139,15 +1139,6 @@ const InvestmentPlatform = () => {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={pendingOpen} onOpenChange={setPendingOpen}>
-        <DialogContent className="bg-gray-900 border-gray-700 mx-4 max-w-3xl">
-          <DialogHeader>
-            <DialogTitle className="text-white">Gözləyən Əməliyyatlar</DialogTitle>
-          </DialogHeader>
-          <PendingTransactionsView transactions={pendingTransactions} />
-        </DialogContent>
-      </Dialog>
-
       <Dialog open={withdrawOpen} onOpenChange={setWithdrawOpen}>
         <DialogContent className="bg-gray-900 border-gray-700 mx-4 max-w-sm">
           <DialogHeader>
