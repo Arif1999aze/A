@@ -1211,13 +1211,7 @@ const EnhancedInvestmentPlatform = () => {
             ))}
           </div>
         </Card>
-          <TabsList className="bg-gradient-to-r from-gray-800 to-gray-700 mb-4 sm:mb-6 grid grid-cols-5 h-auto border border-gray-600 shadow-lg">
-            <TabsTrigger 
-              value="dashboard" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white text-xs sm:text-sm py-3 px-2 sm:px-4 font-medium"
-            >
-              <Users className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Profil
+      </div>
             </TabsTrigger>
             <TabsTrigger 
               value="transactions" 
