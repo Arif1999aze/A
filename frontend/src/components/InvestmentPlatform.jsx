@@ -51,7 +51,7 @@ const InvestmentPlatform = () => {
   const packageDefinitions = {
     gold: { name: 'Gold Paket', minAmount: 50, maxAmount: 250, multiplier: 4.5, duration: 60, color: '#FFD700', icon: '👑' },
     titanium: { name: 'Titanium Paket', minAmount: 250, maxAmount: 500, multiplier: 4, duration: 45, color: '#434B52', icon: '🛡️' },
-    platinum: { name: 'Platinum Paket', minAmount: 500, maxAmount: 2000, multiplier: 3, duration: 30, color: '#C0C0C0', icon: '💎' }
+    platinum: { name: 'Platinum Paket', minAmount: 50, maxAmount: 250, multiplier: 3, duration: 30, color: '#C0C0C0', icon: '💎' }
   };
 
   useEffect(() => {
