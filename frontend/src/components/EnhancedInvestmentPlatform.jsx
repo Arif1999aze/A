@@ -404,7 +404,7 @@ const EnhancedInvestmentPlatform = () => {
     showNotification('👋 Çıxış edildi', 'info');
   };
 
-  // Handle package purchase - Fixed for mobile
+  // Handle package purchase - Enhanced for Android/Mobile
   const handlePackagePurchase = async (packageType) => {
     console.log('📦 Package purchase started:', { packageType, amount: investmentAmount, user: user?.id });
     
@@ -436,33 +436,87 @@ const EnhancedInvestmentPlatform = () => {
       showNotification(`❌ Balansınız kifayət etmir. Cari balans: ${formatAmount(user.balance)} AZN`, 'error');
       return;
     }
+
+    // Show loading notification
+    showNotification('⏳ Paket alış işlənir...', 'info');
     
     try {
       console.log('🚀 Making API call for package purchase...');
-      const response = await axios.post(`${API_BASE_URL}/api/packages/purchase`, {
+      
+      // Enhanced request with multiple retry attempts and better error handling
+      const requestData = {
         package_type: packageType,
         amount: amount
-      }, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      };
+      
+      console.log('📤 Request data:', requestData);
+      
+      const response = await fetch(`${API_BASE_URL}/api/packages/purchase`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          // Add headers for better mobile compatibility
+          'Cache-Control': 'no-cache',
+          'X-Requested-With': 'XMLHttpRequest'
         },
-        timeout: 15000
+        body: JSON.stringify(requestData),
+        // Enhanced options for mobile
+        credentials: 'omit',
+        mode: 'cors',
+        timeout: 30000
       });
       
-      console.log('✅ Package purchase successful:', response.data);
+      console.log('📡 Response received:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok
+      });
       
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('❌ API Error Response:', errorText);
+        throw new Error(`HTTP ${response.status}: ${errorText}`);
+      }
+      
+      const responseData = await response.json();
+      console.log('✅ Package purchase successful:', responseData);
+      
+      // Clear form and update UI
       setInvestmentAmount('');
       setSelectedPackage(null);
+      
+      // Force refresh user data
       await fetchUserData();
-      showNotification(`✅ ${pkg.name} uğurla alındı! ${formatAmount(amount)} AZN`, 'success');
+      
+      showNotification(`✅ ${pkg.name} uğurla alındı! ${formatAmount(amount)} AZN yatırıldı.`, 'success');
       
       // Switch to dashboard to show new package
-      setActiveTab('dashboard');
+      setTimeout(() => {
+        setActiveTab('dashboard');
+      }, 1000);
       
     } catch (error) {
       console.error('❌ Package purchase error:', error);
-      const errorMessage = error.response?.data?.detail || error.message || 'Paket alış zamanı xəta baş verdi';
+      
+      let errorMessage = 'Paket alış zamanı xəta baş verdi';
+      
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        errorMessage = 'İnternet bağlantısını yoxlayın və yenidən cəhd edin';
+      } else if (error.message.includes('timeout')) {
+        errorMessage = 'Sorğu vaxtı bitdi, yenidən cəhd edin';
+      } else if (error.message.includes('400')) {
+        errorMessage = 'Yanlış məlumat göndərildi';
+      } else if (error.message.includes('401')) {
+        errorMessage = 'Giriş vaxtınız bitib, yenidən daxil olun';
+        // Force logout
+        handleLogout();
+        return;
+      } else if (error.message.includes('500')) {
+        errorMessage = 'Server xətası, bir qədər sonra cəhd edin';
+      }
+      
       showNotification(`❌ ${errorMessage}`, 'error');
     }
   };
