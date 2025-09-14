@@ -206,12 +206,14 @@ const EnhancedInvestmentPlatform = () => {
     }
   }, [activePackages, token]);
 
-  // Cleanup timers on unmount
+  // Cleanup intervals on unmount
   useEffect(() => {
     return () => {
-      Object.values(countdownTimers).forEach(timer => {
-        if (timer) clearInterval(timer);
-      });
+      if (window.packageStatusCheckers) {
+        Object.values(window.packageStatusCheckers).forEach(interval => {
+          if (interval) clearInterval(interval);
+        });
+      }
     };
   }, []);
 
