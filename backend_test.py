@@ -1,15 +1,32 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend API Tests for InvestAZ Platform - PRIORITY TESTING AREAS
-Focus on recently implemented changes:
-1. Package Purchase API - Test /api/packages/purchase endpoint for robustness and Android compatibility
-2. Transaction APIs - Test withdrawal and deposit endpoints with new card_name format (combined name + surname)
-3. Authentication Flow - Verify JWT authentication is working properly
+Comprehensive Backend API Tests for InvestAZ Platform - 12-HOUR COLLECTION SYSTEM TESTING
+Focus on the updated backend collection system with 12-hour cooldown:
 
-SPECIFIC TEST SCENARIOS:
-- Package Purchase Tests: Valid amounts, boundary conditions, insufficient balance, real-time notifications
-- Transaction Tests: New format with card_name as "Name Surname", card_number as bank name
-- Authentication Tests: User registration, login, admin login, protected routes
+CRITICAL TESTING SCOPE:
+1. **Collection Cooldown System (CRITICAL)**:
+   - Test COLLECTION_COOLDOWN_MINUTES = 720 (12 hours) is working correctly
+   - Verify /api/packages/{package_id}/collect endpoint respects 12-hour cooldown
+   - Test error messages show proper hour/minute format instead of just minutes
+   - Ensure users can collect earnings twice per day (12-hour intervals)
+
+2. **Collection Status Endpoint**:
+   - Test /api/packages/{package_id}/collection-status returns correct cooldown information
+   - Verify can_collect status is accurate for 12-hour system
+   - Check cooldown_remaining_seconds calculation is correct
+
+3. **Package Purchase Flow**:
+   - Ensure package purchase still works correctly with the updated system
+   - Verify new packages start with null last_collection_time
+   - Test first collection is immediately available after package purchase
+
+4. **Error Handling**:
+   - Test cooldown error messages are user-friendly and show hours/minutes
+   - Verify collection attempts during cooldown period are properly rejected
+
+5. **Earnings Calculation**:
+   - Ensure accumulated_earnings are calculated correctly
+   - Test that earnings collection adds to user balance and total_earned properly
 """
 
 import requests
