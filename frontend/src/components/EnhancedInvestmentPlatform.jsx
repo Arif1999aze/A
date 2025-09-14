@@ -171,6 +171,12 @@ const EnhancedInvestmentPlatform = () => {
     }
   }, [token]);
 
+  // Initialize platform
+  const initializePlatform = () => {
+    setMarketItems(marketItemsData);
+    generateLiveTransactions();
+  };
+
   // Auto-refresh functionality
   useEffect(() => {
     if (isLoggedIn && user) {
