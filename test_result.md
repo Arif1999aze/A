@@ -542,7 +542,11 @@
 
 ## test_plan:
   current_focus:
-    - "URGENT: Package Purchase Balance Deduction Testing"
+    - "Update collection cooldown from 20 minutes to 12 hours (720 minutes)"
+    - "Remove 20-minute countdown timer and auto-collection system"
+    - "Implement 12-hour collection system (2 times per day)"
+    - "Professional UI/UX redesign for real investment site appearance"
+    - "Enhanced earnings display and package information"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
