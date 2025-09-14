@@ -844,6 +844,181 @@ const EnhancedInvestmentPlatform = () => {
           </div>
         </div>
 
+        {/* Deposit Modal */}
+        <Dialog open={showDepositModal} onOpenChange={setShowDepositModal}>
+          <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-white text-center">💰 Depozit</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="text-center p-4 bg-green-900/30 border border-green-600 rounded-lg">
+                <p className="text-green-300 text-sm">
+                  💡 Balansınızı artırmaq üçün depozit edin
+                </p>
+              </div>
+              <Button 
+                onClick={() => setShowDepositModal(false)}
+                className="w-full"
+              >
+                Bağla
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Withdraw Modal */}
+        <Dialog open={showWithdrawModal} onOpenChange={setShowWithdrawModal}>
+          <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-white text-center">🏦 Çıxarış</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="text-center p-4 bg-purple-900/30 border border-purple-600 rounded-lg">
+                <p className="text-purple-300 text-sm">
+                  💰 Çəkiləbilir Qazanc: {formatAmount(user?.total_earned || 0)} AZN
+                </p>
+                <p className="text-purple-400 text-xs mt-1">
+                  ⏰ 30 dəqiqə hesabınıza köçürüləcəkdir
+                </p>
+              </div>
+              <Button 
+                onClick={() => setShowWithdrawModal(false)}
+                className="w-full"
+              >
+                Bağla
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Tracking Modal */}
+        <Dialog open={showTrackingModal} onOpenChange={setShowTrackingModal}>
+          <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+            <DialogHeader>
+              <DialogTitle className="text-white text-center">📊 Tarixçə</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="text-center p-4 bg-yellow-900/30 border border-yellow-600 rounded-lg">
+                <p className="text-yellow-300 text-sm">
+                  📈 Əməliyyat tarixçənizi burada görə bilərsiniz
+                </p>
+              </div>
+              <Button 
+                onClick={() => setShowTrackingModal(false)}
+                className="w-full"
+              >
+                Bağla
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Market Modal */}
+        <Dialog open={showMarketModal} onOpenChange={setShowMarketModal}>
+          <DialogContent className="bg-gray-900 border-gray-700 max-w-6xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-white text-center">🛒 Investment Paketləri</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-6">
+              {/* Package Selection Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {Object.entries(packageDefinitions).map(([key, pkg]) => (
+                  <Card 
+                    key={key} 
+                    className={`bg-gradient-to-br ${pkg.gradient} p-1 hover:scale-105 transition-all duration-500 cursor-pointer ${pkg.shadowColor} shadow-xl hover:shadow-2xl ${
+                      selectedPackage === key ? 'ring-4 ring-yellow-400 ring-opacity-70' : ''
+                    }`}
+                    onClick={() => {
+                      console.log('Package selected:', key);
+                      setSelectedPackage(key);
+                    }}
+                  >
+                    <div className="bg-gray-900/95 backdrop-blur rounded-lg p-4 h-full relative overflow-hidden">
+                      {/* Professional Badge */}
+                      {selectedPackage === key && (
+                        <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                          ✨ SEÇİLİB
+                        </div>
+                      )}
+                      
+                      <div className="text-center mb-4">
+                        <div className={`text-4xl mb-3 p-3 rounded-xl bg-gradient-to-r ${pkg.borderGradient} inline-block shadow-lg`}>
+                          {pkg.icon}
+                        </div>
+                        <h3 className="text-lg font-bold mb-2 text-white" 
+                            style={{
+                              color: pkg.color,
+                              textShadow: `0 0 20px ${pkg.color}60`
+                            }}>
+                          {pkg.name}
+                        </h3>
+                        <p className="text-gray-300 text-xs mb-3 bg-gray-800/50 rounded-lg p-2">
+                          {pkg.description}
+                        </p>
+                      </div>
+
+                      <div className="space-y-2 mb-4 text-xs">
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded p-2">
+                          <span className="text-gray-300">Limit:</span>
+                          <span className="font-bold text-white">{pkg.minAmount}-{pkg.maxAmount} AZN</span>
+                        </div>
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded p-2">
+                          <span className="text-gray-300">Gəlir:</span>
+                          <span className="font-bold text-green-400">%{pkg.dailyReturn}</span>
+                        </div>
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded p-2">
+                          <span className="text-gray-300">Müddət:</span>
+                          <span className="font-bold text-blue-400">{pkg.duration} gün</span>
+                        </div>
+                      </div>
+
+                      {selectedPackage === key && (
+                        <div className="space-y-3 animate-in slide-in-from-top">
+                          <Input
+                            type="number"
+                            placeholder={`Məbləğ (${pkg.minAmount}-${pkg.maxAmount})`}
+                            value={investmentAmount}
+                            onChange={(e) => setInvestmentAmount(e.target.value)}
+                            min={pkg.minAmount}
+                            max={pkg.maxAmount}
+                            className="bg-gray-800 border-gray-600 text-white text-center font-bold"
+                          />
+                          
+                          <Button
+                            onClick={() => {
+                              handlePackagePurchase(key);
+                              setShowMarketModal(false);
+                            }}
+                            disabled={!investmentAmount || parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount || !user}
+                            className={`w-full py-3 text-sm font-bold transition-all duration-300 ${
+                              !investmentAmount || parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount || !user
+                                ? 'bg-gray-600 cursor-not-allowed'
+                                : `bg-gradient-to-r ${pkg.borderGradient} hover:scale-105 shadow-lg`
+                            } text-white disabled:opacity-50`}
+                          >
+                            <Package className="w-4 h-4 mr-2" />
+                            {!user ? '🔒 Giriş Edin' : '💰 Paketi Al'}
+                          </Button>
+                        </div>
+                      )}
+                      
+                      {selectedPackage !== key && (
+                        <Button
+                          onClick={() => setSelectedPackage(key)}
+                          variant="outline"
+                          className="w-full border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black py-2 text-sm"
+                        >
+                          ✨ Seç
+                        </Button>
+                      )}
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
         {/* Profile Modal */}
         <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
           <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
