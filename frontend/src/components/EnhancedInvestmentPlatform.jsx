@@ -1065,7 +1065,7 @@ const EnhancedInvestmentPlatform = () => {
         </div>
       </div>
 
-      {/* Main Content - Mobile Responsive */}
+      {/* Main Content - Dashboard Only */}
       <div className="container mx-auto px-4 sm:px-6 py-4 sm:py-6">
         {/* Balance Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
