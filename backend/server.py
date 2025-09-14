@@ -663,44 +663,32 @@ async def send_message(
     current_user: User = Depends(get_current_user)
 ):
     # Check if user has any pending/unanswered messages
-    existing_unanswered = await db.messages.find_one({
-        "user_id": current_user.id,
-        "is_from_admin": False,
-        "$or": [
-            # No admin reply exists for this user's message
-            {"$and": [
-                {"user_id": current_user.id},
-                {"is_from_admin": False}
-            ]}
-        ]
-    })
+    user_messages = await db.messages.find({"user_id": current_user.id, "is_from_admin": False}).to_list(None)
+    admin_replies = await db.messages.find({"user_id": current_user.id, "is_from_admin": True}).to_list(None)
     
-    # Check if there's an admin reply to any of user's messages
-    has_recent_admin_reply = await db.messages.find_one({
-        "user_id": current_user.id,
-        "is_from_admin": True
-    })
+    # If user has sent messages but no admin has replied, block new message
+    if user_messages and not admin_replies:
+        raise HTTPException(
+            status_code=400, 
+            detail="Admin cavab verənə qədər yeni mesaj göndərə bilməzsiniz."
+        )
     
-    # If user has sent message and no admin reply exists, block new message
-    if existing_unanswered and not has_recent_admin_reply:
-        # Find if there's an admin reply after the user's last message
-        user_last_message = await db.messages.find_one(
-            {"user_id": current_user.id, "is_from_admin": False},
-            sort=[("created_date", -1)]
+    # If user has messages and admin replies exist, check if latest user message has a reply
+    if user_messages and admin_replies:
+        # Get the latest user message
+        latest_user_message = max(user_messages, key=lambda x: x["created_date"])
+        
+        # Check if there's an admin reply after this message
+        admin_reply_after = any(
+            reply["created_date"] > latest_user_message["created_date"] 
+            for reply in admin_replies
         )
         
-        if user_last_message:
-            admin_reply_after = await db.messages.find_one({
-                "user_id": current_user.id,
-                "is_from_admin": True,
-                "created_date": {"$gt": user_last_message["created_date"]}
-            })
-            
-            if not admin_reply_after:
-                raise HTTPException(
-                    status_code=400, 
-                    detail="Admin cavab verənə qədər yeni mesaj göndərə bilməzsiniz."
-                )
+        if not admin_reply_after:
+            raise HTTPException(
+                status_code=400, 
+                detail="Admin cavab verənə qədər yeni mesaj göndərə bilməzsiniz."
+            )
     
     message = Message(
         user_id=current_user.id,
