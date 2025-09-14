@@ -455,7 +455,7 @@ const EnhancedInvestmentPlatform = () => {
         },
         data: {
           package_type: packageType,
-          amount: amount
+          invested_amount: amount  // ✅ Backend expects "invested_amount"
         },
         timeout: 20000, // 20 seconds
         validateStatus: function (status) {
