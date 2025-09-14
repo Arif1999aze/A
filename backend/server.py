@@ -312,7 +312,7 @@ PACKAGE_DEFINITIONS = {
 }
 
 # Collection cooldown time (20 minutes)
-COLLECTION_COOLDOWN_MINUTES = 20
+COLLECTION_COOLDOWN_MINUTES = 720  # 12 hours = 720 minutes (2 times per day)
 
 # Authentication endpoints
 @api_router.post("/auth/register", response_model=Token)
