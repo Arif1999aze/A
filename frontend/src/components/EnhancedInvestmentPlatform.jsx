@@ -650,43 +650,62 @@ const EnhancedInvestmentPlatform = () => {
     }
   };
 
-  // Countdown timer management
+  // Countdown timer management with enhanced error handling
   const startCountdownTimer = (packageId, initialTime = 20 * 60) => {
-    // Clear existing timer
-    if (countdownTimers[packageId]) {
-      clearInterval(countdownTimers[packageId]);
-    }
-    
-    let timeLeft = Math.floor(initialTime);
-    
-    const timer = setInterval(() => {
-      timeLeft--;
+    try {
+      // Clear existing timer
+      if (countdownTimers[packageId] && typeof countdownTimers[packageId] === 'number') {
+        clearInterval(countdownTimers[packageId]);
+      }
       
+      // Validate initialTime
+      let timeLeft = Math.floor(Math.max(0, initialTime));
+      if (timeLeft === 0) {
+        console.log(`Timer for package ${packageId} already at 0, ready for collection`);
+        return;
+      }
+      
+      console.log(`Starting countdown timer for package ${packageId}: ${timeLeft} seconds`);
+      
+      const timer = setInterval(() => {
+        timeLeft--;
+        
+        setCountdownTimers(prev => ({
+          ...prev,
+          [packageId]: Math.max(0, timeLeft)
+        }));
+        
+        // Auto-collect when timer reaches 0
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          console.log(`Timer completed for package ${packageId}`);
+          
+          if (autoCollectionEnabled) {
+            handleAutoCollection(packageId);
+          } else {
+            // Remove timer and allow manual collection
+            setCountdownTimers(prev => {
+              const updated = { ...prev };
+              delete updated[packageId];
+              return updated;
+            });
+          }
+        }
+      }, 1000);
+      
+      // Store timer ID for cleanup
       setCountdownTimers(prev => ({
         ...prev,
         [packageId]: timeLeft
       }));
       
-      // Auto-collect when timer reaches 0
-      if (timeLeft <= 0) {
-        clearInterval(timer);
-        if (autoCollectionEnabled) {
-          handleAutoCollection(packageId);
-        } else {
-          // Remove timer and allow manual collection
-          setCountdownTimers(prev => {
-            const updated = { ...prev };
-            delete updated[packageId];
-            return updated;
-          });
-        }
-      }
-    }, 1000);
-    
-    setCountdownTimers(prev => ({
-      ...prev,
-      [packageId]: timeLeft
-    }));
+      // Store timer reference for cleanup
+      if (!window.packageTimers) window.packageTimers = {};
+      window.packageTimers[packageId] = timer;
+      
+    } catch (error) {
+      console.error(`Error starting countdown timer for package ${packageId}:`, error);
+    }
   };
 
   // Auto-collection function
