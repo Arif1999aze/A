@@ -1,7 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import './App.css';
-import InvestmentPlatform from './components/InvestmentPlatform';
+import EnhancedInvestmentPlatform from './components/EnhancedInvestmentPlatform';
 import AdminPanel from './components/AdminPanel';
 
 function App() {
