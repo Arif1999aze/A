@@ -105,6 +105,18 @@
 ## user_problem_statement: "User requested major changes to the investment platform: 1) Remove 20-minute automatic countdown timer and auto-collection toggle from package information, 2) Replace with 12-hour collection system (2 times per day), 3) Ensure all users can properly collect package earnings with correct calculation, 4) Display current earnings on screen when customer collects, 5) Show how much money the package has generated, 6) Redesign package collection page colors and theme to look like a real investment site"
 
 ## backend:
+  - task: "Update collection cooldown from 20 minutes to 12 hours (720 minutes)"
+    implemented: true
+    working: false
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+        - working: false
+        - agent: "main"
+        - comment: "✅ IMPLEMENTED: Changed COLLECTION_COOLDOWN_MINUTES from 20 to 720 (12 hours). Updated error messages to show hours and minutes instead of minutes and seconds. System now supports 2 collections per day as requested."
+
   - task: "Remove lisenziya references from backend"
     implemented: true
     working: true
