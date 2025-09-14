@@ -290,21 +290,37 @@ const EnhancedInvestmentPlatform = () => {
     setCanSendMessage(hasAdminReplyAfter);
   };
 
-  // Generate live transactions for animation
+  // Generate live transactions for animation - More diverse and colorful
   const generateLiveTransactions = () => {
-    const names = ["Rəşad M.", "Ayşə Q.", "Mehman B.", "Günel S.", "Elvin T.", "Nigar H.", "Fərid K.", "Səma A."];
-    const amounts = [120, 250, 180, 90, 310, 75, 450, 200, 160, 280];
-    const types = ["depozit", "qazanc", "çıxarış"];
+    const names = [
+      "Rəşad M.", "Ayşə Q.", "Mehman B.", "Günel S.", "Elvin T.", "Nigar H.", 
+      "Fərid K.", "Səma A.", "Tural R.", "Leyla Ə.", "Kamran İ.", "Zəhra N.",
+      "Orxan Y.", "Mehriban S.", "Eldən V.", "Aynur M.", "Ruslan Q.", "Könül A.",
+      "İlham B.", "Sevda H.", "Murad T.", "Ülviyyə K.", "Vüsal E.", "Nərgiz F."
+    ];
+    
+    const amounts = [75, 120, 89, 156, 203, 95, 310, 178, 245, 134, 267, 198, 87, 345, 156, 289, 123, 234, 167, 298];
+    const types = [
+      { name: "depozit", color: "bg-blue-500", icon: "💰" },
+      { name: "qazanc", color: "bg-green-500", icon: "📈" },
+      { name: "çıxarış", color: "bg-purple-500", icon: "🏦" },
+      { name: "bonus", color: "bg-yellow-500", icon: "🎁" },
+      { name: "paket", color: "bg-pink-500", icon: "📦" }
+    ];
+    
+    const selectedType = types[Math.floor(Math.random() * types.length)];
     
     const newTransaction = {
-      id: Date.now(),
+      id: Date.now() + Math.random(),
       name: names[Math.floor(Math.random() * names.length)],
       amount: amounts[Math.floor(Math.random() * amounts.length)],
-      type: types[Math.floor(Math.random() * types.length)],
+      type: selectedType.name,
+      color: selectedType.color,
+      icon: selectedType.icon,
       timestamp: new Date()
     };
     
-    setLiveTransactions(prev => [newTransaction, ...prev.slice(0, 4)]);
+    setLiveTransactions(prev => [newTransaction, ...prev.slice(0, 5)]); // Keep 6 transactions
   };
 
   // Show notification
