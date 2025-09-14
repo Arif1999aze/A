@@ -632,12 +632,6 @@ const EnhancedInvestmentPlatform = () => {
     }
   };
 
-  // Handle earnings collection
-  const handleCollectEarnings = async (packageId) => {
-    try {
-      await axios.post(`${API_BASE_URL}/api/packages/${packageId}/collect`, {}, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
   // Handle collect earnings with improved error handling
   const handleCollectEarnings = async (packageId) => {
     console.log('Collecting earnings for package:', packageId);
