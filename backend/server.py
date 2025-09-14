@@ -329,13 +329,14 @@ async def register_user(user_data: UserCreate):
     while await db.users.find_one({"user_code": user_code}):
         user_code = generate_user_code()
     
-    # Create new user
+    # Create new user with 10 AZN registration bonus
     hashed_password = get_password_hash(user_data.password)
     user = User(
         email=user_data.email,
         name=user_data.name,
         password_hash=hashed_password,
-        user_code=user_code
+        user_code=user_code,
+        balance=10.0  # 10 AZN registration bonus
     )
     
     await db.users.insert_one(user.dict())
