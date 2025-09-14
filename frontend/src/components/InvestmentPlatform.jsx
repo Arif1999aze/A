@@ -627,23 +627,7 @@ const InvestmentPlatform = () => {
                         )}
                       </button>
                       
-                      <button
-                        onClick={() => {
-                          setPendingOpen(true);
-                          setMenuOpen(false);
-                        }}
-                        className="w-full text-left px-4 py-2 text-sm text-white hover:bg-gray-700 flex items-center justify-between"
-                      >
-                        <span className="flex items-center">
-                          <Clock className="w-4 h-4 mr-2" />
-                          Gözləyən Əməliyyatlar
-                        </span>
-                        {pendingTransactions.length > 0 && (
-                          <Badge className="bg-yellow-600 text-white text-xs">
-                            {pendingTransactions.length}
-                          </Badge>
-                        )}
-                      </button>
+
                       
                       <button
                         onClick={() => {
