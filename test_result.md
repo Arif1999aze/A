@@ -404,13 +404,11 @@
 
 ## test_plan:
   current_focus:
-    - "Admin Panel Real-time Notifications"
-    - "Investment Package Limits Update"
-    - "Support System Message Restriction"
+    - "Enhanced Admin Search by AZ Code"
   stuck_tasks:
     - "Enhanced Admin Search by AZ Code"
-  test_all: true
-  test_priority: "high_first"
+  test_all: false
+  test_priority: "stuck_first"
 
 ## agent_communication:
     - agent: "main"
