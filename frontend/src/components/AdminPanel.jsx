@@ -48,9 +48,14 @@ const AdminPanel = () => {
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    if (token) {
+    console.log('🔄 UseEffect işləyir, token:', token ? 'mövcud' : 'yox', 'isLoggedIn:', isLoggedIn);
+    
+    if (token && !isLoggedIn) {
+      console.log('🔐 Token mövcud, login edilir...');
       setIsLoggedIn(true);
       initializeAdminPanel();
+    } else if (token && isLoggedIn) {
+      console.log('✅ Token və login mövcud, panel aktiv');
     }
   }, [token]);
 
