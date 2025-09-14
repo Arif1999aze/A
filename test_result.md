@@ -261,6 +261,18 @@
         - agent: "testing"
         - comment: "✅ NEW FEATURE: Admin message deletion working. DELETE /api/admin/messages/{id} endpoint functional."
 
+  - task: "Updated Deposit Limits (50-2000 AZN)"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+        - working: true
+        - agent: "testing"
+        - comment: "✅ NEW FEATURE FULLY WORKING: Deposit limits updated from 50-2500 AZN to 50-2000 AZN as requested. Comprehensive testing shows 100% success rate (6/6 tests passed). All boundary conditions work correctly: 49 AZN rejected, 50 AZN accepted, 2000 AZN accepted, 2001 AZN rejected, old maximum 2500 AZN now properly rejected. Error messages are accurate and informative."
+
 
 
 ## frontend:
