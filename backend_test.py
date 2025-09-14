@@ -90,20 +90,23 @@ def make_request(method, endpoint, data=None, headers=None, files=None):
     url = f"{API_URL}{endpoint}"
     try:
         if method.upper() == 'GET':
-            response = requests.get(url, headers=headers, timeout=30)
+            response = requests.get(url, headers=headers, timeout=60)
         elif method.upper() == 'POST':
             if files:
-                response = requests.post(url, data=data, headers=headers, files=files, timeout=30)
+                response = requests.post(url, data=data, headers=headers, files=files, timeout=60)
             else:
-                response = requests.post(url, json=data, headers=headers, timeout=30)
+                response = requests.post(url, json=data, headers=headers, timeout=60)
         elif method.upper() == 'PUT':
-            response = requests.put(url, json=data, headers=headers, timeout=30)
+            response = requests.put(url, json=data, headers=headers, timeout=60)
         elif method.upper() == 'DELETE':
-            response = requests.delete(url, headers=headers, timeout=30)
+            response = requests.delete(url, headers=headers, timeout=60)
         else:
             raise ValueError(f"Unsupported method: {method}")
         
         return response
+    except requests.exceptions.Timeout:
+        print(f"❌ Request timeout for {method} {endpoint}")
+        return None
     except requests.exceptions.RequestException as e:
         print(f"❌ Request failed for {method} {endpoint}: {e}")
         return None
