@@ -404,11 +404,10 @@
 
 ## test_plan:
   current_focus:
-    - "Enhanced Admin Search by AZ Code"
-  stuck_tasks:
-    - "Enhanced Admin Search by AZ Code"
+    - "InvestAZ Admin Panel - Complete Rebuild"
+  stuck_tasks: []
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "high_first"
 
 ## frontend:
   - task: "InvestAZ Admin Panel - Complete Rebuild"
