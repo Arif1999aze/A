@@ -1045,30 +1045,34 @@ const EnhancedInvestmentPlatform = () => {
                               </div>
                             </div>
 
-                            {/* Enhanced Package Stats - More Detailed */}
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
-                              <div className="text-center bg-gray-800 rounded-lg p-3">
-                                <p className="text-xs sm:text-sm text-gray-400">Paket Sonu Gəlir</p>
+                            {/* Professional Package Stats - Enhanced Design */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+                              <div className="text-center bg-gradient-to-br from-green-900/50 to-green-800/30 rounded-xl p-3 border border-green-700/30">
+                                <div className="text-green-400 text-lg mb-1">🎯</div>
+                                <p className="text-xs sm:text-sm text-green-300 font-medium">Paket Sonu Gəlir</p>
                                 <p className="text-sm sm:text-lg font-bold text-green-400">
                                   {formatAmount(totalExpectedEarnings)} AZN
                                 </p>
                               </div>
-                              <div className="text-center bg-gray-800 rounded-lg p-3">
-                                <p className="text-xs sm:text-sm text-gray-400">Cari Qazanc</p>
+                              <div className="text-center bg-gradient-to-br from-yellow-900/50 to-yellow-800/30 rounded-xl p-3 border border-yellow-700/30">
+                                <div className="text-yellow-400 text-lg mb-1">💎</div>
+                                <p className="text-xs sm:text-sm text-yellow-300 font-medium">Cari Qazanc</p>
                                 <p className="text-sm sm:text-lg font-bold text-yellow-400">
                                   {formatAmount(pkg.accumulated_earnings || 0)} AZN
                                 </p>
                               </div>
-                              <div className="text-center bg-gray-800 rounded-lg p-3">
-                                <p className="text-xs sm:text-sm text-gray-400">Paket Qalan Vaxt</p>
+                              <div className="text-center bg-gradient-to-br from-blue-900/50 to-blue-800/30 rounded-xl p-3 border border-blue-700/30">
+                                <div className="text-blue-400 text-lg mb-1">⏰</div>
+                                <p className="text-xs sm:text-sm text-blue-300 font-medium">Paket Qalan Vaxt</p>
                                 <p className="text-sm sm:text-lg font-bold text-blue-400">
                                   {timeRemaining}
                                 </p>
                               </div>
-                              <div className="text-center bg-gray-800 rounded-lg p-3">
-                                <p className="text-xs sm:text-sm text-gray-400">Sonrakı Toplama</p>
+                              <div className="text-center bg-gradient-to-br from-purple-900/50 to-purple-800/30 rounded-xl p-3 border border-purple-700/30">
+                                <div className="text-purple-400 text-lg mb-1">📅</div>
+                                <p className="text-xs sm:text-sm text-purple-300 font-medium">Sonrakı Toplama</p>
                                 <p className="text-sm sm:text-lg font-bold text-purple-400">
-                                  {canCollect ? 'Hazır!' : `${nextCollection.hours}s ${nextCollection.minutes}d`}
+                                  {canCollect ? '✅ Hazır!' : `${nextCollection.hours}s ${nextCollection.minutes}d`}
                                 </p>
                               </div>
                             </div>
