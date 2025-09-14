@@ -637,6 +637,39 @@ const AdminPanel = () => {
         </Button>
       </div>
 
+      {/* Real-time Notifications Panel */}
+      {notifications.length > 0 && (
+        <div className="mb-6">
+          <Card className="bg-gray-900 border-yellow-600 p-4">
+            <div className="flex items-center mb-3">
+              <Bell className="w-5 h-5 text-yellow-400 mr-2" />
+              <h3 className="text-lg font-bold text-yellow-400">Canlı Bildirimlər</h3>
+              <Badge className="ml-2 bg-yellow-600">{notifications.length}</Badge>
+            </div>
+            <div className="space-y-2 max-h-32 overflow-y-auto">
+              {notifications.map((notification) => (
+                <div
+                  key={notification.id}
+                  className={`p-2 rounded border-l-4 text-sm ${
+                    notification.type === 'info' ? 'bg-blue-900/30 border-blue-400 text-blue-300' :
+                    notification.type === 'warning' ? 'bg-yellow-900/30 border-yellow-400 text-yellow-300' :
+                    notification.type === 'message' ? 'bg-green-900/30 border-green-400 text-green-300' :
+                    'bg-gray-800/50 border-gray-600 text-gray-300'
+                  }`}
+                >
+                  <div className="flex justify-between items-start">
+                    <span>{notification.message}</span>
+                    <span className="text-xs opacity-70">
+                      {notification.timestamp.toLocaleTimeString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
         <Card className="bg-gray-900 border-gray-700 p-4">
