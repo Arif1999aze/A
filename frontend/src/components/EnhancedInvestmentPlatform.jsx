@@ -512,37 +512,39 @@ const EnhancedInvestmentPlatform = () => {
           </div>
         </div>
 
-        {/* Hero Section */}
-        <div className="container mx-auto px-6 py-12">
-          <div className="text-center mb-12">
-            <h2 className="text-5xl font-bold mb-6">
+        {/* Hero Section - Mobile Optimized */}
+        <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-12">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 leading-tight">
               İnvestisiya ilə <span className="text-yellow-400">Gələcəyinizi</span> Qurun
             </h2>
-            <p className="text-xl text-gray-400 max-w-3xl mx-auto">
+            <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
               InvestAZ platforması ilə güvənli və gəlirli investisiya imkanlarından yararlanın. 
               Peşəkar komandamız sizin üçün ən yaxşı investisiya həllərini təqdim edir.
             </p>
           </div>
 
-          {/* Live Transactions */}
-          <div className="mb-12">
-            <h3 className="text-2xl font-bold text-center mb-6">🔴 Canlı Əməliyyatlar</h3>
+          {/* Live Transactions - Mobile Responsive */}
+          <div className="mb-8 sm:mb-12">
+            <h3 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6">
+              🔴 Canlı Əməliyyatlar
+            </h3>
             <div className="max-w-2xl mx-auto space-y-2">
               {liveTransactions.map((transaction) => (
-                <div key={transaction.id} className="bg-gray-900 rounded-lg p-4 border-l-4 border-l-green-400 animate-in slide-in-from-right">
-                  <div className="flex justify-between items-center">
+                <div key={transaction.id} className="bg-gray-900 rounded-lg p-3 sm:p-4 border-l-4 border-l-green-400 animate-in slide-in-from-right">
+                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
                     <div className="flex items-center space-x-3">
                       <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="font-medium">{transaction.name}</span>
+                      <span className="font-medium text-sm sm:text-base">{transaction.name}</span>
                       <Badge className={
-                        transaction.type === 'depozit' ? 'bg-blue-600' :
-                        transaction.type === 'qazanc' ? 'bg-green-600' : 'bg-purple-600'
+                        transaction.type === 'depozit' ? 'bg-blue-600 text-xs' :
+                        transaction.type === 'qazanc' ? 'bg-green-600 text-xs' : 'bg-purple-600 text-xs'
                       }>
                         {transaction.type}
                       </Badge>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-green-400">+{formatAmount(transaction.amount)} AZN</p>
+                    <div className="text-left sm:text-right">
+                      <p className="font-bold text-green-400 text-sm sm:text-base">+{formatAmount(transaction.amount)} AZN</p>
                       <p className="text-xs text-gray-500">{transaction.timestamp.toLocaleTimeString()}</p>
                     </div>
                   </div>
@@ -551,26 +553,34 @@ const EnhancedInvestmentPlatform = () => {
             </div>
           </div>
 
-          {/* Package Overview */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          {/* Package Overview - Mobile First Design */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
             {Object.entries(packageDefinitions).map(([key, pkg]) => (
-              <Card key={key} className="bg-gray-900 border-gray-700 p-6 hover:border-yellow-400 transition-colors">
+              <Card key={key} className="bg-gray-900 border-gray-700 p-4 sm:p-6 hover:border-yellow-400 transition-colors">
                 <div className="text-center">
-                  <div className="text-4xl mb-3">{pkg.icon}</div>
-                  <h3 className="text-xl font-bold mb-2" style={{color: pkg.color}}>{pkg.name}</h3>
-                  <p className="text-gray-400 text-sm mb-4">{pkg.description}</p>
+                  <div className="text-3xl sm:text-4xl mb-3">{pkg.icon}</div>
+                  <h3 className="text-lg sm:text-xl font-bold mb-2 text-white" style={{color: pkg.color}}>
+                    {pkg.name}
+                  </h3>
+                  <p className="text-gray-400 text-sm mb-4 leading-relaxed min-h-[3rem]">
+                    {pkg.description}
+                  </p>
                   <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span>Limit:</span>
-                      <span className="font-bold">{pkg.minAmount}-{pkg.maxAmount} AZN</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300">Limit:</span>
+                      <span className="font-bold text-white">{pkg.minAmount}-{pkg.maxAmount} AZN</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Gündəlik gəlir:</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300">Gündəlik gəlir:</span>
                       <span className="font-bold text-green-400">%{pkg.dailyReturn}</span>
                     </div>
-                    <div className="flex justify-between">
-                      <span>Müddət:</span>
-                      <span className="font-bold">{pkg.duration} gün</span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300">Müddət:</span>
+                      <span className="font-bold text-white">{pkg.duration} gün</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-300">Toplam gəlir:</span>
+                      <span className="font-bold text-yellow-400">%{(pkg.multiplier * 100).toFixed(0)}</span>
                     </div>
                   </div>
                 </div>
@@ -578,14 +588,14 @@ const EnhancedInvestmentPlatform = () => {
             ))}
           </div>
 
-          {/* Call to Action */}
+          {/* Call to Action - Mobile Optimized */}
           <div className="text-center">
             <Button 
               onClick={() => setShowRegister(true)}
               size="lg"
-              className="bg-yellow-400 text-black hover:bg-yellow-500 px-8 py-4 text-lg"
+              className="bg-yellow-400 text-black hover:bg-yellow-500 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
             >
-              <Gift className="w-5 h-5 mr-2" />
+              <Gift className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
               İndi Qoşul və 10 AZN Bonus Al!
             </Button>
           </div>
