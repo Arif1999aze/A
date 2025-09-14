@@ -177,19 +177,19 @@ const EnhancedInvestmentPlatform = () => {
     generateLiveTransactions();
   };
 
-  // Auto-refresh functionality
+  // Auto-refresh functionality - Faster intervals
   useEffect(() => {
     if (isLoggedIn && user) {
-      // Refresh user data every 10 seconds
+      // Refresh user data every 5 seconds (faster)
       const userRefreshInterval = setInterval(() => {
         console.log('🔄 Auto-refreshing user data...');
         fetchUserData();
-      }, 10000);
+      }, 5000);
 
-      // Refresh live transactions every 8 seconds
+      // Refresh live transactions every 4 seconds (faster)
       const liveTransactionInterval = setInterval(() => {
         generateLiveTransactions();
-      }, 8000);
+      }, 4000);
 
       return () => {
         clearInterval(userRefreshInterval);
