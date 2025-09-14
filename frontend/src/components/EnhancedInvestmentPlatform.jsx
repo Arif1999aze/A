@@ -635,13 +635,13 @@ const EnhancedInvestmentPlatform = () => {
   };
 
   // Countdown timer management
-  const startCountdownTimer = (packageId) => {
+  const startCountdownTimer = (packageId, initialTime = 20 * 60) => {
     // Clear existing timer
     if (countdownTimers[packageId]) {
       clearInterval(countdownTimers[packageId]);
     }
     
-    let timeLeft = 20 * 60; // 20 minutes in seconds
+    let timeLeft = Math.floor(initialTime);
     
     const timer = setInterval(() => {
       timeLeft--;
@@ -652,9 +652,18 @@ const EnhancedInvestmentPlatform = () => {
       }));
       
       // Auto-collect when timer reaches 0
-      if (timeLeft <= 0 && autoCollectionEnabled) {
+      if (timeLeft <= 0) {
         clearInterval(timer);
-        handleAutoCollection(packageId);
+        if (autoCollectionEnabled) {
+          handleAutoCollection(packageId);
+        } else {
+          // Remove timer and allow manual collection
+          setCountdownTimers(prev => {
+            const updated = { ...prev };
+            delete updated[packageId];
+            return updated;
+          });
+        }
       }
     }, 1000);
     
