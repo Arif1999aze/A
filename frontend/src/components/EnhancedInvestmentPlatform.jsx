@@ -1299,84 +1299,181 @@ const EnhancedInvestmentPlatform = () => {
             </div>
           </TabsContent>
 
-          {/* Market Tab - Now Package Store */}
+          {/* Market Tab - Professional Package Selection */}
           <TabsContent value="market">
             <div className="space-y-6">
               <div className="text-center mb-6 sm:mb-8">
-                <h2 className="text-2xl sm:text-3xl font-bold mb-4">🛒 Paket Mağazası</h2>
-                <p className="text-gray-400 text-sm sm:text-base">Bütün investisiya paketləri burada</p>
+                <h2 className="text-2xl sm:text-3xl font-bold mb-4 bg-gradient-to-r from-pink-400 to-pink-600 bg-clip-text text-transparent">
+                  🛒 Investment Paketləri
+                </h2>
+                <p className="text-gray-400 text-sm sm:text-base">Sizə uyğun paketi seçin və investisiyaya başlayın</p>
               </div>
 
+              {/* Package Selection Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {Object.entries(packageDefinitions).map(([key, pkg]) => (
-                  <Card key={key} className="bg-gray-900 border-gray-700 hover:border-yellow-400 transition-all duration-300 hover:scale-105">
-                    <div className="p-4 sm:p-6">
+                  <Card 
+                    key={key} 
+                    className={`bg-gradient-to-br ${pkg.gradient} p-1 hover:scale-105 transition-all duration-500 cursor-pointer ${pkg.shadowColor} shadow-xl hover:shadow-2xl ${
+                      selectedPackage === key ? 'ring-4 ring-yellow-400 ring-opacity-70' : ''
+                    }`}
+                    onClick={() => {
+                      console.log('Package selected:', key);
+                      setSelectedPackage(key);
+                    }}
+                  >
+                    <div className="bg-gray-900/95 backdrop-blur rounded-lg p-4 sm:p-6 h-full relative overflow-hidden">
+                      {/* Professional Badge */}
+                      {selectedPackage === key && (
+                        <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                          ✨ SEÇİLİB
+                        </div>
+                      )}
+                      
                       <div className="text-center mb-4 sm:mb-6">
-                        <div className="text-4xl sm:text-5xl mb-3">{pkg.icon}</div>
-                        <h3 className="text-xl sm:text-2xl font-bold mb-2 text-white drop-shadow-lg" 
+                        <div className={`text-5xl sm:text-6xl mb-4 p-4 rounded-2xl bg-gradient-to-r ${pkg.borderGradient} inline-block shadow-lg transform hover:rotate-6 transition-transform`}>
+                          {pkg.icon}
+                        </div>
+                        <h3 className="text-xl sm:text-2xl font-bold mb-3 text-white drop-shadow-lg" 
                             style={{
                               color: pkg.color,
-                              textShadow: `0 0 10px ${pkg.color}40`
+                              textShadow: `0 0 20px ${pkg.color}60`
                             }}>
                           {pkg.name}
                         </h3>
-                        <p className="text-gray-400 text-sm leading-relaxed mb-4">{pkg.description}</p>
-                        <div className="text-xl sm:text-2xl font-bold text-yellow-400 mb-4">
-                          {pkg.minAmount === pkg.maxAmount ? 
-                            `${formatAmount(pkg.minAmount)} AZN` : 
-                            `${formatAmount(pkg.minAmount)}-${formatAmount(pkg.maxAmount)} AZN`
-                          }
+                        <p className="text-gray-300 text-sm leading-relaxed mb-4 bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
+                          {pkg.description}
+                        </p>
+                        
+                        {/* Features List */}
+                        <div className="space-y-2 mb-4">
+                          {pkg.features.map((feature, idx) => (
+                            <div key={idx} className="flex items-center space-x-2 text-xs text-gray-300 bg-gray-800/30 rounded-lg p-2">
+                              <CheckCircle className="w-3 h-3 text-green-400" />
+                              <span>{feature}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
 
-                      <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6">
-                        <div className="flex items-center space-x-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                          <span className="text-white">Gündəlik %{pkg.dailyReturn} gəlir</span>
+                      <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+                          <span className="text-sm text-gray-300 font-medium">İnvestisiya Limiti:</span>
+                          <span className="font-bold text-white text-sm bg-gradient-to-r from-green-400 to-blue-400 bg-clip-text text-transparent">
+                            {pkg.minAmount}-{pkg.maxAmount} AZN
+                          </span>
                         </div>
-                        <div className="flex items-center space-x-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                          <span className="text-white">{pkg.duration} gün müddət</span>
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+                          <span className="text-sm text-gray-300 font-medium">Gündəlik Gəlir:</span>
+                          <span className="font-bold text-green-400 text-sm bg-green-900/30 px-2 py-1 rounded-full">
+                            %{pkg.dailyReturn}
+                          </span>
                         </div>
-                        <div className="flex items-center space-x-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                          <span className="text-white">Toplam %{(pkg.multiplier * 100).toFixed(0)} gəlir</span>
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded-lg p-3 border border-gray-700/30">
+                          <span className="text-sm text-gray-300 font-medium">Müddət:</span>
+                          <span className="font-bold text-blue-400 text-sm bg-blue-900/30 px-2 py-1 rounded-full">
+                            {pkg.duration} gün
+                          </span>
                         </div>
-                        <div className="flex items-center space-x-2 text-sm">
-                          <CheckCircle className="w-4 h-4 text-green-400" />
-                          <span className="text-white">20 dəqiqədə bir qazanc toplama</span>
+                        <div className="flex justify-between items-center bg-gray-800/50 rounded-lg p-3 border border-yellow-700/30">
+                          <span className="text-sm text-gray-300 font-medium">Toplam Gəlir:</span>
+                          <span className="font-bold text-yellow-400 text-sm bg-yellow-900/30 px-2 py-1 rounded-full animate-pulse">
+                            %{(pkg.multiplier * 100).toFixed(0)}
+                          </span>
                         </div>
                       </div>
 
-                      <Button
-                        onClick={() => {
-                          setSelectedPackage(key);
-                          setActiveTab('packages');
-                        }}
-                        className="w-full bg-gradient-to-r from-yellow-400 to-yellow-500 text-black hover:from-yellow-500 hover:to-yellow-600 py-3 text-base font-semibold"
-                      >
-                        <Package className="w-4 h-4 mr-2" />
-                        Bu Paketi Seç
-                      </Button>
+                      {selectedPackage === key && (
+                        <div className="space-y-3 sm:space-y-4 animate-in slide-in-from-top">
+                          <div className="bg-gradient-to-r from-gray-800/80 to-gray-700/60 rounded-xl p-4 border border-gray-600/50">
+                            <Input
+                              type="number"
+                              placeholder={`Məbləğ (${pkg.minAmount}-${pkg.maxAmount} AZN)`}
+                              value={investmentAmount}
+                              onChange={(e) => {
+                                console.log('Amount changed:', e.target.value);
+                                setInvestmentAmount(e.target.value);
+                              }}
+                              min={pkg.minAmount}
+                              max={pkg.maxAmount}
+                              className="bg-gray-900/80 border-gray-500 text-white text-center text-lg font-bold placeholder-gray-400 focus:border-yellow-400 focus:ring-2 focus:ring-yellow-400/20"
+                            />
+                          </div>
+                          
+                          {/* Enhanced Amount validation display */}
+                          {investmentAmount && (
+                            <div className="text-center text-sm">
+                              {parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount ? (
+                                <div className="bg-red-900/50 border border-red-600/50 rounded-lg p-3">
+                                  <p className="text-red-300 font-semibold">⚠️ Məbləğ {pkg.minAmount}-{pkg.maxAmount} AZN arası olmalıdır</p>
+                                </div>
+                              ) : (
+                                <div className="bg-green-900/50 border border-green-600/50 rounded-lg p-3">
+                                  <p className="text-green-300 font-semibold">✅ Məbləğ uyğundur</p>
+                                  <p className="text-xs text-green-400 mt-1">
+                                    Gözlənilən gəlir: {formatAmount(parseFloat(investmentAmount) * pkg.multiplier)} AZN
+                                  </p>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                          
+                          <Button
+                            onClick={() => {
+                              console.log('Purchase clicked for:', key, 'amount:', investmentAmount);
+                              handlePackagePurchase(key);
+                            }}
+                            disabled={!investmentAmount || parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount || !user}
+                            className={`w-full py-4 text-base font-bold transition-all duration-300 ${
+                              !investmentAmount || parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount || !user
+                                ? 'bg-gray-600 cursor-not-allowed'
+                                : `bg-gradient-to-r ${pkg.borderGradient} hover:scale-105 shadow-lg ${pkg.shadowColor}`
+                            } text-white disabled:opacity-50`}
+                          >
+                            <Package className="w-5 h-5 mr-2" />
+                            {!user ? '🔒 Giriş Edin' : '💰 Paketi Al'}
+                          </Button>
+                          
+                          {/* Enhanced Balance check */}
+                          {user && investmentAmount && parseFloat(investmentAmount) > (user.balance || 0) && (
+                            <div className="bg-red-900/50 border border-red-600/50 rounded-lg p-3">
+                              <p className="text-red-300 text-sm text-center font-semibold">
+                                ⚠️ Balansınız kifayət etmir
+                              </p>
+                              <p className="text-xs text-red-400 text-center mt-1">
+                                Cari: {formatAmount(user.balance || 0)} AZN | Lazım: {formatAmount(parseFloat(investmentAmount))} AZN
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                      
+                      {selectedPackage !== key && (
+                        <Button
+                          onClick={() => {
+                            console.log('Select package clicked:', key);
+                            setSelectedPackage(key);
+                          }}
+                          variant="outline"
+                          className={`w-full border-2 hover:scale-105 transition-all duration-300 py-4 text-base font-bold ${
+                            key === 'gold' ? 'border-yellow-400 text-yellow-400 hover:bg-yellow-400' :
+                            key === 'titanium' ? 'border-indigo-400 text-indigo-400 hover:bg-indigo-400' :
+                            'border-emerald-400 text-emerald-400 hover:bg-emerald-400'
+                          } hover:text-black`}
+                        >
+                          ✨ Paketi Seç
+                        </Button>
+                      )}
                     </div>
                   </Card>
                 ))}
               </div>
               
-              {/* Market instruction */}
-              <div className="bg-blue-900/30 border border-blue-600 rounded-lg p-4 mt-6">
-                <div className="flex items-start space-x-3">
-                  <div className="text-2xl">💡</div>
-                  <div>
-                    <h4 className="text-blue-200 font-medium mb-2">Paket Seçim Təlimatı</h4>
-                    <ul className="text-blue-200 text-sm space-y-1 list-disc list-inside">
-                      <li>İstədiyiniz paketi seçin və "Bu Paketi Seç" düyməsini basın</li>
-                      <li>Paketlər bölməsinə keçəcək və paket seçili olacaq</li>
-                      <li>Məbləği yazıb "Paketi Al" düyməsi ilə satın alın</li>
-                      <li>Çoxlu paket satın ala bilərsiniz</li>
-                    </ul>
-                  </div>
-                </div>
+              {/* Mobile instruction */}
+              <div className="bg-pink-900/30 border border-pink-600 rounded-lg p-4 mt-6 sm:hidden">
+                <p className="text-pink-200 text-sm text-center">
+                  💡 Paket seçmək üçün kartın üstünə toxunun, sonra məbləği yazıb "Paketi Al" düyməsini basın.
+                </p>
               </div>
             </div>
           </TabsContent>
