@@ -1458,11 +1458,22 @@ const EnhancedInvestmentPlatform = () => {
                 const nextCollection = getTimeUntilNextCollection(pkg);
                 const canCollect = canCollectEarnings(pkg);
                 
-                // Calculate remaining days
+                // Calculate days correctly - from package start to package end
+                const startDate = new Date(pkg.created_at || pkg.start_date);
                 const endDate = new Date(pkg.end_date);
                 const now = new Date();
-                const remainingMs = endDate - now;
-                const remainingDays = Math.max(0, Math.ceil(remainingMs / (1000 * 60 * 60 * 24)));
+                
+                // Total package duration in days
+                const totalDays = Math.ceil((endDate - startDate) / (1000 * 60 * 60 * 24));
+                
+                // Days elapsed since package started
+                const elapsedDays = Math.max(0, Math.ceil((now - startDate) / (1000 * 60 * 60 * 24)));
+                
+                // Remaining days until package ends
+                const remainingDays = Math.max(0, Math.ceil((endDate - now) / (1000 * 60 * 60 * 24)));
+                
+                // Calculate actual collected earnings from total_earned (what user has actually collected so far)
+                const actualCollectedEarnings = pkg.total_earned || 0;
                 
                 return (
                   <div key={pkg.id} className={`p-1 rounded-lg bg-gradient-to-r ${packageDef.gradient} opacity-90`}>
@@ -1485,11 +1496,13 @@ const EnhancedInvestmentPlatform = () => {
                       <div className="grid grid-cols-3 gap-3 text-center text-xs mb-4">
                         <div>
                           <p className="text-gray-400">Toplam Qazanc</p>
-                          <p className="font-bold text-yellow-400">{formatAmount(pkg.total_earned || 0)} AZN</p>
+                          <p className="font-bold text-yellow-400">{formatAmount(actualCollectedEarnings)} AZN</p>
+                          <p className="text-xs text-yellow-500">Toplandı</p>
                         </div>
                         <div>
                           <p className="text-gray-400">Qalan Gün</p>
                           <p className="font-bold text-blue-400">{remainingDays} gün</p>
+                          <p className="text-xs text-blue-500">{totalDays} gündən</p>
                         </div>
                         <div>
                           <p className="text-gray-400">Sonrakı Toplama</p>
@@ -1499,18 +1512,21 @@ const EnhancedInvestmentPlatform = () => {
                         </div>
                       </div>
                       
-                      {/* Progress Bar */}
+                      {/* Progress Bar - Package completion */}
                       <div className="mb-4">
                         <div className="flex justify-between text-xs mb-2">
-                          <span className="text-gray-400">Tamamlanma</span>
-                          <span className="text-yellow-400">{progress.toFixed(1)}%</span>
+                          <span className="text-gray-400">Paket Tamamlanması</span>
+                          <span className="text-yellow-400">{Math.min(100, (elapsedDays / totalDays) * 100).toFixed(1)}%</span>
                         </div>
-                        <Progress value={progress} className="h-2" />
+                        <Progress value={Math.min(100, (elapsedDays / totalDays) * 100)} className="h-2" />
                       </div>
                       
-                      {/* Collect Earnings Button */}
+                      {/* Collect Earnings Button - Fixed */}
                       <Button
-                        onClick={() => handleCollectEarnings(pkg.id)}
+                        onClick={() => {
+                          console.log('Collecting earnings for package:', pkg.id);
+                          handleCollectEarnings(pkg.id);
+                        }}
                         disabled={!canCollect || pkg.accumulated_earnings <= 0}
                         className={`w-full py-2 text-sm font-bold transition-all duration-300 ${
                           canCollect && pkg.accumulated_earnings > 0
@@ -1519,11 +1535,18 @@ const EnhancedInvestmentPlatform = () => {
                         } disabled:opacity-50 disabled:cursor-not-allowed`}
                       >
                         <Coins className="w-4 h-4 mr-2" />
-                        {canCollect ? 
+                        {canCollect && pkg.accumulated_earnings > 0 ? 
                           `Qazanc Topla (${formatAmount(pkg.accumulated_earnings || 0)} AZN)` : 
                           `Gözlə (${nextCollection.hours}s ${nextCollection.minutes}d)`
                         }
                       </Button>
+                      
+                      {/* Package Info */}
+                      <div className="mt-3 text-xs text-gray-500 text-center">
+                        <p>Başlama: {startDate.toLocaleDateString()}</p>
+                        <p>Bitmə: {endDate.toLocaleDateString()}</p>
+                        <p>Cari qazanc: {formatAmount(pkg.accumulated_earnings || 0)} AZN</p>
+                      </div>
                     </div>
                   </div>
                 );
