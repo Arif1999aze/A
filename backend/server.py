@@ -63,7 +63,7 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=[
         "http://localhost:3000",
-        "https://investor-portal-7.preview.emergentagent.com"
+        "https://investaz-platform-1.preview.emergentagent.com"
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],

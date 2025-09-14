@@ -29,7 +29,7 @@ def get_backend_url():
             for line in f:
                 if line.startswith('REACT_APP_BACKEND_URL='):
                     return line.split('=', 1)[1].strip()
-    return "https://investor-portal-7.preview.emergentagent.com"
+    return "https://investaz-platform-1.preview.emergentagent.com"
 
 BASE_URL = get_backend_url()
 API_URL = f"{BASE_URL}/api"
