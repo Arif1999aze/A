@@ -48,19 +48,15 @@ const EnhancedInvestmentPlatform = () => {
   const [marketItems, setMarketItems] = useState([]);
   const [selectedMarketItem, setSelectedMarketItem] = useState(null);
 
-  // Transaction States
-  const [transactions, setTransactions] = useState([]);
-  const [pendingTransactions, setPendingTransactions] = useState([]);
-
-  // Message States
+  // Transaction and Message States
+  const [liveTransactions, setLiveTransactions] = useState([]);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [canSendMessage, setCanSendMessage] = useState(true);
-
-  // Real-time States
-  const [websocket, setWebsocket] = useState(null);
   const [notifications, setNotifications] = useState([]);
-  const [liveTransactions, setLiveTransactions] = useState([]);
+
+  // Refs
+  const wsRef = useRef(null);
+  const notificationTimeoutRef = useRef(null);
 
   // Package definitions with updated limits and professional styling
   const packageDefinitions = {
@@ -111,79 +107,61 @@ const EnhancedInvestmentPlatform = () => {
     }
   };
 
-  // Market Items - Virtual products/services
-  const marketItemsData = [
+  // Market items
+  const marketItems = [
     {
       id: 1,
-      name: "Premium Analiz Paketi",
-      icon: "📊",
-      price: 150,
-      category: "analiz",
-      description: "Gündəlik bazar analizləri və investisiya tövsiyələri",
-      benefits: ["Gündəlik analiz", "SMS bildirişlər", "30 gün dəstək"]
+      name: "Premium Hesab",
+      description: "VIP xidmətləri və eksklüziv imkanlar",
+      price: 50,
+      icon: "👑",
+      benefits: ["Prioritet dəstək", "Premium analitika", "Xüsusi bonuslar"]
     },
     {
       id: 2,
-      name: "VIP Konsultasiya",
-      icon: "🎯",  
-      price: 300,
-      category: "konsultasiya",
-      description: "Şəxsi investisiya məsləhətçisi ilə 1-1 görüş",
-      benefits: ["2 saatlıq görüş", "Şəxsi strategiya", "3 ay izləmə"]
+      name: "Pro Alətlər",
+      description: "Peşəkar investisiya alətləri",
+      price: 30,
+      icon: "🛠️",
+      benefits: ["Təkmil hesabatlar", "Risk analizi", "Portfel idarəetməsi"]
     },
     {
       id: 3,
-      name: "Trading Botu",
-      icon: "🤖",
-      price: 500,
-      category: "bot",
-      description: "Avtomatik trading botu lisenziyası",
-      benefits: ["24/7 işləmə", "AI alqoritmi", "1 il lisenziya"]
-    },
-    {
-      id: 4,
-      name: "Kriptovalyuta Kursu",
-      icon: "🎓",
-      price: 200,
-      category: "təhsil",
-      description: "Kriptovalyuta ticarəti üzrə tam kurs",
-      benefits: ["20 video dərs", "Sertifikat", "Canlı dəstək"]
-    },
-    {
-      id: 5,
-      name: "Portfolio Optimizer",
-      icon: "⚡",
+      name: "Elite Status",
+      description: "Ən yüksək səviyyə üzv statusu",
       price: 100,
-      category: "alət",
-      description: "Portfolio optimallaşdırma aləti",
-      benefits: ["Risk analizi", "Diversifikasiya", "Aylıq report"]
-    },
-    {
-      id: 6,
-      name: "Mobil Tətbiq Premium",
-      icon: "📱",
-      price: 80,
-      category: "tətbiq",
-      description: "Mobil app premium versiyası",
+      icon: "💎",
       benefits: ["Reklamssız", "Push bildiriş", "Advanced grafikler"]
     }
   ];
 
-  // Initialize component
+  // Initialize platform on mount
   useEffect(() => {
     initializePlatform();
-    return () => {
-      if (websocket) websocket.close();
-    };
   }, []);
 
-  // Check token on mount
+  // Check authentication status
   useEffect(() => {
-    if (token) {
-      validateToken();
-    } else {
+    const checkAuth = async () => {
+      if (token) {
+        try {
+          const response = await axios.get(`${API_BASE_URL}/api/auth/me`, {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setUser(response.data);
+          setIsLoggedIn(true);
+        } catch (error) {
+          localStorage.removeItem('token');
+          setToken(null);
+          setIsLoggedIn(false);
+        }
+      } else {
+        setIsLoggedIn(false);
+      }
       setLoading(false);
-    }
+    };
+
+    checkAuth();
   }, [token]);
 
   // Start collection status check for active packages
@@ -232,229 +210,115 @@ const EnhancedInvestmentPlatform = () => {
     };
   }, []);
 
-  // Initialize platform
+  // Initialize platform data and intervals
   const initializePlatform = () => {
-    setMarketItems(marketItemsData);
     generateLiveTransactions();
-  };
-
-  // Auto-refresh functionality - Faster intervals
-  useEffect(() => {
-    if (isLoggedIn && user) {
-      // Refresh user data every 5 seconds (faster)
-      const userRefreshInterval = setInterval(() => {
-        console.log('🔄 Auto-refreshing user data...');
+    
+    // Generate new transactions every 2.5 seconds (faster)
+    const transactionInterval = setInterval(generateLiveTransactions, 2500);
+    
+    // Auto-refresh user data every 30 seconds
+    const userDataInterval = setInterval(() => {
+      if (isLoggedIn && token) {
         fetchUserData();
-      }, 5000);
+      }
+    }, 30000);
 
-      // Refresh live transactions every 2.5 seconds (faster for customer engagement)
-      const liveTransactionInterval = setInterval(() => {
-        generateLiveTransactions();
-      }, 2500);
-
-      return () => {
-        clearInterval(userRefreshInterval);
-        clearInterval(liveTransactionInterval);
-      };
-    }
-  }, [isLoggedIn, user]);
+    // Cleanup function
+    return () => {
+      clearInterval(transactionInterval);
+      clearInterval(userDataInterval);
+    };
+  };
 
   // Page visibility auto-refresh - refresh when user returns to tab
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (!document.hidden && isLoggedIn) {
-        console.log('👁️ Page visible again, refreshing data...');
+      if (!document.hidden && isLoggedIn && token) {
         fetchUserData();
-        generateLiveTransactions();
       }
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-  }, [isLoggedIn]);
+  }, [isLoggedIn, token]);
 
-  // Validate token
-  const validateToken = async () => {
-    try {
-      const response = await axios.get(`${API_BASE_URL}/api/packages/my`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+  // Notification system
+  const showNotification = (message, type = 'info') => {
+    const id = Date.now();
+    const notification = { id, message, type };
+    
+    setNotifications(prev => [...prev, notification]);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+      setNotifications(prev => prev.filter(n => n.id !== id));
+    }, 5000);
+  };
+
+  // Generate live transactions with enhanced randomization
+  const generateLiveTransactions = () => {
+    const names = [
+      'Anar M.', 'Səbinə K.', 'Rəşad A.', 'Günel Ə.', 'Elvin T.',
+      'Aynur H.', 'Fərid S.', 'Nigar R.', 'Tural V.', 'Məryəm N.',
+      'Cavid P.', 'Sevil Q.', 'Ruslan B.', 'Lalə C.', 'Fikrət D.',
+      'Ülviyyə G.', 'Məmməd L.', 'Könül F.', 'Orxan Y.', 'Aysel Z.',
+      'Vüsal İ.', 'Gülnar U.', 'Təbriz J.', 'Məleykə O.', 'Kamran X.'
+    ];
+    
+    const actions = [
+      { type: 'Depozit', icon: '💰', color: 'bg-green-600' },
+      { type: 'Paket Alım', icon: '📦', color: 'bg-blue-600' },
+      { type: 'Qazanc', icon: '💎', color: 'bg-yellow-600' },
+      { type: 'Çıxarış', icon: '🏦', color: 'bg-purple-600' }
+    ];
+
+    const newTransactions = [];
+    const transactionCount = Math.floor(Math.random() * 3) + 1; // 1-3 transactions
+
+    for (let i = 0; i < transactionCount; i++) {
+      const action = actions[Math.floor(Math.random() * actions.length)];
+      const amount = Math.floor(Math.random() * 2451) + 50; // 50-2500 AZN range
       
-      if (response.data) {
-        await fetchUserData();
-        setIsLoggedIn(true);
-      }
-    } catch (error) {
-      console.error('Token validation failed:', error);
-      localStorage.removeItem('token');
-      setToken(null);
-      setIsLoggedIn(false);
-    } finally {
-      setLoading(false);
+      newTransactions.push({
+        id: Date.now() + i,
+        name: names[Math.floor(Math.random() * names.length)],
+        type: action.type,
+        icon: action.icon,
+        color: action.color,
+        amount: amount,
+        timestamp: new Date()
+      });
     }
+
+    setLiveTransactions(prev => {
+      const combined = [...newTransactions, ...prev];
+      return combined.slice(0, 50); // Keep last 50 transactions
+    });
   };
 
   // Fetch user data
   const fetchUserData = async () => {
+    if (!token) return;
+    
     try {
-      // Fetch user profile
-      const userResponse = await axios.get(`${API_BASE_URL}/api/auth/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      const [userResponse, packagesResponse] = await Promise.all([
+        axios.get(`${API_BASE_URL}/api/auth/me`, {
+          headers: { Authorization: `Bearer ${token}` }
+        }),
+        axios.get(`${API_BASE_URL}/api/packages/my`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+      ]);
+
       setUser(userResponse.data);
-
-      // Fetch user packages
-      const packagesResponse = await axios.get(`${API_BASE_URL}/api/packages/my`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setActivePackages(packagesResponse.data);
-
-      // Fetch transactions
-      const transactionsResponse = await axios.get(`${API_BASE_URL}/api/transactions/my`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setTransactions(transactionsResponse.data);
-      setPendingTransactions(transactionsResponse.data.filter(t => t.status === 'pending'));
-
-      // Fetch messages
-      const messagesResponse = await axios.get(`${API_BASE_URL}/api/messages/my`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      setMessages(messagesResponse.data);
-      
-      // Check if user can send message
-      checkMessagePermission(messagesResponse.data);
-
+      const allPackages = packagesResponse.data;
+      setActivePackages(allPackages.filter(pkg => pkg.status === 'active'));
     } catch (error) {
-      console.error('Error fetching user data:', error);
-    }
-  };
-
-  // Check message permission
-  const checkMessagePermission = (userMessages) => {
-    const userSentMessages = userMessages.filter(m => !m.is_from_admin);
-    const adminReplies = userMessages.filter(m => m.is_from_admin);
-    
-    if (userSentMessages.length === 0) {
-      setCanSendMessage(true);
-      return;
-    }
-    
-    const latestUserMessage = userSentMessages.reduce((latest, msg) => 
-      new Date(msg.created_date) > new Date(latest.created_date) ? msg : latest
-    );
-    
-    const hasAdminReplyAfter = adminReplies.some(msg => 
-      new Date(msg.created_date) > new Date(latestUserMessage.created_date)
-    );
-    
-    setCanSendMessage(hasAdminReplyAfter);
-  };
-
-  // Generate live transactions for animation - More diverse and colorful
-  const generateLiveTransactions = () => {
-    const names = [
-      "Rəşad M.", "Ayşə Q.", "Mehman B.", "Günel S.", "Elvin T.", "Nigar H.", 
-      "Fərid K.", "Səma A.", "Tural R.", "Leyla Ə.", "Kamran İ.", "Zəhra N.",
-      "Orxan Y.", "Mehriban S.", "Eldən V.", "Aynur M.", "Ruslan Q.", "Könül A.",
-      "İlham B.", "Sevda H.", "Murad T.", "Ülviyyə K.", "Vüsal E.", "Nərgiz F."
-    ];
-    
-    // Enhanced amounts range: 50-2500 AZN for better engagement
-    const amounts = [
-      52, 89, 134, 187, 245, 298, 356, 423, 489, 567, 634, 712, 798, 856, 923, 
-      1045, 1156, 1234, 1387, 1456, 1523, 1634, 1789, 1856, 1923, 2034, 2156, 
-      2245, 2334, 2423, 2487
-    ];
-    const types = [
-      { name: "depozit", color: "bg-blue-500", icon: "💰" },
-      { name: "qazanc", color: "bg-green-500", icon: "📈" },
-      { name: "çıxarış", color: "bg-purple-500", icon: "🏦" },
-      { name: "bonus", color: "bg-yellow-500", icon: "🎁" },
-      { name: "paket", color: "bg-pink-500", icon: "📦" }
-    ];
-    
-    const selectedType = types[Math.floor(Math.random() * types.length)];
-    
-    const newTransaction = {
-      id: Date.now() + Math.random(),
-      name: names[Math.floor(Math.random() * names.length)],
-      amount: amounts[Math.floor(Math.random() * amounts.length)],
-      type: selectedType.name,
-      color: selectedType.color,
-      icon: selectedType.icon,
-      timestamp: new Date()
-    };
-    
-    setLiveTransactions(prev => [newTransaction, ...prev.slice(0, 5)]); // Keep 6 transactions
-  };
-
-  // Show notification
-  const showNotification = (message, type = 'info') => {
-    const notification = {
-      id: Date.now(),
-      message,
-      type,
-      timestamp: new Date()
-    };
-    
-    setNotifications(prev => [notification, ...prev.slice(0, 2)]);
-    
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== notification.id));
-    }, 5000);
-  };
-
-  // Handle login
-  const handleLogin = async (email, password) => {
-    setLoginError('');
-    setLoading(true);
-    
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
-        email,
-        password
-      });
-      
-      const newToken = response.data.access_token;
-      localStorage.setItem('token', newToken);
-      setToken(newToken);
-      setIsLoggedIn(true);
-      setShowLogin(false);
-      
-      await fetchUserData();
-      showNotification('✅ Uğurla daxil oldunuz!', 'success');
-    } catch (error) {
-      setLoginError(error.response?.data?.detail || 'Giriş xətası');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Handle register
-  const handleRegister = async (name, email, password) => {
-    setRegisterError('');
-    setLoading(true);
-    
-    try {
-      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, {
-        name,
-        email,
-        password
-      });
-      
-      const newToken = response.data.access_token;
-      localStorage.setItem('token', newToken);
-      setToken(newToken);
-      setIsLoggedIn(true);
-      setShowRegister(false);
-      
-      await fetchUserData();
-      showNotification('🎉 Qeydiyyat uğurlu! 50 AZN bonus əlavə edildi!', 'success');
-    } catch (error) {
-      setRegisterError(error.response?.data?.detail || 'Qeydiyyat xətası');
-    } finally {
-      setLoading(false);
+      console.error('Data fetch error:', error);
+      if (error.response?.status === 401) {
+        handleLogout();
+      }
     }
   };
 
@@ -462,173 +326,115 @@ const EnhancedInvestmentPlatform = () => {
   const handleLogout = () => {
     localStorage.removeItem('token');
     setToken(null);
-    setIsLoggedIn(false);
     setUser(null);
+    setIsLoggedIn(false);
     setActivePackages([]);
-    setTransactions([]);
-    setMessages([]);
-    showNotification('👋 Çıxış edildi', 'info');
+    showNotification('Çıxış edildi', 'info');
   };
 
-  // Handle package purchase - Simplified and robust for all devices
+  // Handle login
+  const handleLogin = async (credentials) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/login`, credentials);
+      const { access_token } = response.data;
+      
+      localStorage.setItem('token', access_token);
+      setToken(access_token);
+      setLoginError('');
+      setShowLogin(false);
+      showNotification('Uğurla giriş edildi!', 'success');
+      
+      // Fetch user data after login
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await fetchUserData();
+    } catch (error) {
+      setLoginError(error.response?.data?.detail || 'Giriş xətası');
+    }
+  };
+
+  // Handle register
+  const handleRegister = async (userData) => {
+    try {
+      const response = await axios.post(`${API_BASE_URL}/api/auth/register`, userData);
+      const { access_token } = response.data;
+      
+      localStorage.setItem('token', access_token);
+      setToken(access_token);
+      setRegisterError('');
+      setShowRegister(false);
+      showNotification('Qeydiyyat uğurla tamamlandı! 50 AZN bonus verildi!', 'success');
+      
+      // Fetch user data after registration
+      await new Promise(resolve => setTimeout(resolve, 500));
+      await fetchUserData();
+    } catch (error) {
+      setRegisterError(error.response?.data?.detail || 'Qeydiyyat xətası');
+    }
+  };
+
+  // Enhanced package purchase with robust error handling
   const handlePackagePurchase = async (packageType) => {
-    console.log('📦 Paket alış başladıldı:', { packageType, amount: investmentAmount, userBalance: user?.balance });
-    
-    // Basic validations
-    if (!investmentAmount || !selectedPackage || !packageType) {
-      showNotification('❌ Paket və məbləğ seçin', 'error');
-      return;
-    }
-    
-    if (!user || !token) {
-      showNotification('❌ İlk olaraq sisteme daxil olun', 'error');
-      setShowLogin(true);
-      return;
-    }
-    
-    const amount = parseFloat(investmentAmount);
-    const pkg = packageDefinitions[packageType];
-    
-    // Amount validation
-    if (isNaN(amount) || amount <= 0) {
-      showNotification('❌ Düzgün məbləğ daxil edin', 'error');
-      return;
-    }
-    
-    if (amount < pkg.minAmount || amount > pkg.maxAmount) {
-      showNotification(`❌ Məbləğ ${pkg.minAmount}-${pkg.maxAmount} AZN arasında olmalıdır`, 'error');
-      return;
-    }
-    
-    if (user.balance < amount) {
-      showNotification(`❌ Balansınız kifayət etmir. Lazım: ${formatAmount(amount)} AZN, Mövcud: ${formatAmount(user.balance)} AZN`, 'error');
+    if (!user || !investmentAmount) {
+      showNotification('⚠️ Məbləğ daxil edin', 'error');
       return;
     }
 
-    // Show loading
-    showNotification('⏳ Paket alınır...', 'info');
+    const amount = parseFloat(investmentAmount);
+    const packageInfo = packageDefinitions[packageType];
     
+    if (amount < packageInfo.minAmount || amount > packageInfo.maxAmount) {
+      showNotification(`⚠️ Məbləğ ${packageInfo.minAmount}-${packageInfo.maxAmount} AZN arası olmalıdır`, 'error');
+      return;
+    }
+
+    if (amount > user.balance) {
+      showNotification('⚠️ Balansınız kifayət etmir', 'error');
+      return;
+    }
+
     try {
-      console.log('🔄 API sorğusu göndərilir...');
-      
-      // Simple axios request - most reliable
-      const response = await axios({
+      // Enhanced fetch with robust error handling and timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+      const response = await fetch(`${API_BASE_URL}/api/packages/purchase`, {
         method: 'POST',
-        url: `${API_BASE_URL}/api/packages/purchase`,
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Accept': 'application/json',
         },
-        data: {
+        body: JSON.stringify({
           package_type: packageType,
-          invested_amount: amount  // ✅ Backend expects "invested_amount"
-        },
-        timeout: 20000, // 20 seconds
-        validateStatus: function (status) {
-          return status < 500; // Resolve only if status is less than 500
-        }
+          invested_amount: amount // Key fix: send invested_amount instead of amount
+        }),
+        signal: controller.signal,
+        // Additional fetch options for better compatibility
+        mode: 'cors',
+        credentials: 'same-origin',
       });
-      
-      console.log('📡 API cavabı:', {
-        status: response.status,
-        data: response.data
-      });
-      
-      if (response.status >= 400) {
-        throw new Error(response.data?.detail || `HTTP ${response.status}`);
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.detail || `HTTP ${response.status}`);
       }
+
+      const result = await response.json();
       
-      console.log('✅ Paket alış uğurlu');
-      
-      // Clear form
       setInvestmentAmount('');
       setSelectedPackage(null);
-      
-      // Refresh user data
-      console.log('🔄 İstifadəçi məlumatları yenilənir...');
       await fetchUserData();
-      
-      // Success notification with detailed package info
-      const dailyEarnings = (amount * pkg.multiplier) / pkg.duration;
-      const totalEarnings = amount * pkg.multiplier;
-      
-      showNotification(
-        `🎉 ${pkg.name} uğurla alındı!\n` +
-        `💰 İnvestisiya: ${formatAmount(amount)} AZN\n` +
-        `📈 Gündelik gəlir: ${formatAmount(dailyEarnings)} AZN\n` +
-        `🏆 Toplam gəlir: ${formatAmount(totalEarnings)} AZN\n` +
-        `⏰ 20 dəqiqədə bir qazanc toplayın!`, 
-        'success'
-      );
-      
-      // Switch to dashboard after short delay
-      setTimeout(() => {
-        setActiveTab('dashboard');
-      }, 2000);
+      showNotification(`✅ ${packageInfo.name} paketi uğurla alındı!`, 'success');
       
     } catch (error) {
-      console.error('❌ Paket alış xətası:', error);
-      
-      // Detailed error handling
-      let errorMessage = 'Naməlum xəta';
-      
-      if (error.code === 'ECONNABORTED') {
-        errorMessage = 'Bağlantı vaxtı bitdi. İnternet bağlantınızı yoxlayın.';
-      } else if (error.response) {
-        // Server responded with error
-        const status = error.response.status;
-        const detail = error.response.data?.detail || error.response.data?.message;
-        
-        if (status === 400) {
-          errorMessage = detail || 'Yanlış məlumat göndərildi';
-        } else if (status === 401) {
-          errorMessage = 'Giriş vaxtınız bitib. Yenidən daxil olun.';
-          setTimeout(() => {
-            handleLogout();
-          }, 2000);
-        } else if (status === 403) {
-          errorMessage = 'Bu əməliyyat üçün icazəniz yoxdur';
-        } else if (status === 422) {
-          errorMessage = detail || 'Məlumat doğrulanmadı';
-        } else if (status >= 500) {
-          errorMessage = 'Server xətası. Bir neçə dəqiqə sonra cəhd edin.';
-        } else {
-          errorMessage = detail || `Server xətası (${status})`;
-        }
-      } else if (error.request) {
-        // Network error
-        errorMessage = 'İnternet bağlantısı problemi. Bağlantınızı yoxlayın.';
+      console.error('Package purchase error:', error);
+      if (error.name === 'AbortError') {
+        showNotification('❌ Bağlantı timeout oldu', 'error');
       } else {
-        errorMessage = error.message || 'Paket alış zamanı xəta baş verdi';
+        showNotification('❌ Alış zamanı xəta', 'error');
       }
-      
-      console.log('📋 Xəta təfsilatı:', errorMessage);
-      showNotification(`❌ ${errorMessage}`, 'error');
-    }
-  };
-
-  // Handle market purchase
-  const handleMarketPurchase = async (item) => {
-    if (user.balance < item.price) {
-      showNotification('❌ Balansınız kifayət etmir', 'error');
-      return;
-    }
-    
-    try {
-      // Create a transaction for market item
-      await axios.post(`${API_BASE_URL}/api/transactions`, {
-        type: 'market_purchase',
-        amount: item.price,
-        description: `Market alışı: ${item.name}`,
-        item_id: item.id
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      
-      await fetchUserData();
-      showNotification(`✅ ${item.name} uğurla alındı!`, 'success');
-    } catch (error) {
-      showNotification('❌ Alış zamanı xəta', 'error');
     }
   };
 
@@ -676,7 +482,6 @@ const EnhancedInvestmentPlatform = () => {
       }
     }
   };
-  };
 
   // Check if earnings can be collected (12-hour cooldown)
   const canCollectEarnings = (pkg) => {
@@ -710,17 +515,15 @@ const EnhancedInvestmentPlatform = () => {
     return { hours, minutes, canCollect: false };
   };
 
-  // Handle send message
+  // Send message
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !canSendMessage) return;
+    if (!newMessage.trim()) return;
     
     try {
-      await axios.post(`${API_BASE_URL}/api/messages`, {
-        content: newMessage,
-        message_type: 'support'
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await axios.post(`${API_BASE_URL}/api/messages`, 
+        { content: newMessage },
+        { headers: { Authorization: `Bearer ${token}` }}
+      );
       
       setNewMessage('');
       await fetchUserData();
@@ -778,7 +581,7 @@ const EnhancedInvestmentPlatform = () => {
               <Button 
                 onClick={() => setShowRegister(true)}
                 variant="outline"
-                className="border-yellow-400 text-yellow-400"
+                className="border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black"
               >
                 Qeydiyyat
               </Button>
@@ -786,489 +589,35 @@ const EnhancedInvestmentPlatform = () => {
           </div>
         </div>
 
-        {/* Hero Section - Mobile Optimized */}
-        <div className="container mx-auto px-4 py-8 sm:px-6 sm:py-12">
-          <div className="text-center mb-8 sm:mb-12">
-            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 leading-tight">
-              İnvestisiya ilə <span className="text-yellow-400">Gələcəyinizi</span> Qurun
-            </h2>
-            <p className="text-base sm:text-lg lg:text-xl text-gray-400 max-w-3xl mx-auto leading-relaxed">
-              InvestAZ platforması ilə güvənli və gəlirli investisiya imkanlarından yararlanın. 
-              Peşəkar komandamız sizin üçün ən yaxşı investisiya həllərini təqdim edir.
-            </p>
-          </div>
-
-          {/* Live Transactions - Mobile Responsive */}
-          <div className="mb-8 sm:mb-12">
-            <h3 className="text-xl sm:text-2xl font-bold text-center mb-4 sm:mb-6">
-              🔴 Canlı Əməliyyatlar
-            </h3>
-            <div className="max-w-2xl mx-auto space-y-2">
-              {liveTransactions.map((transaction) => (
-                <div key={transaction.id} className="bg-gray-900 rounded-lg p-3 sm:p-4 border-l-4 border-l-green-400 animate-in slide-in-from-right duration-500">
-                  <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                      <span className="text-lg">{transaction.icon}</span>
-                      <span className="font-medium text-sm sm:text-base text-white">{transaction.name}</span>
-                      <Badge className={`${transaction.color} text-white text-xs border-0`}>
-                        {transaction.type}
-                      </Badge>
-                    </div>
-                    <div className="text-left sm:text-right">
-                      <p className="font-bold text-green-400 text-sm sm:text-base animate-pulse">
-                        +{formatAmount(transaction.amount)} AZN
-                      </p>
-                      <p className="text-xs text-gray-500">{transaction.timestamp.toLocaleTimeString()}</p>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Package Overview - Mobile First Design */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
+        {/* Hero Section */}
+        <div className="container mx-auto px-6 py-16 text-center">
+          <h2 className="text-5xl font-bold mb-8 bg-gradient-to-r from-yellow-400 to-yellow-600 bg-clip-text text-transparent">
+            Gələcəyinizi İnvestAZ ilə qurun
+          </h2>
+          <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+            Azərbaycanın ən güvənilir investisiya platforması. 50+ AZN qeydiyyat bonusu və günlük qazanclar sizləri gözləyir.
+          </p>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
             {Object.entries(packageDefinitions).map(([key, pkg]) => (
-              <Card key={key} className="bg-gray-900 border-gray-700 p-4 sm:p-6 hover:border-yellow-400 transition-colors">
-                <div className="text-center">
-                  <div className="text-3xl sm:text-4xl mb-3">{pkg.icon}</div>
-                  <h3 className="text-lg sm:text-xl font-bold mb-2 text-white" style={{color: pkg.color}}>
-                    {pkg.name}
-                  </h3>
-                  <p className="text-gray-400 text-sm mb-4 leading-relaxed min-h-[3rem]">
-                    {pkg.description}
-                  </p>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-300">Limit:</span>
-                      <span className="font-bold text-white">{pkg.minAmount}-{pkg.maxAmount} AZN</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-300">Gündəlik gəlir:</span>
-                      <span className="font-bold text-green-400">%{pkg.dailyReturn}</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-300">Müddət:</span>
-                      <span className="font-bold text-white">{pkg.duration} gün</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-gray-300">Toplam gəlir:</span>
-                      <span className="font-bold text-yellow-400">%{(pkg.multiplier * 100).toFixed(0)}</span>
-                    </div>
-                  </div>
+              <Card key={key} className="bg-gray-900 border-gray-700 p-6">
+                <div className="text-4xl mb-4">{pkg.icon}</div>
+                <h3 className="text-xl font-bold mb-2" style={{color: pkg.color}}>{pkg.name}</h3>
+                <p className="text-gray-400 mb-4">{pkg.description}</p>
+                <div className="text-2xl font-bold text-yellow-400">
+                  %{(pkg.multiplier * 100).toFixed(0)} Gəlir
                 </div>
               </Card>
             ))}
           </div>
-
-          {/* Call to Action - Mobile Optimized */}
-          <div className="text-center">
-            <Button 
-              onClick={() => setShowRegister(true)}
-              size="lg"
-              className="bg-yellow-400 text-black hover:bg-yellow-500 px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg w-full sm:w-auto"
-            >
-              <Gift className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
-              İndi Qoşul və 50 AZN Bonus Al!
-            </Button>
-          </div>
+          
+          <Button 
+            onClick={() => setShowRegister(true)}
+            className="bg-yellow-400 text-black hover:bg-yellow-500 text-lg px-8 py-3"
+          >
+            İndi Başlayın - 50 AZN Bonus
+          </Button>
         </div>
-
-        {/* Deposit Modal - Enhanced */}
-        <Dialog open={showDepositModal} onOpenChange={setShowDepositModal}>
-          <DialogContent className="bg-gray-900 border-gray-700 max-w-lg">
-            <DialogHeader>
-              <DialogTitle className="text-white text-center flex items-center justify-center">
-                <DollarSign className="w-5 h-5 mr-2 text-green-400" />
-                💰 Depozit Əməliyyatı
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="text-center p-4 bg-green-900/30 border border-green-600 rounded-lg">
-                <p className="text-green-300 text-sm mb-2">
-                  💡 Balansınızı artırmaq üçün depozit edin
-                </p>
-                <p className="text-green-400 font-bold text-lg">
-                  Cari Balans: {formatAmount(user?.balance || 0)} AZN
-                </p>
-              </div>
-              
-              {/* Deposit Form */}
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm text-gray-400 mb-1 block">Ad Soyad</label>
-                  <Input 
-                    placeholder="Adınızı və soyadınızı daxil edin"
-                    className="bg-gray-800 border-gray-600 text-white"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-1 block">Bank</label>
-                  <Input 
-                    placeholder="Bank adını daxil edin"
-                    className="bg-gray-800 border-gray-600 text-white"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-1 block">Məbləğ (AZN)</label>
-                  <Input 
-                    type="number"
-                    placeholder="Depozit məbləğini daxil edin"
-                    className="bg-gray-800 border-gray-600 text-white"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-1 block">Qəbz Şəkli</label>
-                  <Input 
-                    type="file"
-                    accept="image/*"
-                    className="bg-gray-800 border-gray-600 text-white"
-                  />
-                </div>
-              </div>
-              
-              <div className="flex space-x-3">
-                <Button 
-                  onClick={() => setShowDepositModal(false)}
-                  variant="outline"
-                  className="flex-1 border-gray-600"
-                >
-                  İmtina
-                </Button>
-                <Button 
-                  className="flex-1 bg-green-600 hover:bg-green-700"
-                >
-                  <DollarSign className="w-4 h-4 mr-2" />
-                  Depozit Et
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Withdraw Modal - Enhanced */}
-        <Dialog open={showWithdrawModal} onOpenChange={setShowWithdrawModal}>
-          <DialogContent className="bg-gray-900 border-gray-700 max-w-lg">
-            <DialogHeader>
-              <DialogTitle className="text-white text-center flex items-center justify-center">
-                <Activity className="w-5 h-5 mr-2 text-purple-400" />
-                🏦 Çıxarış Əməliyyatı
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="text-center p-4 bg-purple-900/30 border border-purple-600 rounded-lg">
-                <p className="text-purple-300 text-sm mb-2">
-                  💰 Çəkiləbilir Qazanc
-                </p>
-                <p className="text-purple-400 font-bold text-xl mb-2">
-                  {formatAmount(user?.total_earned || 0)} AZN
-                </p>
-                <p className="text-purple-400 text-xs bg-purple-800/50 px-2 py-1 rounded-full inline-block">
-                  ⏰ 30 dəqiqə hesabınıza köçürüləcəkdir
-                </p>
-              </div>
-              
-              {/* Withdraw Form */}
-              <div className="space-y-3">
-                <div>
-                  <label className="text-sm text-gray-400 mb-1 block">Ad Soyad</label>
-                  <Input 
-                    placeholder="Adınızı və soyadınızı daxil edin"
-                    className="bg-gray-800 border-gray-600 text-white"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-1 block">Bank</label>
-                  <Input 
-                    placeholder="Bank adını daxil edin"
-                    className="bg-gray-800 border-gray-600 text-white"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm text-gray-400 mb-1 block">Çıxarış Məbləği (AZN)</label>
-                  <Input 
-                    type="number"
-                    placeholder={`Maksimum: ${formatAmount(user?.total_earned || 0)} AZN`}
-                    className="bg-gray-800 border-gray-600 text-white"
-                    max={user?.total_earned || 0}
-                  />
-                </div>
-              </div>
-              
-              <div className="flex space-x-3">
-                <Button 
-                  onClick={() => setShowWithdrawModal(false)}
-                  variant="outline"
-                  className="flex-1 border-gray-600"
-                >
-                  İmtina
-                </Button>
-                <Button 
-                  className="flex-1 bg-purple-600 hover:bg-purple-700"
-                >
-                  <Activity className="w-4 h-4 mr-2" />
-                  Çıxarış Et
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Tracking Modal - Enhanced */}
-        <Dialog open={showTrackingModal} onOpenChange={setShowTrackingModal}>
-          <DialogContent className="bg-gray-900 border-gray-700 max-w-4xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-white text-center flex items-center justify-center">
-                <BarChart3 className="w-5 h-5 mr-2 text-yellow-400" />
-                📊 Əməliyyat Tarixçəsi
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="text-center p-4 bg-yellow-900/30 border border-yellow-600 rounded-lg">
-                <p className="text-yellow-300 text-sm">
-                  📈 Bütün depozit və çıxarış əməliyyatlarınızı burada görə bilərsiniz
-                </p>
-              </div>
-              
-              {/* Transaction History */}
-              <div className="space-y-3">
-                <Card className="bg-gray-800 border-gray-700 p-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-                        <DollarSign className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">Depozit</h4>
-                        <p className="text-sm text-gray-400">500.00 AZN</p>
-                        <p className="text-xs text-gray-500">Bu gün, 14:30</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-green-600 animate-pulse">
-                      Təsdiqləndi
-                    </Badge>
-                  </div>
-                </Card>
-
-                <Card className="bg-gray-800 border-gray-700 p-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
-                        <Activity className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">Çıxarış</h4>
-                        <p className="text-sm text-gray-400">150.00 AZN</p>
-                        <p className="text-xs text-gray-500">Dünən, 09:15</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-green-600">
-                      Tamamlandı
-                    </Badge>
-                  </div>
-                </Card>
-
-                <Card className="bg-gray-800 border-gray-700 p-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center">
-                        <DollarSign className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">Depozit</h4>
-                        <p className="text-sm text-gray-400">200.00 AZN</p>
-                        <p className="text-xs text-gray-500">2 gün əvvəl, 16:45</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-yellow-600 animate-pulse">
-                      Gözləyir
-                    </Badge>
-                  </div>
-                </Card>
-                
-                <Card className="bg-gray-800 border-gray-700 p-4">
-                  <div className="flex justify-between items-center">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                        <Package className="w-5 h-5 text-white" />
-                      </div>
-                      <div>
-                        <h4 className="font-semibold text-white">Paket Alımı</h4>
-                        <p className="text-sm text-gray-400">Gold Premium - 250.00 AZN</p>
-                        <p className="text-xs text-gray-500">3 gün əvvəl, 11:20</p>
-                      </div>
-                    </div>
-                    <Badge className="bg-green-600">
-                      Aktiv
-                    </Badge>
-                  </div>
-                </Card>
-              </div>
-              
-              <Button 
-                onClick={() => setShowTrackingModal(false)}
-                className="w-full mt-4"
-              >
-                Bağla
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Market Modal */}
-        <Dialog open={showMarketModal} onOpenChange={setShowMarketModal}>
-          <DialogContent className="bg-gray-900 border-gray-700 max-w-6xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="text-white text-center">🛒 Investment Paketləri</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-6">
-              {/* Package Selection Grid */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Object.entries(packageDefinitions).map(([key, pkg]) => (
-                  <Card 
-                    key={key} 
-                    className={`bg-gradient-to-br ${pkg.gradient} p-1 hover:scale-105 transition-all duration-500 cursor-pointer ${pkg.shadowColor} shadow-xl hover:shadow-2xl ${
-                      selectedPackage === key ? 'ring-4 ring-yellow-400 ring-opacity-70' : ''
-                    }`}
-                    onClick={() => {
-                      console.log('Package selected:', key);
-                      setSelectedPackage(key);
-                    }}
-                  >
-                    <div className="bg-gray-900/95 backdrop-blur rounded-lg p-4 h-full relative overflow-hidden">
-                      {/* Professional Badge */}
-                      {selectedPackage === key && (
-                        <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 rounded-full text-xs font-bold animate-pulse">
-                          ✨ SEÇİLİB
-                        </div>
-                      )}
-                      
-                      <div className="text-center mb-4">
-                        <div className={`text-4xl mb-3 p-3 rounded-xl bg-gradient-to-r ${pkg.borderGradient} inline-block shadow-lg`}>
-                          {pkg.icon}
-                        </div>
-                        <h3 className="text-lg font-bold mb-2 text-white" 
-                            style={{
-                              color: pkg.color,
-                              textShadow: `0 0 20px ${pkg.color}60`
-                            }}>
-                          {pkg.name}
-                        </h3>
-                        <p className="text-gray-300 text-xs mb-3 bg-gray-800/50 rounded-lg p-2">
-                          {pkg.description}
-                        </p>
-                      </div>
-
-                      <div className="space-y-2 mb-4 text-xs">
-                        <div className="flex justify-between items-center bg-gray-800/50 rounded p-2">
-                          <span className="text-gray-300">Limit:</span>
-                          <span className="font-bold text-white">{pkg.minAmount}-{pkg.maxAmount} AZN</span>
-                        </div>
-                        <div className="flex justify-between items-center bg-gray-800/50 rounded p-2">
-                          <span className="text-gray-300">Gəlir:</span>
-                          <span className="font-bold text-green-400">%{pkg.dailyReturn}</span>
-                        </div>
-                        <div className="flex justify-between items-center bg-gray-800/50 rounded p-2">
-                          <span className="text-gray-300">Müddət:</span>
-                          <span className="font-bold text-blue-400">{pkg.duration} gün</span>
-                        </div>
-                      </div>
-
-                      {selectedPackage === key && (
-                        <div className="space-y-3 animate-in slide-in-from-top">
-                          <Input
-                            type="number"
-                            placeholder={`Məbləğ (${pkg.minAmount}-${pkg.maxAmount})`}
-                            value={investmentAmount}
-                            onChange={(e) => setInvestmentAmount(e.target.value)}
-                            min={pkg.minAmount}
-                            max={pkg.maxAmount}
-                            className="bg-gray-800 border-gray-600 text-white text-center font-bold"
-                          />
-                          
-                          <Button
-                            onClick={() => {
-                              handlePackagePurchase(key);
-                              setShowMarketModal(false);
-                            }}
-                            disabled={!investmentAmount || parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount || !user}
-                            className={`w-full py-3 text-sm font-bold transition-all duration-300 ${
-                              !investmentAmount || parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount || !user
-                                ? 'bg-gray-600 cursor-not-allowed'
-                                : `bg-gradient-to-r ${pkg.borderGradient} hover:scale-105 shadow-lg`
-                            } text-white disabled:opacity-50`}
-                          >
-                            <Package className="w-4 h-4 mr-2" />
-                            {!user ? '🔒 Giriş Edin' : '💰 Paketi Al'}
-                          </Button>
-                        </div>
-                      )}
-                      
-                      {selectedPackage !== key && (
-                        <Button
-                          onClick={() => setSelectedPackage(key)}
-                          variant="outline"
-                          className="w-full border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black py-2 text-sm"
-                        >
-                          ✨ Seç
-                        </Button>
-                      )}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-
-        {/* Profile Modal */}
-        <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
-          <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
-            <DialogHeader>
-              <DialogTitle className="text-white text-center">👤 Profil Tənzimləmələri</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              {/* Profile Info Display */}
-              <div className="space-y-3">
-                <div className="bg-gray-800/50 rounded-lg p-3">
-                  <label className="text-xs text-gray-400">Ad Soyad</label>
-                  <p className="font-semibold text-white">{user?.name}</p>
-                </div>
-                <div className="bg-gray-800/50 rounded-lg p-3">
-                  <label className="text-xs text-gray-400">Email</label>
-                  <p className="font-semibold text-white">{user?.email}</p>
-                </div>
-                <div className="bg-gray-800/50 rounded-lg p-3">
-                  <label className="text-xs text-gray-400">İstifadəçi Kodu</label>
-                  <p className="font-semibold text-purple-400">{user?.user_code}</p>
-                </div>
-                <div className="bg-gray-800/50 rounded-lg p-3">
-                  <label className="text-xs text-gray-400">Referral Numarası</label>
-                  <p className="font-semibold text-yellow-400">REF-{user?.user_code || '000000'}</p>
-                </div>
-              </div>
-              
-              {/* Action Buttons */}
-              <div className="flex space-x-3">
-                <Button 
-                  onClick={() => setShowProfileModal(false)}
-                  variant="outline"
-                  className="flex-1 border-gray-600"
-                >
-                  Bağla
-                </Button>
-                <Button 
-                  onClick={handleLogout}
-                  className="flex-1 bg-red-600 hover:bg-red-700"
-                >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Çıxış
-                </Button>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
 
         {/* Login Dialog */}
         <Dialog open={showLogin} onOpenChange={setShowLogin}>
@@ -1293,30 +642,21 @@ const EnhancedInvestmentPlatform = () => {
     );
   }
 
-  // Main Dashboard
+  // Main platform interface
   return (
     <div className="min-h-screen bg-gray-950 text-white">
       {/* Notifications */}
-      <div className="fixed top-4 right-4 z-50 space-y-2 max-w-sm">
-        {notifications.map((notification) => (
+      <div className="fixed top-4 right-4 z-50 space-y-2">
+        {notifications.map(notification => (
           <div
             key={notification.id}
-            className={`p-3 rounded-lg shadow-lg border-l-4 animate-in slide-in-from-right ${
-              notification.type === 'success' ? 'bg-green-900/90 border-green-400' :
-              notification.type === 'error' ? 'bg-red-900/90 border-red-400' :
-              notification.type === 'warning' ? 'bg-yellow-900/90 border-yellow-400' :
-              'bg-blue-900/90 border-blue-400'
+            className={`p-4 rounded-lg shadow-lg border-l-4 transition-all duration-300 ${
+              notification.type === 'success' ? 'bg-green-900 border-green-400' :
+              notification.type === 'error' ? 'bg-red-900 border-red-400' :
+              'bg-blue-900 border-blue-400'
             }`}
           >
-            <div className="flex items-start space-x-2">
-              <Bell className="w-4 h-4 mt-0.5 text-yellow-400" />
-              <div className="flex-1">
-                <p className="text-sm text-white font-medium">{notification.message}</p>
-                <p className="text-xs text-gray-300 mt-1">
-                  {notification.timestamp.toLocaleTimeString()}
-                </p>
-              </div>
-            </div>
+            <p className="text-white text-sm">{notification.message}</p>
           </div>
         ))}
       </div>
@@ -1614,6 +954,409 @@ const EnhancedInvestmentPlatform = () => {
         </Card>
       </div>
 
+      {/* Modals */}
+      {/* Deposit Modal - Enhanced */}
+      <Dialog open={showDepositModal} onOpenChange={setShowDepositModal}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-white text-center flex items-center justify-center">
+              <DollarSign className="w-5 h-5 mr-2 text-green-400" />
+              💰 Depozit Əməliyyatı
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-center p-4 bg-green-900/30 border border-green-600 rounded-lg">
+              <p className="text-green-300 text-sm mb-2">
+                💡 Balansınızı artırmaq üçün depozit edin
+              </p>
+              <p className="text-green-400 font-bold text-lg">
+                Cari Balans: {formatAmount(user?.balance || 0)} AZN
+              </p>
+            </div>
+            
+            {/* Deposit Form */}
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Ad Soyad</label>
+                <Input 
+                  placeholder="Adınızı və soyadınızı daxil edin"
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Bank</label>
+                <Input 
+                  placeholder="Bank adını daxil edin"
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Məbləğ (AZN)</label>
+                <Input 
+                  type="number"
+                  placeholder="Depozit məbləğini daxil edin"
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Qəbz Şəkli</label>
+                <Input 
+                  type="file"
+                  accept="image/*"
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+            </div>
+            
+            <div className="flex space-x-3">
+              <Button 
+                onClick={() => setShowDepositModal(false)}
+                variant="outline"
+                className="flex-1 border-gray-600"
+              >
+                İmtina
+              </Button>
+              <Button 
+                onClick={() => {
+                  showNotification('✅ Depozit sorğusu göndərildi', 'success');
+                  setShowDepositModal(false);
+                }}
+                className="flex-1 bg-green-600 hover:bg-green-700"
+              >
+                <DollarSign className="w-4 h-4 mr-2" />
+                Depozit Et
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Withdraw Modal - Enhanced */}
+      <Dialog open={showWithdrawModal} onOpenChange={setShowWithdrawModal}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-lg">
+          <DialogHeader>
+            <DialogTitle className="text-white text-center flex items-center justify-center">
+              <Activity className="w-5 h-5 mr-2 text-purple-400" />
+              🏦 Çıxarış Əməliyyatı
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-center p-4 bg-purple-900/30 border border-purple-600 rounded-lg">
+              <p className="text-purple-300 text-sm mb-2">
+                💰 Çəkiləbilir Qazanc
+              </p>
+              <p className="text-purple-400 font-bold text-xl mb-2">
+                {formatAmount(user?.total_earned || 0)} AZN
+              </p>
+              <p className="text-purple-400 text-xs bg-purple-800/50 px-2 py-1 rounded-full inline-block">
+                ⏰ 30 dəqiqə hesabınıza köçürüləcəkdir
+              </p>
+            </div>
+            
+            {/* Withdraw Form */}
+            <div className="space-y-3">
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Ad Soyad</label>
+                <Input 
+                  placeholder="Adınızı və soyadınızı daxil edin"
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Bank</label>
+                <Input 
+                  placeholder="Bank adını daxil edin"
+                  className="bg-gray-800 border-gray-600 text-white"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-gray-400 mb-1 block">Çıxarış Məbləği (AZN)</label>
+                <Input 
+                  type="number"
+                  placeholder={`Maksimum: ${formatAmount(user?.total_earned || 0)} AZN`}
+                  className="bg-gray-800 border-gray-600 text-white"
+                  max={user?.total_earned || 0}
+                />
+              </div>
+            </div>
+            
+            <div className="flex space-x-3">
+              <Button 
+                onClick={() => setShowWithdrawModal(false)}
+                variant="outline"
+                className="flex-1 border-gray-600"
+              >
+                İmtina
+              </Button>
+              <Button 
+                onClick={() => {
+                  showNotification('✅ Çıxarış sorğusu göndərildi. 30 dəqiqə hesabınıza köçürüləcəkdir', 'success');
+                  setShowWithdrawModal(false);
+                }}
+                className="flex-1 bg-purple-600 hover:bg-purple-700"
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                Çıxarış Et
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Tracking Modal - Enhanced */}
+      <Dialog open={showTrackingModal} onOpenChange={setShowTrackingModal}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-white text-center flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 mr-2 text-yellow-400" />
+              📊 Əməliyyat Tarixçəsi
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="text-center p-4 bg-yellow-900/30 border border-yellow-600 rounded-lg">
+              <p className="text-yellow-300 text-sm">
+                📈 Bütün depozit və çıxarış əməliyyatlarınızı burada görə bilərsiniz
+              </p>
+            </div>
+            
+            {/* Transaction History */}
+            <div className="space-y-3">
+              <Card className="bg-gray-800 border-gray-700 p-4">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
+                      <DollarSign className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white">Depozit</h4>
+                      <p className="text-sm text-gray-400">500.00 AZN</p>
+                      <p className="text-xs text-gray-500">Bu gün, 14:30</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-green-600 animate-pulse">
+                    Təsdiqləndi
+                  </Badge>
+                </div>
+              </Card>
+
+              <Card className="bg-gray-800 border-gray-700 p-4">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-purple-600 rounded-full flex items-center justify-center">
+                      <Activity className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white">Çıxarış</h4>
+                      <p className="text-sm text-gray-400">150.00 AZN</p>
+                      <p className="text-xs text-gray-500">Dünən, 09:15</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-green-600">
+                    Tamamlandı
+                  </Badge>
+                </div>
+              </Card>
+
+              <Card className="bg-gray-800 border-gray-700 p-4">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-yellow-600 rounded-full flex items-center justify-center">
+                      <DollarSign className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white">Depozit</h4>
+                      <p className="text-sm text-gray-400">200.00 AZN</p>
+                      <p className="text-xs text-gray-500">2 gün əvvəl, 16:45</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-yellow-600 animate-pulse">
+                    Gözləyir
+                  </Badge>
+                </div>
+              </Card>
+              
+              <Card className="bg-gray-800 border-gray-700 p-4">
+                <div className="flex justify-between items-center">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                      <Package className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-white">Paket Alımı</h4>
+                      <p className="text-sm text-gray-400">Gold Premium - 250.00 AZN</p>
+                      <p className="text-xs text-gray-500">3 gün əvvəl, 11:20</p>
+                    </div>
+                  </div>
+                  <Badge className="bg-green-600">
+                    Aktiv
+                  </Badge>
+                </div>
+              </Card>
+            </div>
+            
+            <Button 
+              onClick={() => setShowTrackingModal(false)}
+              className="w-full mt-4"
+            >
+              Bağla
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Market Modal */}
+      <Dialog open={showMarketModal} onOpenChange={setShowMarketModal}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-6xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-white text-center">🛒 Investment Paketləri</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* Package Selection Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {Object.entries(packageDefinitions).map(([key, pkg]) => (
+                <Card 
+                  key={key} 
+                  className={`bg-gradient-to-br ${pkg.gradient} p-1 hover:scale-105 transition-all duration-500 cursor-pointer ${pkg.shadowColor} shadow-xl hover:shadow-2xl ${
+                    selectedPackage === key ? 'ring-4 ring-yellow-400 ring-opacity-70' : ''
+                  }`}
+                  onClick={() => {
+                    console.log('Package selected:', key);
+                    setSelectedPackage(key);
+                  }}
+                >
+                  <div className="bg-gray-900/95 backdrop-blur rounded-lg p-4 h-full relative overflow-hidden">
+                    {/* Professional Badge */}
+                    {selectedPackage === key && (
+                      <div className="absolute top-2 right-2 bg-yellow-400 text-black px-2 py-1 rounded-full text-xs font-bold animate-pulse">
+                        ✨ SEÇİLİB
+                      </div>
+                    )}
+                    
+                    <div className="text-center mb-4">
+                      <div className={`text-4xl mb-3 p-3 rounded-xl bg-gradient-to-r ${pkg.borderGradient} inline-block shadow-lg`}>
+                        {pkg.icon}
+                      </div>
+                      <h3 className="text-lg font-bold mb-2 text-white" 
+                          style={{
+                            color: pkg.color,
+                            textShadow: `0 0 20px ${pkg.color}60`
+                          }}>
+                        {pkg.name}
+                      </h3>
+                      <p className="text-gray-300 text-xs mb-3 bg-gray-800/50 rounded-lg p-2">
+                        {pkg.description}
+                      </p>
+                    </div>
+
+                    <div className="space-y-2 mb-4 text-xs">
+                      <div className="flex justify-between items-center bg-gray-800/50 rounded p-2">
+                        <span className="text-gray-300">Limit:</span>
+                        <span className="font-bold text-white">{pkg.minAmount}-{pkg.maxAmount} AZN</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-gray-800/50 rounded p-2">
+                        <span className="text-gray-300">Gəlir:</span>
+                        <span className="font-bold text-green-400">%{pkg.dailyReturn}</span>
+                      </div>
+                      <div className="flex justify-between items-center bg-gray-800/50 rounded p-2">
+                        <span className="text-gray-300">Müddət:</span>
+                        <span className="font-bold text-blue-400">{pkg.duration} gün</span>
+                      </div>
+                    </div>
+
+                    {selectedPackage === key && (
+                      <div className="space-y-3 animate-in slide-in-from-top">
+                        <Input
+                          type="number"
+                          placeholder={`Məbləğ (${pkg.minAmount}-${pkg.maxAmount})`}
+                          value={investmentAmount}
+                          onChange={(e) => setInvestmentAmount(e.target.value)}
+                          min={pkg.minAmount}
+                          max={pkg.maxAmount}
+                          className="bg-gray-800 border-gray-600 text-white text-center font-bold"
+                        />
+                        
+                        <Button
+                          onClick={() => {
+                            handlePackagePurchase(key);
+                            setShowMarketModal(false);
+                          }}
+                          disabled={!investmentAmount || parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount || !user}
+                          className={`w-full py-3 text-sm font-bold transition-all duration-300 ${
+                            !investmentAmount || parseFloat(investmentAmount) < pkg.minAmount || parseFloat(investmentAmount) > pkg.maxAmount || !user
+                              ? 'bg-gray-600 cursor-not-allowed'
+                              : `bg-gradient-to-r ${pkg.borderGradient} hover:scale-105 shadow-lg`
+                          } text-white disabled:opacity-50`}
+                        >
+                          <Package className="w-4 h-4 mr-2" />
+                          {!user ? '🔒 Giriş Edin' : '💰 Paketi Al'}
+                        </Button>
+                      </div>
+                    )}
+                    
+                    {selectedPackage !== key && (
+                      <Button
+                        onClick={() => setSelectedPackage(key)}
+                        variant="outline"
+                        className="w-full border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black py-2 text-sm"
+                      >
+                        ✨ Seç
+                      </Button>
+                    )}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Profile Modal */}
+      <Dialog open={showProfileModal} onOpenChange={setShowProfileModal}>
+        <DialogContent className="bg-gray-900 border-gray-700 max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-white text-center">👤 Profil Tənzimləmələri</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Profile Info Display */}
+            <div className="space-y-3">
+              <div className="bg-gray-800/50 rounded-lg p-3">
+                <label className="text-xs text-gray-400">Ad Soyad</label>
+                <p className="font-semibold text-white">{user?.name}</p>
+              </div>
+              <div className="bg-gray-800/50 rounded-lg p-3">
+                <label className="text-xs text-gray-400">Email</label>
+                <p className="font-semibold text-white">{user?.email}</p>
+              </div>
+              <div className="bg-gray-800/50 rounded-lg p-3">
+                <label className="text-xs text-gray-400">İstifadəçi Kodu</label>
+                <p className="font-semibold text-purple-400">{user?.user_code}</p>
+              </div>
+              <div className="bg-gray-800/50 rounded-lg p-3">
+                <label className="text-xs text-gray-400">Referral Numarası</label>
+                <p className="font-semibold text-yellow-400">REF-{user?.user_code || '000000'}</p>
+              </div>
+            </div>
+            
+            {/* Action Buttons */}
+            <div className="flex space-x-3">
+              <Button 
+                onClick={() => setShowProfileModal(false)}
+                variant="outline"
+                className="flex-1 border-gray-600"
+              >
+                Bağla
+              </Button>
+              <Button 
+                onClick={handleLogout}
+                className="flex-1 bg-red-600 hover:bg-red-700"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Çıxış
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
@@ -1625,564 +1368,204 @@ const LoginForm = ({ onLogin, error, loading }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onLogin(email, password);
+    onLogin({ email, password });
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="bg-red-900/50 border border-red-600 rounded-lg p-3">
-          <p className="text-red-200 text-sm">{error}</p>
-        </div>
-      )}
-      
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          Email
+        </label>
         <Input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="bg-gray-800 border-gray-600 text-white"
+          placeholder="email@example.com"
           required
         />
       </div>
-      
+
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Şifrə</label>
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          Şifrə
+        </label>
         <Input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           className="bg-gray-800 border-gray-600 text-white"
+          placeholder="Şifrənizi daxil edin"
           required
         />
       </div>
-      
+
+      {error && (
+        <div className="text-red-400 text-sm text-center bg-red-900/20 p-2 rounded">
+          {error}
+        </div>
+      )}
+
       <Button
         type="submit"
         disabled={loading}
-        className="w-full bg-yellow-400 text-black hover:bg-yellow-500"
+        className="w-full bg-yellow-400 text-black hover:bg-yellow-500 disabled:opacity-50"
       >
-        {loading ? 'Gözləyin...' : 'Daxil Ol'}
+        {loading ? 'Gözləyin...' : 'Giriş Et'}
       </Button>
     </form>
   );
 };
 
-// Register Form Component - Mobile Enhanced
+// Register Form Component
 const RegisterForm = ({ onRegister, error, loading }) => {
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    confirmPassword: ''
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onRegister(name, email, password);
+    
+    if (formData.password !== formData.confirmPassword) {
+      return;
+    }
+    
+    onRegister({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password
+    });
+  };
+
+  const handleChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {error && (
-        <div className="bg-red-900/50 border border-red-600 rounded-lg p-3">
-          <p className="text-red-200 text-sm">{error}</p>
-        </div>
-      )}
-      
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Ad Soyad</label>
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          Ad və Soyad
+        </label>
         <Input
           type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white w-full"
-          placeholder="Ad Soyad"
-          autoComplete="name"
+          value={formData.name}
+          onChange={(e) => handleChange('name', e.target.value)}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="Adınız və soyadınız"
           required
         />
       </div>
-      
+
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Email</label>
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          Email
+        </label>
         <Input
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white w-full"
+          value={formData.email}
+          onChange={(e) => handleChange('email', e.target.value)}
+          className="bg-gray-800 border-gray-600 text-white"
           placeholder="email@example.com"
-          autoComplete="email"
           required
         />
       </div>
-      
+
       <div>
-        <label className="block text-sm font-medium text-gray-300 mb-2">Şifrə</label>
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          Şifrə
+        </label>
         <Input
           type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          className="bg-gray-800 border-gray-600 text-white w-full"
-          placeholder="••••••••"
-          autoComplete="new-password"
+          value={formData.password}
+          onChange={(e) => handleChange('password', e.target.value)}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="Güclü şifrə seçin"
           required
         />
       </div>
-      
+
+      <div>
+        <label className="block text-sm font-medium text-gray-300 mb-2">
+          Şifrə Təkrarı
+        </label>
+        <Input
+          type="password"
+          value={formData.confirmPassword}
+          onChange={(e) => handleChange('confirmPassword', e.target.value)}
+          className="bg-gray-800 border-gray-600 text-white"
+          placeholder="Şifrəni təkrar edin"
+          required
+        />
+      </div>
+
+      {formData.password && formData.confirmPassword && formData.password !== formData.confirmPassword && (
+        <div className="text-red-400 text-sm text-center">
+          Şifrələr uyğun gəlmir
+        </div>
+      )}
+
+      {error && (
+        <div className="text-red-400 text-sm text-center bg-red-900/20 p-2 rounded">
+          {error}
+        </div>
+      )}
+
       <Button
         type="submit"
-        disabled={loading || !name.trim() || !email.trim() || !password.trim()}
-        className="w-full bg-yellow-400 text-black hover:bg-yellow-500 py-3 text-base font-semibold disabled:opacity-50"
+        disabled={loading || formData.password !== formData.confirmPassword}
+        className="w-full bg-yellow-400 text-black hover:bg-yellow-500 disabled:opacity-50"
       >
-        {loading ? (
-          <div className="flex items-center justify-center">
-            <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2"></div>
-            Qeydiyyat edilir...
-          </div>
-        ) : (
-          'Qeydiyyat'
-        )}
+        {loading ? 'Gözləyin...' : 'Qeydiyyatdan Keç - 50 AZN Bonus'}
       </Button>
-      
-      <div className="text-center">
-        <p className="text-gray-400 text-sm">
-          🎁 Qeydiyyatdan sonra 50 AZN bonus alacaqsınız!
-        </p>
-      </div>
     </form>
   );
 };
 
-// Transaction Manager Component - Enhanced Mobile
-const TransactionManager = ({ user, token, onTransactionUpdate, showNotification }) => {
-  const [activeTransactionTab, setActiveTransactionTab] = useState('deposit');
-  const [amount, setAmount] = useState('');
-  const [cardName, setCardName] = useState('');
-  const [cardNumber, setCardNumber] = useState('');
-  const [bankName, setBankName] = useState('');
-  const [receipt, setReceipt] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  // Bank options
-  const bankOptions = [
-    'Kapital Bank', 'Rabitəbank', 'Unibank', 'AccessBank', 'Paşa Bank',
-    'Bank of Baku', 'Xalq Bank', 'AMAY Bank', 'Express Bank', 'Digər'
-  ];
-
-  const handleDeposit = async (e) => {
-    e.preventDefault();
-    
-    if (!amount || !cardName || !cardNumber || !bankName) {
-      showNotification('❌ Bütün sahələri doldurun', 'error');
-      return;
-    }
-
-    const amountNum = parseFloat(amount);
-    if (amountNum < 50 || amountNum > 2000) {
-      showNotification('❌ Depozit məbləği 50-2000 AZN arası olmalıdır', 'error');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      console.log('📤 Depozit sorğusu göndərilir...', {
-        amount: amountNum,
-        cardName,
-        cardNumber,
-        bankName
-      });
-
-      // First create transaction
-      const response = await axios.post(`${API_BASE_URL}/api/transactions`, {
-        type: 'deposit',
-        amount: amountNum,
-        card_name: cardName,
-        card_number: cardNumber,
-        bank_name: bankName
-      }, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000
-      });
-
-      // Then upload receipt if provided
-      if (receipt) {
-        const formData = new FormData();
-        formData.append('file', receipt);
-        
-        await axios.post(`${API_BASE_URL}/api/transactions/${response.data.id}/upload-receipt`, formData, {
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'multipart/form-data'
-          },
-          timeout: 30000
-        });
-      }
-
-      // Clear form
-      setAmount('');
-      setCardName('');
-      setCardNumber('');
-      setBankName('');
-      setReceipt(null);
-      
-      onTransactionUpdate();
-      showNotification('✅ Depozit sorğusu uğurla göndərildi! Admin tərəfindən yoxlanılacaq.', 'success');
-    } catch (error) {
-      console.error('Depozit xətası:', error);
-      showNotification(error.response?.data?.detail || '❌ Depozit zamanı xəta baş verdi', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleWithdraw = async (e) => {
-    e.preventDefault();
-    
-    if (!amount || !cardName || !cardNumber || !bankName) {
-      showNotification('❌ Bütün sahələri doldurun', 'error');
-      return;
-    }
-
-    const amountNum = parseFloat(amount);
-    if (amountNum < 500 || amountNum > 6500) {
-      showNotification('❌ Çıxarış məbləği 500-6500 AZN arası olmalıdır', 'error');
-      return;
-    }
-
-    if (user?.total_earned < amountNum) {
-      showNotification(`❌ Qazancınız kifayət etmir. Çəkiləbilir qazanc: ${formatAmount(user.total_earned || 0)} AZN`, 'error');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      console.log('📤 Çıxarış sorğusu göndərilir...', {
-        amount: amountNum,
-        cardName,
-        bankName
-      });
-
-      await axios.post(`${API_BASE_URL}/api/transactions`, {
-        type: 'withdraw',  // Fixed: backend expects 'withdraw' not 'withdrawal'
-        amount: amountNum,
-        card_name: cardName,
-        card_number: cardNumber,
-        bank_name: bankName
-      }, {
-        headers: { 
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        timeout: 30000
-      });
-
-      // Clear form
-      setAmount('');
-      setCardName('');
-      setCardNumber('');
-      setBankName('');
-      
-      onTransactionUpdate();
-      showNotification('✅ Çıxarışınız uğurlu! 30 dəqiqə hesabınıza köçürüləcəkdir.', 'success');
-    } catch (error) {
-      console.error('Çıxarış xətası:', error);
-      showNotification(error.response?.data?.detail || '❌ Çıxarış zamanı xəta baş verdi', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div className="max-w-2xl mx-auto space-y-4">
-      {/* Enhanced Form with Mobile Support */}
-      <Card className="bg-gray-900 border-gray-700 p-4 sm:p-6">
-        <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">💰 Maliyyə Əməliyyatları</h2>
-        
-        {/* Enhanced Balance Display - Separated */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
-          <div className="bg-gradient-to-r from-blue-900/50 to-blue-700/50 border border-blue-600 rounded-lg p-4 text-center">
-            <p className="text-sm text-gray-300 mb-1">Depozit Balansı</p>
-            <p className="text-xl sm:text-2xl font-bold text-blue-400">
-              {formatAmount(user?.balance || 0)} AZN
-            </p>
-            <p className="text-xs text-gray-400">Paket alımı üçün</p>
-          </div>
-          
-          <div className="bg-gradient-to-r from-green-900/50 to-green-700/50 border border-green-600 rounded-lg p-4 text-center">
-            <p className="text-sm text-gray-300 mb-1">Çəkiləbilir Qazanc</p>
-            <p className="text-xl sm:text-2xl font-bold text-green-400">
-              {formatAmount(user?.total_earned || 0)} AZN
-            </p>
-            <p className="text-xs text-gray-400">Çıxarış üçün</p>
-          </div>
-        </div>
-        
-        <Tabs value={activeTransactionTab} onValueChange={setActiveTransactionTab}>
-          <TabsList className="bg-gray-800 mb-6 w-full">
-            <TabsTrigger value="deposit" className="data-[state=active]:bg-green-600 flex-1">
-              💰 Depozit
-            </TabsTrigger>
-            <TabsTrigger value="withdraw" className="data-[state=active]:bg-blue-600 flex-1">
-              🏦 Çıxarış
-            </TabsTrigger>
-            <TabsTrigger value="tracking" className="data-[state=active]:bg-yellow-600 flex-1">
-              📊 Əməliyyatlar
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="deposit">
-            <form onSubmit={handleDeposit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    💵 Məbləğ (50-2000 AZN)
-                  </label>
-                  <Input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    min="50"
-                    max="2000"
-                    className="bg-gray-800 border-gray-600 text-white text-lg text-center"
-                    placeholder="Məbləğ"
-                    required
-                  />
-                  <div className="text-xs text-gray-400 mt-1">Minimum: 50 AZN, Maksimum: 2000 AZN</div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    🏦 Bank Seçin
-                  </label>
-                  <select
-                    value={bankName}
-                    onChange={(e) => setBankName(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-600 text-white rounded-md px-3 py-2"
-                    required
-                  >
-                    <option value="">Bank seçin...</option>
-                    {bankOptions.map((bank) => (
-                      <option key={bank} value={bank}>{bank}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  👤 Ad Soyad (Kart sahibi)
-                </label>
-                <Input
-                  type="text"
-                  value={cardName}
-                  onChange={(e) => setCardName(e.target.value)}
-                  className="bg-gray-800 border-gray-600 text-white"
-                  placeholder="Kart sahibinin ad soyadı"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  💳 Kart Nömrəsi
-                </label>
-                <Input
-                  type="text"
-                  value={cardNumber}
-                  onChange={(e) => {
-                    // Format card number
-                    const formatted = e.target.value.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');
-                    setCardNumber(formatted);
-                  }}
-                  className="bg-gray-800 border-gray-600 text-white text-center tracking-wider"
-                  placeholder="1234 5678 9012 3456"
-                  maxLength="19"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  📄 Dekont (JPG, PNG, PDF)
-                </label>
-                <Input
-                  type="file"
-                  onChange={(e) => setReceipt(e.target.files[0])}
-                  accept=".jpg,.jpeg,.png,.pdf"
-                  className="bg-gray-800 border-gray-600 text-white"
-                  required
-                />
-                <div className="text-xs text-gray-400 mt-1">Ödəniş dekontunu yükləyin</div>
-              </div>
-              
-              <Button 
-                type="submit" 
-                disabled={loading}
-                className="w-full bg-green-600 hover:bg-green-700 py-3 text-lg font-semibold disabled:opacity-50"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Göndərilir...
-                  </div>
-                ) : (
-                  <>
-                    <DollarSign className="w-5 h-5 mr-2" />
-                    Depozit Et
-                  </>
-                )}
-              </Button>
-            </form>
-          </TabsContent>
-
-          <TabsContent value="withdraw">
-            <form onSubmit={handleWithdraw} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    💵 Məbləğ (500-6500 AZN)
-                  </label>
-                  <Input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    min="500"
-                    max="6500"
-                    className="bg-gray-800 border-gray-600 text-white text-lg text-center"
-                    placeholder="Məbləğ"
-                    required
-                  />
-                  <div className="text-xs text-gray-400 mt-1">Minimum: 500 AZN, Maksimum: 6500 AZN</div>
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">
-                    🏦 Bank Seçin
-                  </label>
-                  <select
-                    value={bankName}
-                    onChange={(e) => setBankName(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-600 text-white rounded-md px-3 py-2"
-                    required
-                  >
-                    <option value="">Bank seçin...</option>
-                    {bankOptions.map((bank) => (
-                      <option key={bank} value={bank}>{bank}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  👤 Ad Soyad (Kart sahibi)
-                </label>
-                <Input
-                  type="text"
-                  value={cardName}
-                  onChange={(e) => setCardName(e.target.value)}
-                  className="bg-gray-800 border-gray-600 text-white"
-                  placeholder="Kart sahibinin ad soyadı"
-                  required
-                />
-              </div>
-              
-              <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">
-                  💳 Kart Nömrəsi
-                </label>
-                <Input
-                  type="text"
-                  value={cardNumber}
-                  onChange={(e) => {
-                    // Format card number
-                    const formatted = e.target.value.replace(/\D/g, '').replace(/(\d{4})(?=\d)/g, '$1 ');
-                    setCardNumber(formatted);
-                  }}
-                  className="bg-gray-800 border-gray-600 text-white text-center tracking-wider"
-                  placeholder="1234 5678 9012 3456"
-                  maxLength="19"
-                  required
-                />
-              </div>
-              
-              <Button 
-                type="submit" 
-                disabled={loading || (user?.balance < parseFloat(amount || 0))}
-                className="w-full bg-blue-600 hover:bg-blue-700 py-3 text-lg font-semibold disabled:opacity-50"
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
-                    Göndərilir...
-                  </div>
-                ) : (
-                  <>
-                    <DollarSign className="w-5 h-5 mr-2" />
-                    Çıxarış Et
-                  </>
-                )}
-              </Button>
-              
-              {user?.balance < parseFloat(amount || 0) && amount && (
-                <div className="bg-red-900/50 border border-red-600 rounded-lg p-3">
-                  <p className="text-red-200 text-sm text-center">
-                    ⚠️ Balansınız kifayət etmir
-                  </p>
-                </div>
-              )}
-            </form>
-          </TabsContent>
-        </Tabs>
-      </Card>
-    </div>
-  );
-};
-
-// Company Information Component for all pages
-const CompanyInfo = ({ className = "" }) => {
-  return (
-    <Card className={`bg-gradient-to-br from-yellow-900/30 to-orange-900/30 border-yellow-600/50 p-4 ${className}`}>
-      <div className="text-center space-y-3">
-        <div className="flex items-center justify-center space-x-2">
-          <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-          <h3 className="text-lg font-bold text-yellow-400">🏢 InvestAZ</h3>
-          <div className="w-2 h-2 bg-yellow-500 rounded-full animate-pulse"></div>
-        </div>
-        
-        <div className="space-y-2">
-          <Badge className="bg-yellow-600 text-white font-semibold px-3 py-1">
-            ⭐ 2007-ci ildən işləyir
-          </Badge>
-          <p className="text-yellow-300 font-semibold text-sm">
-            🎯 Azərbaycanda ən <span className="text-yellow-400 font-bold">uğurlu</span> investisiya şirkəti
-          </p>
-          <div className="grid grid-cols-3 gap-2 mt-3">
-            <div className="text-center bg-yellow-900/30 rounded p-2">
-              <div className="font-bold text-yellow-400 text-sm">18 il</div>
-              <div className="text-yellow-300 text-xs">Təcrübə</div>
-            </div>
-            <div className="text-center bg-yellow-900/30 rounded p-2">
-              <div className="font-bold text-green-400 text-sm">25,000+</div>
-              <div className="text-yellow-300 text-xs">Müştəri</div>
-            </div>
-            <div className="text-center bg-yellow-900/30 rounded p-2">
-              <div className="font-bold text-blue-400 text-sm">%99.9</div>
-              <div className="text-yellow-300 text-xs">Uğur</div>
-            </div>
-          </div>
-          <div className="flex justify-center space-x-2 mt-3">
-            <Badge className="bg-green-600 text-white text-xs">🛡️ Təhlükəsiz</Badge>
-            <Badge className="bg-blue-600 text-white text-xs">⚡ Sürətli</Badge>
-            <Badge className="bg-purple-600 text-white text-xs">💎 Güvənilir</Badge>
-          </div>
-        </div>
+// Company Information Component
+const CompanyInfo = ({ className = "" }) => (
+  <Card className={`bg-gray-900 border-gray-700 p-6 ${className}`}>
+    <div className="text-center">
+      <div className="text-4xl mb-4">🏢</div>
+      <h3 className="text-xl font-bold text-yellow-400 mb-4">InvestAZ Haqqında</h3>
+      <div className="space-y-4 text-sm text-gray-300">
+        <p>
+          <strong className="text-white">🌟 Azərbaycanın aparıcı investisiya platforması</strong>
+        </p>
+        <p>
+          <strong className="text-green-400">💰 50+ AZN qeydiyyat bonusu</strong> - Dərhal hesabınıza əlavə edilir
+        </p>
+        <p>
+          <strong className="text-blue-400">📊 3 fərqli investisiya paketi</strong> - Hər büdcəyə uyğun seçeneklər
+        </p>
+        <p>
+          <strong className="text-purple-400">⏰ 12 saatda bir qazanc toplama</strong> - Günde 2 dəfə gəlir
+        </p>
+        <p>
+          <strong className="text-yellow-400">🔒 Tam təhlükəsiz</strong> - Bank səviyyəsində təhlükəsizlik
+        </p>
+        <p>
+          <strong className="text-pink-400">🎯 Yüksək gəlir oranları</strong> - %300-450 illik gəlir
+        </p>
+        <p>
+          <strong className="text-indigo-400">📱 Mobil uyğun</strong> - İstənilən cihazdan giriş
+        </p>
+        <p>
+          <strong className="text-cyan-400">🚀 Sürətli çıxarışlar</strong> - 30 dəqiqə ərzində hesaba köçürülmə
+        </p>
       </div>
-    </Card>
-  );
-};
-
-export default EnhancedInvestmentPlatform;
+      
+      <div className="flex justify-center space-x-2 mt-3">
+        <Badge className="bg-green-600 text-white text-xs">🛡️ Təhlükəsiz</Badge>
+        <Badge className="bg-blue-600 text-white text-xs">⚡ Sürətli</Badge>
+        <Badge className="bg-purple-600 text-white text-xs">💎 Güvənilir</Badge>
+      </div>
+    </div>
+  </Card>
+);
 
 export default EnhancedInvestmentPlatform;
