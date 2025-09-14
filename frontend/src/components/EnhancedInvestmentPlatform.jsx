@@ -1139,7 +1139,11 @@ const EnhancedInvestmentPlatform = () => {
                     <div className="p-4 sm:p-6">
                       <div className="text-center mb-4 sm:mb-6">
                         <div className="text-4xl sm:text-5xl mb-3">{pkg.icon}</div>
-                        <h3 className="text-xl sm:text-2xl font-bold mb-2 text-white" style={{color: pkg.color}}>
+                        <h3 className="text-xl sm:text-2xl font-bold mb-2 text-white drop-shadow-lg" 
+                            style={{
+                              color: pkg.color,
+                              textShadow: `0 0 10px ${pkg.color}40`
+                            }}>
                           {pkg.name}
                         </h3>
                         <p className="text-gray-400 text-sm leading-relaxed mb-4">{pkg.description}</p>
