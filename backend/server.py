@@ -616,12 +616,13 @@ async def create_transaction(
         "transaction_id": transaction.id
     }))
     
-    # Send real-time update to user if balance changed
+    # Send real-time update to user if earnings changed
     if transaction_data.type == TransactionType.WITHDRAW:
         user_doc = await db.users.find_one({"id": current_user.id})
         await manager.send_to_user(current_user.id, json.dumps({
-            "type": "balance_update",
-            "new_balance": user_doc["balance"]
+            "type": "earnings_update",
+            "new_total_earned": user_doc["total_earned"],
+            "new_balance": user_doc["balance"]  # Send both for frontend sync
         }))
     
     return transaction
