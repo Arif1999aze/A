@@ -56,9 +56,15 @@ print("=" * 60)
 
 # Test data - Using realistic data as per requirements
 test_user_data = {
-    "email": "leyla.hasanova@gmail.com",
-    "name": "Leyla Hasanova",
+    "email": "aysel.mammadova@gmail.com",
+    "name": "Aysel Mammadova", 
     "password": "securepass123"
+}
+
+collection_test_user_data = {
+    "email": "collection.test.user@example.com",
+    "name": "Collection Test User",
+    "password": "testpass123"
 }
 
 admin_credentials = {
