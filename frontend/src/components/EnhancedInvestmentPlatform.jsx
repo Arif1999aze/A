@@ -1212,38 +1212,7 @@ const EnhancedInvestmentPlatform = () => {
           </div>
         </Card>
       </div>
-            </TabsTrigger>
-            <TabsTrigger 
-              value="transactions" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white text-xs sm:text-sm py-3 px-2 sm:px-4 font-medium"
-            >
-              <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Depozit
-            </TabsTrigger>
-            <TabsTrigger 
-              value="withdraw" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white text-xs sm:text-sm py-3 px-2 sm:px-4 font-medium"
-            >
-              <Activity className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Çıxarış
-            </TabsTrigger>
-            <TabsTrigger 
-              value="tracking" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-yellow-500 data-[state=active]:to-yellow-600 data-[state=active]:text-white text-xs sm:text-sm py-3 px-2 sm:px-4 font-medium"
-            >
-              <BarChart3 className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Tarixçə
-            </TabsTrigger>
-            <TabsTrigger 
-              value="market" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-pink-600 data-[state=active]:text-white text-xs sm:text-sm py-3 px-2 sm:px-4 font-medium"
-            >
-              <ShoppingCart className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
-              Market
-            </TabsTrigger>
-          </TabsList>
 
-      </div>
     </div>
   );
 };
