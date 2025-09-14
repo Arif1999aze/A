@@ -145,7 +145,7 @@ const AdminPanel = () => {
     setLoading(true);
     
     try {
-      console.log('🔐 Giriş cəhdi:', { username });
+      console.log('🔐 Admin girişi başladılır:', { username, apiUrl: API_BASE_URL });
       
       // Check credentials
       if (username !== 'batuhan' || password !== '18061999') {
@@ -156,10 +156,19 @@ const AdminPanel = () => {
       const response = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         email: 'admin@investaz.com',
         password: '18061999'
+      }, {
+        timeout: 10000, // 10 second timeout
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       
+      if (!response.data || !response.data.access_token) {
+        throw new Error('Token alınmadı');
+      }
+      
       const newToken = response.data.access_token;
-      console.log('🔑 Token alındı');
+      console.log('🔑 Token uğurla alındı');
       
       // Save token
       localStorage.setItem('admin_token', newToken);
@@ -173,8 +182,26 @@ const AdminPanel = () => {
       
     } catch (error) {
       console.error('❌ Giriş xətası:', error);
-      setLoginError(error.response?.data?.detail || error.message || 'Giriş xətası');
-      showNotification('❌ Giriş uğursuz', 'error');
+      
+      let errorMessage = 'Giriş xətası';
+      
+      if (error.code === 'ECONNREFUSED' || error.message.includes('Network Error')) {
+        errorMessage = 'Server ilə bağlantı xətası. Zəhmət olmasa bir qədər sonra cəhd edin.';
+      } else if (error.response?.status === 401) {
+        errorMessage = 'Yanlış istifadəçi adı və ya şifrə';
+      } else if (error.response?.status >= 500) {
+        errorMessage = 'Server xətası. Zəhmət olmasa bir qədər sonra cəhd edin.';
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+      
+      setLoginError(errorMessage);
+      showNotification(`❌ ${errorMessage}`, 'error');
+      
+      // Clear any stored tokens on error
+      localStorage.removeItem('admin_token');
+      setToken(null);
+      setIsLoggedIn(false);
     } finally {
       setLoading(false);
     }
