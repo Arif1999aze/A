@@ -1718,12 +1718,23 @@ const TransactionManager = ({ user, token, onTransactionUpdate, showNotification
       <Card className="bg-gray-900 border-gray-700 p-4 sm:p-6">
         <h2 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6 text-center">💰 Maliyyə Əməliyyatları</h2>
         
-        {/* Current Balance Display */}
-        <div className="bg-gradient-to-r from-green-900/50 to-blue-900/50 border border-green-600 rounded-lg p-4 mb-6 text-center">
-          <p className="text-sm text-gray-300 mb-1">Cari Balansınız</p>
-          <p className="text-2xl sm:text-3xl font-bold text-green-400">
-            {formatAmount(user?.balance || 0)} AZN
-          </p>
+        {/* Enhanced Balance Display - Separated */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+          <div className="bg-gradient-to-r from-blue-900/50 to-blue-700/50 border border-blue-600 rounded-lg p-4 text-center">
+            <p className="text-sm text-gray-300 mb-1">Depozit Balansı</p>
+            <p className="text-xl sm:text-2xl font-bold text-blue-400">
+              {formatAmount(user?.balance || 0)} AZN
+            </p>
+            <p className="text-xs text-gray-400">Paket alımı üçün</p>
+          </div>
+          
+          <div className="bg-gradient-to-r from-green-900/50 to-green-700/50 border border-green-600 rounded-lg p-4 text-center">
+            <p className="text-sm text-gray-300 mb-1">Çəkiləbilir Qazanc</p>
+            <p className="text-xl sm:text-2xl font-bold text-green-400">
+              {formatAmount(user?.total_earned || 0)} AZN
+            </p>
+            <p className="text-xs text-gray-400">Çıxarış üçün</p>
+          </div>
         </div>
         
         <Tabs value={activeTransactionTab} onValueChange={setActiveTransactionTab}>
