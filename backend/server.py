@@ -535,10 +535,10 @@ async def create_transaction(
             {"$inc": {"balance": -transaction_data.amount}}
         )
     
-    # Validate deposit amount limits
+    # Validate deposit amount limits - Updated per user requirements
     if transaction_data.type == TransactionType.DEPOSIT:
-        if transaction_data.amount < 50 or transaction_data.amount > 2500:
-            raise HTTPException(status_code=400, detail="Deposit amount must be between 50-2500 AZN")
+        if transaction_data.amount < 50 or transaction_data.amount > 2000:
+            raise HTTPException(status_code=400, detail="Deposit amount must be between 50-2000 AZN")
     
     transaction = Transaction(
         user_id=current_user.id,
