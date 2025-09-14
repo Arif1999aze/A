@@ -217,7 +217,13 @@ def test_collection_system():
     print("\n7️⃣ Testing immediate second collection (should fail)...")
     second_collect_response = make_request('POST', f'/packages/{package_id}/collect', headers=headers)
     
-    if not second_collect_response or second_collect_response.status_code != 400:
+    if not second_collect_response:
+        print("❌ Second collection request failed: No response")
+        return False
+    
+    print(f"   Second collection status: {second_collect_response.status_code}")
+    if second_collect_response.status_code != 400:
+        print(f"   Response body: {second_collect_response.text}")
         print("❌ Second collection should fail with 400 status")
         return False
     
