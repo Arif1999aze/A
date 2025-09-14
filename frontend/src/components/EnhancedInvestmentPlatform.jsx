@@ -768,21 +768,21 @@ const EnhancedInvestmentPlatform = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Dashboard Tab */}
+          {/* Dashboard Tab - Mobile Responsive */}
           <TabsContent value="dashboard">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Left Column - Package Details */}
-              <div className="lg:col-span-2 space-y-6">
-                <h2 className="text-2xl font-bold">Aktiv Paketləriniz</h2>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+              {/* Left Column - Package Details - Full width on mobile */}
+              <div className="lg:col-span-2 space-y-4 sm:space-y-6">
+                <h2 className="text-xl sm:text-2xl font-bold">Aktiv Paketləriniz</h2>
                 
                 {activePackages.length === 0 ? (
-                  <Card className="bg-gray-900 border-gray-700 p-8 text-center">
-                    <Package className="w-16 h-16 text-gray-600 mx-auto mb-4" />
-                    <h3 className="text-xl font-medium mb-2">Aktiv paketiniz yoxdur</h3>
-                    <p className="text-gray-400 mb-4">İnvestisiya etmək üçün paket seçin</p>
+                  <Card className="bg-gray-900 border-gray-700 p-6 sm:p-8 text-center">
+                    <Package className="w-12 h-12 sm:w-16 sm:h-16 text-gray-600 mx-auto mb-4" />
+                    <h3 className="text-lg sm:text-xl font-medium mb-2">Aktiv paketiniz yoxdur</h3>
+                    <p className="text-gray-400 mb-4 text-sm sm:text-base">İnvestisiya etmək üçün paket seçin</p>
                     <Button 
                       onClick={() => setActiveTab('packages')}
-                      className="bg-yellow-400 text-black hover:bg-yellow-500"
+                      className="bg-yellow-400 text-black hover:bg-yellow-500 w-full sm:w-auto"
                     >
                       Paket Seç
                     </Button>
@@ -796,46 +796,46 @@ const EnhancedInvestmentPlatform = () => {
                       
                       return (
                         <Card key={pkg.id} className={`bg-gradient-to-r ${packageDef.gradient} p-1 relative`}>
-                          <div className="bg-gray-900 rounded-lg p-6">
-                            {/* Package Header */}
-                            <div className="flex justify-between items-start mb-4">
+                          <div className="bg-gray-900 rounded-lg p-4 sm:p-6">
+                            {/* Package Header - Mobile Responsive */}
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start space-y-3 sm:space-y-0 mb-4">
                               <div className="flex items-center space-x-3">
-                                <div className="text-3xl">{packageDef.icon}</div>
+                                <div className="text-2xl sm:text-3xl">{packageDef.icon}</div>
                                 <div>
-                                  <h3 className="text-xl font-bold" style={{color: packageDef.color}}>
+                                  <h3 className="text-lg sm:text-xl font-bold" style={{color: packageDef.color}}>
                                     {packageDef.name} #{index + 1}
                                   </h3>
-                                  <p className="text-gray-400">İnvestisiya: {formatAmount(pkg.invested_amount)} AZN</p>
+                                  <p className="text-gray-400 text-sm">İnvestisiya: {formatAmount(pkg.invested_amount)} AZN</p>
                                 </div>
                               </div>
-                              <Badge className="bg-green-600 animate-pulse">
+                              <Badge className="bg-green-600 animate-pulse self-start">
                                 Aktiv
                               </Badge>
                             </div>
 
-                            {/* Package Stats */}
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                            {/* Package Stats - Mobile Grid */}
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-4">
                               <div className="text-center">
-                                <p className="text-sm text-gray-400">Toplam Qazanc</p>
-                                <p className="text-lg font-bold text-green-400">
+                                <p className="text-xs sm:text-sm text-gray-400">Toplam Qazanc</p>
+                                <p className="text-sm sm:text-lg font-bold text-green-400">
                                   {formatAmount(pkg.total_earned || 0)} AZN
                                 </p>
                               </div>
                               <div className="text-center">
-                                <p className="text-sm text-gray-400">Cari Qazanc</p>
-                                <p className="text-lg font-bold text-yellow-400">
+                                <p className="text-xs sm:text-sm text-gray-400">Cari Qazanc</p>
+                                <p className="text-sm sm:text-lg font-bold text-yellow-400">
                                   {formatAmount(pkg.accumulated_earnings || 0)} AZN
                                 </p>
                               </div>
                               <div className="text-center">
-                                <p className="text-sm text-gray-400">Qalan Vaxt</p>
-                                <p className="text-lg font-bold text-blue-400">
+                                <p className="text-xs sm:text-sm text-gray-400">Qalan Vaxt</p>
+                                <p className="text-sm sm:text-lg font-bold text-blue-400">
                                   {timeRemaining}
                                 </p>
                               </div>
                               <div className="text-center">
-                                <p className="text-sm text-gray-400">Gəlir %</p>
-                                <p className="text-lg font-bold text-purple-400">
+                                <p className="text-xs sm:text-sm text-gray-400">Gəlir %</p>
+                                <p className="text-sm sm:text-lg font-bold text-purple-400">
                                   %{(progress).toFixed(1)}
                                 </p>
                               </div>
@@ -843,22 +843,22 @@ const EnhancedInvestmentPlatform = () => {
 
                             {/* Progress Bar */}
                             <div className="mb-4">
-                              <div className="flex justify-between text-sm mb-2">
+                              <div className="flex justify-between text-xs sm:text-sm mb-2">
                                 <span>Tamamlanma</span>
                                 <span>{progress.toFixed(1)}%</span>
                               </div>
                               <Progress value={progress} className="h-2" />
                             </div>
 
-                            {/* Collection Button */}
-                            <div className="flex justify-between items-center">
-                              <div className="text-sm text-gray-400">
+                            {/* Collection Button - Mobile Responsive */}
+                            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
+                              <div className="text-xs sm:text-sm text-gray-400">
                                 Son toplama: {pkg.last_collection ? new Date(pkg.last_collection).toLocaleString() : 'Heç vaxt'}
                               </div>
                               <Button
                                 onClick={() => handleCollectEarnings(pkg.id)}
                                 disabled={!pkg.can_collect || pkg.accumulated_earnings <= 0}
-                                className="bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                                className="bg-green-600 hover:bg-green-700 disabled:opacity-50 w-full sm:w-auto"
                               >
                                 <Coins className="w-4 h-4 mr-2" />
                                 Qazanc Topla ({formatAmount(pkg.accumulated_earnings || 0)} AZN)
@@ -872,27 +872,27 @@ const EnhancedInvestmentPlatform = () => {
                 )}
               </div>
 
-              {/* Right Column - Live Data */}
-              <div className="space-y-6">
-                {/* Live Transactions */}
+              {/* Right Column - Live Data - Mobile adjusted */}
+              <div className="space-y-4 sm:space-y-6">
+                {/* Live Transactions - Mobile Responsive */}
                 <Card className="bg-gray-900 border-gray-700 p-4">
-                  <h3 className="text-lg font-bold mb-4 flex items-center">
+                  <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 flex items-center">
                     <div className="w-3 h-3 bg-red-500 rounded-full animate-pulse mr-2"></div>
-                    Canlı Əməliyyatlar
+                    <span className="text-sm sm:text-base">Canlı Əməliyyatlar</span>
                   </h3>
-                  <div className="space-y-2 max-h-64 overflow-y-auto">
+                  <div className="space-y-2 max-h-48 sm:max-h-64 overflow-y-auto">
                     {liveTransactions.map((transaction) => (
                       <div key={transaction.id} className="bg-gray-800 rounded p-2 text-sm">
                         <div className="flex justify-between items-center">
-                          <span className="font-medium">{transaction.name}</span>
-                          <Badge size="sm" className={
+                          <span className="font-medium text-xs sm:text-sm truncate">{transaction.name}</span>
+                          <Badge size="sm" className={`text-xs ${
                             transaction.type === 'depozit' ? 'bg-blue-600' :
                             transaction.type === 'qazanc' ? 'bg-green-600' : 'bg-purple-600'
-                          }>
+                          }`}>
                             {transaction.type}
                           </Badge>
                         </div>
-                        <div className="flex justify-between text-xs text-gray-400">
+                        <div className="flex justify-between text-xs text-gray-400 mt-1">
                           <span>{formatAmount(transaction.amount)} AZN</span>
                           <span>{transaction.timestamp.toLocaleTimeString()}</span>
                         </div>
@@ -901,24 +901,24 @@ const EnhancedInvestmentPlatform = () => {
                   </div>
                 </Card>
 
-                {/* Pending Transactions */}
+                {/* Pending Transactions - Mobile Responsive */}
                 {pendingTransactions.length > 0 && (
                   <Card className="bg-gray-900 border-gray-700 p-4">
-                    <h3 className="text-lg font-bold mb-4 flex items-center">
-                      <Clock className="w-5 h-5 mr-2 text-yellow-400" />
-                      Gözləyən Əməliyyatlar ({pendingTransactions.length})
+                    <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 flex items-center">
+                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-yellow-400" />
+                      <span className="text-sm sm:text-base">Gözləyən Əməliyyatlar ({pendingTransactions.length})</span>
                     </h3>
                     <div className="space-y-2">
                       {pendingTransactions.map((transaction) => (
                         <div key={transaction.id} className="bg-gray-800 rounded p-3">
                           <div className="flex justify-between items-center">
                             <div>
-                              <Badge className={transaction.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'}>
+                              <Badge className={`text-xs ${transaction.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'}`}>
                                 {transaction.type === 'deposit' ? 'Depozit' : 'Çıxarış'}
                               </Badge>
-                              <p className="font-bold mt-1">{formatAmount(transaction.amount)} AZN</p>
+                              <p className="font-bold mt-1 text-sm">{formatAmount(transaction.amount)} AZN</p>
                             </div>
-                            <Badge variant="outline" className="border-yellow-600 text-yellow-400">
+                            <Badge variant="outline" className="border-yellow-600 text-yellow-400 text-xs">
                               Gözləyir
                             </Badge>
                           </div>
@@ -931,26 +931,26 @@ const EnhancedInvestmentPlatform = () => {
                   </Card>
                 )}
 
-                {/* Quick Stats */}
+                {/* Quick Stats - Mobile Responsive */}
                 <Card className="bg-gray-900 border-gray-700 p-4">
-                  <h3 className="text-lg font-bold mb-4">Statistika</h3>
-                  <div className="space-y-3">
+                  <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Statistika</h3>
+                  <div className="space-y-2 sm:space-y-3">
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Toplam İnvestisiya:</span>
-                      <span className="font-bold text-blue-400">{formatAmount(user?.total_invested || 0)} AZN</span>
+                      <span className="text-gray-400 text-xs sm:text-sm">Toplam İnvestisiya:</span>
+                      <span className="font-bold text-blue-400 text-xs sm:text-sm">{formatAmount(user?.total_invested || 0)} AZN</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Toplam Qazanc:</span>
-                      <span className="font-bold text-green-400">{formatAmount(user?.total_earned || 0)} AZN</span>
+                      <span className="text-gray-400 text-xs sm:text-sm">Toplam Qazanc:</span>
+                      <span className="font-bold text-green-400 text-xs sm:text-sm">{formatAmount(user?.total_earned || 0)} AZN</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Aktiv Paketlər:</span>
-                      <span className="font-bold text-purple-400">{activePackages.length}</span>
+                      <span className="text-gray-400 text-xs sm:text-sm">Aktiv Paketlər:</span>
+                      <span className="font-bold text-purple-400 text-xs sm:text-sm">{activePackages.length}</span>
                     </div>
                     <Separator />
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Cari Balans:</span>
-                      <span className="font-bold text-yellow-400">{formatAmount(user?.balance || 0)} AZN</span>
+                      <span className="text-gray-400 text-xs sm:text-sm">Cari Balans:</span>
+                      <span className="font-bold text-yellow-400 text-sm sm:text-base">{formatAmount(user?.balance || 0)} AZN</span>
                     </div>
                   </div>
                 </Card>
