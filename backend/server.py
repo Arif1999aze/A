@@ -581,13 +581,14 @@ async def create_transaction(
         if transaction_data.amount < 500 or transaction_data.amount > 6500:
             raise HTTPException(status_code=400, detail="Withdrawal amount must be between 500-6500 AZN")
         
-        if current_user.balance < transaction_data.amount:
-            raise HTTPException(status_code=400, detail="Insufficient balance")
+        # Check if user has enough earnings (not balance)
+        if current_user.total_earned < transaction_data.amount:
+            raise HTTPException(status_code=400, detail="Insufficient earnings for withdrawal")
         
-        # Deduct from balance immediately
+        # Deduct from total_earned (not balance)
         await db.users.update_one(
             {"id": current_user.id},
-            {"$inc": {"balance": -transaction_data.amount}}
+            {"$inc": {"total_earned": -transaction_data.amount}}
         )
     
     # Validate deposit amount limits - Updated per user requirements
