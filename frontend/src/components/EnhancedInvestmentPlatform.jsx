@@ -107,8 +107,8 @@ const EnhancedInvestmentPlatform = () => {
     }
   };
 
-  // Market items
-  const marketItems = [
+  // Market items definition
+  const marketItemsDefinition = [
     {
       id: 1,
       name: "Premium Hesab",
