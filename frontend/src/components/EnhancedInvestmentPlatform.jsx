@@ -638,13 +638,50 @@ const EnhancedInvestmentPlatform = () => {
       await axios.post(`${API_BASE_URL}/api/packages/${packageId}/collect`, {}, {
         headers: { Authorization: `Bearer ${token}` }
       });
+  // Handle collect earnings with improved error handling
+  const handleCollectEarnings = async (packageId) => {
+    console.log('Collecting earnings for package:', packageId);
+    
+    if (!packageId) {
+      showNotification('❌ Paket ID tapılmadı', 'error');
+      return;
+    }
+
+    try {
+      const response = await axios.post(
+        `${API_BASE_URL}/api/packages/${packageId}/collect`, 
+        {},
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          timeout: 10000 // 10 second timeout
+        }
+      );
+
+      console.log('Collection response:', response.data);
       
+      // Update user data to reflect new balance and earnings
       await fetchUserData();
-      showNotification('✅ Qazanc çəkiləbilir balansa əlavə edildi!', 'success');
+      
+      showNotification(`✅ ${formatAmount(response.data.collected_amount)} AZN qazanc toplandı!`, 'success');
       
     } catch (error) {
-      showNotification(error.response?.data?.detail || '❌ Qazanc toplama xətası', 'error');
+      console.error('Collection error:', error);
+      
+      if (error.response?.status === 400) {
+        // Cooldown error - show remaining time
+        showNotification(error.response?.data?.detail || '❌ Qazanc toplama xətası', 'error');
+      } else if (error.response?.status === 404) {
+        showNotification('❌ Paket tapılmadı', 'error');
+      } else if (error.code === 'ECONNABORTED') {
+        showNotification('❌ Bağlantı timeout oldu', 'error');
+      } else {
+        showNotification(error.response?.data?.detail || '❌ Qazanc toplama xətası', 'error');
+      }
     }
+  };
   };
 
   // Check if earnings can be collected (12-hour cooldown)
