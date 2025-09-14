@@ -943,36 +943,6 @@ const EnhancedInvestmentPlatform = () => {
                   </div>
                 </Card>
 
-                {/* Pending Transactions - Mobile Responsive */}
-                {pendingTransactions.length > 0 && (
-                  <Card className="bg-gray-900 border-gray-700 p-4">
-                    <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4 flex items-center">
-                      <Clock className="w-4 h-4 sm:w-5 sm:h-5 mr-2 text-yellow-400" />
-                      <span className="text-sm sm:text-base">Gözləyən Əməliyyatlar ({pendingTransactions.length})</span>
-                    </h3>
-                    <div className="space-y-2">
-                      {pendingTransactions.map((transaction) => (
-                        <div key={transaction.id} className="bg-gray-800 rounded p-3">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <Badge className={`text-xs ${transaction.type === 'deposit' ? 'bg-green-600' : 'bg-blue-600'}`}>
-                                {transaction.type === 'deposit' ? 'Depozit' : 'Çıxarış'}
-                              </Badge>
-                              <p className="font-bold mt-1 text-sm">{formatAmount(transaction.amount)} AZN</p>
-                            </div>
-                            <Badge variant="outline" className="border-yellow-600 text-yellow-400 text-xs">
-                              Gözləyir
-                            </Badge>
-                          </div>
-                          <p className="text-xs text-gray-400 mt-2">
-                            {new Date(transaction.created_date).toLocaleString()}
-                          </p>
-                        </div>
-                      ))}
-                    </div>
-                  </Card>
-                )}
-
                 {/* Quick Stats - Mobile Responsive */}
                 <Card className="bg-gray-900 border-gray-700 p-4">
                   <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">Statistika</h3>
