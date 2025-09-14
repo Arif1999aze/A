@@ -344,14 +344,16 @@ async def login_user(user_data: UserLogin):
         # Create or get admin user
         admin_user = await db.users.find_one({"email": "admin@investaz.com"})
         if not admin_user:
-            # Create admin user
+            # Create admin user with proper fields
             admin_user_obj = User(
                 email="admin@investaz.com",
-                name="Admin",
+                name="Admin Batuhan",
                 password_hash=get_password_hash("18061999"),
                 user_code="ADMIN001",
                 balance=0.0,
-                is_admin=True
+                is_admin=True,
+                total_invested=0.0,
+                total_earned=0.0
             )
             await db.users.insert_one(admin_user_obj.dict())
             admin_user = admin_user_obj.dict()
