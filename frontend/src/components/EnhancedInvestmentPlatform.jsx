@@ -384,7 +384,7 @@ const EnhancedInvestmentPlatform = () => {
       setShowRegister(false);
       
       await fetchUserData();
-      showNotification('🎉 Qeydiyyat uğurlu! 10 AZN bonus əlavə edildi!', 'success');
+      showNotification('🎉 Qeydiyyat uğurlu! 50 AZN bonus əlavə edildi!', 'success');
     } catch (error) {
       setRegisterError(error.response?.data?.detail || 'Qeydiyyat xətası');
     } finally {
