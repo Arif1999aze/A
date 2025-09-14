@@ -116,6 +116,13 @@ if collect_response:
     
     if collect_response.status_code == 200:
         print("✅ Collection successful!")
+    elif collect_response.status_code == 400:
+        print("❌ Collection failed - validation error")
+        try:
+            error_data = collect_response.json()
+            print(f"Error details: {error_data}")
+        except:
+            pass
     else:
         print("❌ Collection failed")
 else:
