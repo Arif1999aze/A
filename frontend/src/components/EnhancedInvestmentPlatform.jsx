@@ -652,36 +652,47 @@ const EnhancedInvestmentPlatform = () => {
         ))}
       </div>
 
-      {/* Header */}
+      {/* Header - Mobile Responsive */}
       <div className="border-b border-gray-800 bg-gray-900/50 backdrop-blur">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-yellow-400">InvestAZ</h1>
-              <Badge className="bg-purple-600">
+        <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-3 sm:space-y-0">
+            <div className="flex items-center justify-between sm:justify-start space-x-4">
+              <h1 className="text-xl sm:text-2xl font-bold text-yellow-400">InvestAZ</h1>
+              <Badge className="bg-purple-600 text-xs">
                 {user?.user_code}
               </Badge>
             </div>
             
-            <div className="flex items-center space-x-6">
-              <div className="text-right">
-                <p className="text-sm text-gray-400">Balans</p>
-                <p className="text-xl font-bold text-green-400">{formatAmount(user?.balance || 0)} AZN</p>
+            {/* Balance Info - Stack on mobile */}
+            <div className="flex justify-between sm:justify-end items-center space-x-4 sm:space-x-6">
+              <div className="text-center sm:text-right">
+                <p className="text-xs sm:text-sm text-gray-400">Balans</p>
+                <p className="text-lg sm:text-xl font-bold text-green-400">{formatAmount(user?.balance || 0)} AZN</p>
               </div>
               
-              <div className="text-right">
-                <p className="text-sm text-gray-400">Toplam Qazanc</p>
-                <p className="text-lg font-bold text-yellow-400">{formatAmount(user?.total_earned || 0)} AZN</p>
+              <div className="text-center sm:text-right">
+                <p className="text-xs sm:text-sm text-gray-400">Toplam Qazanc</p>
+                <p className="text-sm sm:text-lg font-bold text-yellow-400">{formatAmount(user?.total_earned || 0)} AZN</p>
               </div>
 
               <Button 
                 onClick={handleLogout}
                 variant="outline" 
                 size="sm"
-                className="border-red-600 text-red-400"
+                className="border-red-600 text-red-400 hidden sm:flex"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Çıxış
+              </Button>
+              
+              {/* Mobile logout */}
+              <Button 
+                onClick={handleLogout}
+                variant="outline" 
+                size="sm"
+                className="border-red-600 text-red-400 sm:hidden px-2"
+              >
+                <LogOut className="w-4 h-4" />
               </Button>
             </div>
           </div>
