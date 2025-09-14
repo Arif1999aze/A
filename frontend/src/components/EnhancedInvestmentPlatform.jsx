@@ -30,6 +30,11 @@ const EnhancedInvestmentPlatform = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [showTrackingModal, setShowTrackingModal] = useState(false);
+  const [showMarketModal, setShowMarketModal] = useState(false);
+  const [showDropdownMenu, setShowDropdownMenu] = useState(false);
   const [loginError, setLoginError] = useState('');
   const [registerError, setRegisterError] = useState('');
 
