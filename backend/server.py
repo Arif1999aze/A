@@ -483,7 +483,7 @@ async def collect_earnings(package_id: str, current_user: User = Depends(get_cur
     if not package.get("is_active", False):
         raise HTTPException(status_code=400, detail="Package is not active")
     
-    # Check 30-minute cooldown
+    # Check 12-hour cooldown (gunun 2 dəfə)
     now = datetime.utcnow()
     last_collection = package.get("last_collection_time")
     
@@ -492,11 +492,11 @@ async def collect_earnings(package_id: str, current_user: User = Depends(get_cur
         cooldown_remaining = timedelta(minutes=COLLECTION_COOLDOWN_MINUTES) - time_since_last
         
         if cooldown_remaining.total_seconds() > 0:
-            minutes_remaining = int(cooldown_remaining.total_seconds() / 60)
-            seconds_remaining = int(cooldown_remaining.total_seconds() % 60)
+            hours_remaining = int(cooldown_remaining.total_seconds() / 3600)
+            minutes_remaining = int((cooldown_remaining.total_seconds() % 3600) / 60)
             raise HTTPException(
                 status_code=400, 
-                detail=f"Cooldown active. Wait {minutes_remaining} minutes {seconds_remaining} seconds"
+                detail=f"Cooldown active. Wait {hours_remaining} hours {minutes_remaining} minutes"
             )
     
     if package["accumulated_earnings"] < 0.01:
