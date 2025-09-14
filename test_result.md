@@ -109,13 +109,16 @@
     implemented: true
     working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
         - working: false
         - agent: "main"
         - comment: "✅ IMPLEMENTED: Changed COLLECTION_COOLDOWN_MINUTES from 20 to 720 (12 hours). Updated error messages to show hours and minutes instead of minutes and seconds. System now supports 2 collections per day as requested."
+        - working: false
+        - agent: "testing"
+        - comment: "❌ CRITICAL ISSUE FOUND: The 12-hour collection system implementation has a major problem - the /api/packages/{package_id}/collect endpoint is timing out instead of returning proper responses. DETAILED FINDINGS: 1) ✅ COLLECTION_COOLDOWN_MINUTES correctly set to 720 (12 hours), 2) ✅ Collection status endpoint (/api/packages/{package_id}/collection-status) working correctly and returns proper cooldown information, 3) ✅ New packages correctly start with null last_collection_time, 4) ✅ Error message format updated to show hours and minutes, 5) ❌ CRITICAL: Collection endpoint (/api/packages/{package_id}/collect) times out on all requests instead of returning 200 (success) or 400 (validation errors like 'No earnings to collect' or cooldown active). TECHNICAL ANALYSIS: The timeout occurs even when packages have accumulated earnings and collection status shows can_collect=true. The issue appears to be in the collection endpoint implementation, possibly related to WebSocket manager calls (manager.send_to_user) or database operations. The endpoint should return proper HTTP responses but instead causes request timeouts. ROOT CAUSE: Likely blocking operation in collection endpoint preventing proper response. IMPACT: Users cannot collect earnings at all, making the 12-hour collection system non-functional despite correct configuration."
 
   - task: "Remove lisenziya references from backend"
     implemented: true
