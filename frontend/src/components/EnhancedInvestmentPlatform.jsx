@@ -56,43 +56,52 @@ const EnhancedInvestmentPlatform = () => {
   const [notifications, setNotifications] = useState([]);
   const [liveTransactions, setLiveTransactions] = useState([]);
 
-  // Package definitions with updated limits
+  // Package definitions with updated limits and professional styling
   const packageDefinitions = {
     gold: {
-      name: "Gold Paket",
+      name: "Gold Premium",
       icon: "🥇",
       color: "#FFD700",
-      gradient: "from-yellow-400 to-yellow-600",
+      gradient: "from-yellow-400 via-yellow-500 to-yellow-600",
+      borderGradient: "from-yellow-300 to-yellow-600",
+      shadowColor: "shadow-yellow-500/20",
       minAmount: 50,
       maxAmount: 250,
       multiplier: 4.5,
       duration: 60,
       dailyReturn: 7.5,
-      description: "Stabil gəlir və uzunmüddətli artım"
+      description: "Stabil gəlir və uzunmüddətli artım",
+      features: ["Gündəlik qazanc", "60 gün müddət", "Yüksək gəlir"]
     },
     titanium: {
-      name: "Titanium Paket", 
+      name: "Titanium Elite", 
       icon: "🔷",
-      color: "#9370DB",
-      gradient: "from-purple-400 to-purple-600",
+      color: "#6366F1",
+      gradient: "from-indigo-400 via-purple-500 to-indigo-600",
+      borderGradient: "from-indigo-300 to-purple-600",
+      shadowColor: "shadow-indigo-500/20",
       minAmount: 250,
       maxAmount: 500,
       multiplier: 4.0,
       duration: 45,
       dailyReturn: 8.9,
-      description: "Yüksək gəlir və orta müddətli investisiya"
+      description: "Yüksək gəlir və orta müddətli investisiya",
+      features: ["Premium analiz", "45 gün müddət", "Eksklüziv gəlir"]
     },
     platinum: {
-      name: "Platinum Paket",
+      name: "Platinum VIP",
       icon: "💎", 
-      color: "#E5E5E5",
-      gradient: "from-gray-300 to-gray-500",
+      color: "#10B981",
+      gradient: "from-emerald-400 via-green-500 to-emerald-600",
+      borderGradient: "from-emerald-300 to-green-600",
+      shadowColor: "shadow-emerald-500/20",
       minAmount: 50,  
       maxAmount: 250,
       multiplier: 3.0,
       duration: 30,
       dailyReturn: 10.0,
-      description: "Maksimum gəlir və qısamüddətli investisiya"
+      description: "Maksimum gəlir və qısamüddətli investisiya",
+      features: ["VIP dəstək", "30 gün müddət", "Maksimum qazanc"]
     }
   };
 
