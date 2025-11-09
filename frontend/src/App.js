@@ -988,6 +988,58 @@ const AdminPanel = () => {
               />
             </div>
 
+            <div>
+              <Label htmlFor="contact_phone">Əlaqə telefonu</Label>
+              <Input
+                id="contact_phone"
+                type="tel"
+                data-testid="admin-phone-input"
+                placeholder="+994 50 123 45 67"
+                value={settings.contact_phone}
+                onChange={(e) => setSettings({ ...settings, contact_phone: e.target.value })}
+                className="mt-1.5"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="contact_email">Əlaqə email</Label>
+              <Input
+                id="contact_email"
+                type="email"
+                data-testid="admin-email-input"
+                placeholder="info@azpay.az"
+                value={settings.contact_email}
+                onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
+                className="mt-1.5"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="contact_address">Ünvan</Label>
+              <Input
+                id="contact_address"
+                type="text"
+                data-testid="admin-address-input"
+                placeholder="Bakı, Azərbaycan"
+                value={settings.contact_address}
+                onChange={(e) => setSettings({ ...settings, contact_address: e.target.value })}
+                className="mt-1.5"
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="about_text">Haqqımızda mətn</Label>
+              <textarea
+                id="about_text"
+                data-testid="admin-about-input"
+                rows="4"
+                placeholder="AzPay haqqında məlumat..."
+                value={settings.about_text}
+                onChange={(e) => setSettings({ ...settings, about_text: e.target.value })}
+                className="mt-1.5 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
             <Button
               onClick={handleUpdate}
               disabled={loading}
