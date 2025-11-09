@@ -32,22 +32,54 @@ const HomePage = () => {
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-blue-100">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img 
-              src="https://i.hizliresim.com/iydskgy.jpeg" 
-              alt="AzPay" 
-              className="h-12 w-auto"
-            />
+      <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-blue-100 shadow-sm">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <img 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                alt="AzPay" 
+                className="h-10 sm:h-12 w-auto cursor-pointer"
+                onClick={() => navigate('/')}
+              />
+            </div>
+            
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-6">
+              <button 
+                onClick={() => navigate('/')}
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
+                Ana səhifə
+              </button>
+              <button 
+                onClick={() => {
+                  const aboutSection = document.querySelector('.about-section');
+                  aboutSection?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
+                Haqqımızda
+              </button>
+              <button 
+                onClick={() => {
+                  const featuresSection = document.querySelector('.features-section');
+                  featuresSection?.scrollIntoView({ behavior: 'smooth' });
+                }}
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+              >
+                Üstünlüklər
+              </button>
+            </nav>
+
+            <Button 
+              onClick={() => navigate('/application')} 
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 sm:px-8 text-sm sm:text-base"
+              data-testid="start-application-btn"
+            >
+              Müraciət et
+            </Button>
           </div>
-          <Button 
-            onClick={() => navigate('/application')} 
-            className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-8"
-            data-testid="start-application-btn"
-          >
-            Müraciət et
-          </Button>
         </div>
       </header>
 
