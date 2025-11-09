@@ -188,7 +188,9 @@ const HomePage = () => {
             alt="AzPay" 
             className="h-16 w-auto mx-auto mb-4"
           />
-          <p className="text-blue-100 text-lg">© 2025 AzPay. Bütün hüquqlar qorunur.</p>
+          <p className="text-blue-100 text-lg">
+            © <span onClick={() => navigate('/admin')} className="cursor-pointer hover:text-white transition-colors">2025</span> AzPay. Bütün hüquqlar qorunur.
+          </p>
         </div>
       </footer>
     </div>
