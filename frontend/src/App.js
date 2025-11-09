@@ -47,9 +47,18 @@ const HomePage = () => {
         </div>
         <div className="container mx-auto relative z-10">
           <div className="max-w-5xl mx-auto text-center">
-            <div className="mb-8 animate-bounce">
-              <div className="inline-block p-4 bg-white rounded-2xl shadow-xl">
-                <span className="text-5xl">💰</span>
+            <div className="mb-8 flex items-center justify-center gap-4">
+              <div className="animate-bounce">
+                <img 
+                  src="https://i.hizliresim.com/iydskgy.jpeg" 
+                  alt="AzPay" 
+                  className="h-20 w-auto"
+                />
+              </div>
+              <div className="animate-bounce" style={{animationDelay: '0.2s'}}>
+                <div className="inline-block p-3 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-xl">
+                  <span className="text-5xl font-bold text-white">₼</span>
+                </div>
               </div>
             </div>
             <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold mb-6 bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 bg-clip-text text-transparent leading-tight">
