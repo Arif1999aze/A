@@ -153,9 +153,9 @@ const HomePage = () => {
           <img 
             src="https://i.hizliresim.com/iydskgy.jpeg" 
             alt="AzPay" 
-            className="h-12 w-auto mx-auto mb-4 brightness-0 invert"
+            className="h-16 w-auto mx-auto mb-4"
           />
-          <p className="text-blue-100">© 2025 AzPay. Bütün hüquqlar qorunur.</p>
+          <p className="text-blue-100 text-lg">© 2025 AzPay. Bütün hüquqlar qorunur.</p>
         </div>
       </footer>
     </div>
