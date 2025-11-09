@@ -781,13 +781,15 @@ const ContractPage = () => {
       <div className="container mx-auto max-w-4xl">
         <Card className="shadow-2xl border-blue-100">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-            <img 
-              src="https://i.hizliresim.com/iydskgy.jpeg" 
-              alt="AzPay" 
-              className="h-14 w-auto mx-auto mb-4 brightness-0 invert"
-            />
+            <div className="text-center mb-4">
+              <img 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                alt="AzPay" 
+                className="h-16 w-auto mx-auto brightness-0 invert"
+              />
+            </div>
             <CardTitle className="text-2xl sm:text-3xl text-center">Kredit Müqaviləsi</CardTitle>
-            <CardDescription className="text-center text-blue-100">
+            <CardDescription className="text-center text-blue-100 text-lg mt-2">
               №{appId.substring(0, 8).toUpperCase()}
             </CardDescription>
           </CardHeader>
