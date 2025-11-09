@@ -190,8 +190,8 @@ const HomePage = () => {
         <div className="container mx-auto max-w-4xl">
           <h2 className="text-2xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 text-blue-900">AzPay haqqında</h2>
           <Card className="border-blue-100 shadow-xl">
-            <CardContent className="p-8">
-              <p className="text-lg text-gray-700 leading-relaxed mb-4">
+            <CardContent className="p-4 sm:p-8">
+              <p className="text-sm sm:text-lg text-gray-700 leading-relaxed mb-4">
                 <strong className="text-blue-700">AzPay</strong> - Azərbaycanda rəqəmsal maliyyə xidmətləri sahəsində fəaliyyət göstərən innovativ şirkətdir. 
                 Biz müştərilərimizə ən sürətli və asan kredit xidmətlərini təqdim edirik.
               </p>
