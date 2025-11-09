@@ -129,6 +129,10 @@ async def update_application(app_id: str, update: CreditApplicationUpdate):
 async def get_credit_offers():
     # Pre-defined credit offers with monthly payments
     offers = [
+        CreditOffer(amount=1000, duration_months=12, interest_rate=18.0, monthly_payment=91.68),
+        CreditOffer(amount=2000, duration_months=12, interest_rate=18.0, monthly_payment=183.36),
+        CreditOffer(amount=3000, duration_months=12, interest_rate=18.0, monthly_payment=275.04),
+        CreditOffer(amount=4000, duration_months=12, interest_rate=18.0, monthly_payment=366.72),
         CreditOffer(amount=5000, duration_months=12, interest_rate=17.0, monthly_payment=460.85),
         CreditOffer(amount=6000, duration_months=12, interest_rate=17.0, monthly_payment=553.02),
         CreditOffer(amount=7000, duration_months=12, interest_rate=17.0, monthly_payment=645.19),
