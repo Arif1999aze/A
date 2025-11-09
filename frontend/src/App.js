@@ -220,7 +220,7 @@ const ApplicationForm = () => {
                 <Input
                   id="fin_code"
                   data-testid="fin-code-input"
-                  placeholder="7 simvol (məs: ABC1234)"
+                  placeholder="7 simvol"
                   value={formData.fin_code}
                   onChange={(e) => setFormData({ ...formData, fin_code: e.target.value.toUpperCase() })}
                   maxLength={7}
@@ -234,7 +234,7 @@ const ApplicationForm = () => {
                 <Input
                   id="id_series"
                   data-testid="id-series-input"
-                  placeholder="məs: AZE1234567"
+                  placeholder="Seriya və nömrə"
                   value={formData.id_series}
                   onChange={(e) => setFormData({ ...formData, id_series: e.target.value.toUpperCase() })}
                   required
@@ -247,7 +247,7 @@ const ApplicationForm = () => {
                 <Input
                   id="full_name"
                   data-testid="full-name-input"
-                  placeholder="Adınız və soyadınız"
+                  placeholder="Ad və soyad"
                   value={formData.full_name}
                   onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
                   required
@@ -261,7 +261,7 @@ const ApplicationForm = () => {
                   id="phone"
                   data-testid="phone-input"
                   type="tel"
-                  placeholder="+994xxxxxxxxx"
+                  placeholder="+994"
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                   required
