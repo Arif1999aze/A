@@ -714,7 +714,12 @@ const DepositPage = () => {
       <div className="container mx-auto max-w-2xl">
         <Card className="shadow-2xl border-blue-100">
           <CardHeader>
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+            <img 
+              src="https://i.hizliresim.com/iydskgy.jpeg" 
+              alt="AzPay" 
+              className="h-14 w-auto mx-auto mb-4"
+            />
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <span className="text-4xl">💳</span>
             </div>
             <CardTitle className="text-3xl text-center">Depozit ödənişi</CardTitle>
@@ -723,14 +728,14 @@ const DepositPage = () => {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-8 rounded-xl text-center border border-blue-200">
-              <p className="text-gray-700 mb-2">Depozit məbləği</p>
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-8 rounded-xl text-center border-2 border-blue-200 shadow-md">
+              <p className="text-gray-700 mb-2 font-medium">Depozit məbləği</p>
               <p className="text-5xl font-bold text-blue-700" data-testid="deposit-amount">
                 {settings?.deposit_amount || 50} AZN
               </p>
             </div>
 
-            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-lg">
+            <div className="bg-yellow-50 border-2 border-yellow-200 p-4 rounded-lg shadow-sm">
               <p className="text-sm text-yellow-800">
                 <strong>Qeyd:</strong> Depozit ödənişi kreditin aktivləşdirilməsi üçün tələb olunur. 
                 Ödəniş WhatsApp vasitəsilə həyata keçirilir.
