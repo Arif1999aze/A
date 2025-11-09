@@ -79,6 +79,7 @@ class Settings(BaseModel):
 class SettingsUpdate(BaseModel):
     deposit_amount: Optional[float] = None
     whatsapp_link: Optional[str] = None
+    whatsapp_message_enabled: Optional[bool] = None
     contact_phone: Optional[str] = None
     contact_email: Optional[str] = None
     contact_address: Optional[str] = None
