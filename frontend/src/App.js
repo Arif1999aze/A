@@ -1009,10 +1009,34 @@ const DepositPage = () => {
               </p>
             </div>
 
-            <div className="bg-yellow-50 border-2 border-yellow-200 p-4 rounded-lg shadow-sm">
-              <p className="text-sm text-yellow-800">
-                <strong>Qeyd:</strong> Depozit ödənişi kreditin aktivləşdirilməsi üçün tələb olunur. 
-                Ödəniş WhatsApp vasitəsilə həyata keçirilir.
+            <div className="bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-300 p-6 rounded-lg shadow-sm">
+              <div className="flex items-start gap-3">
+                <div className="flex-shrink-0 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                  <span className="text-white text-xl">✓</span>
+                </div>
+                <div>
+                  <h4 className="font-bold text-green-800 text-lg mb-2">Depozit haqqında</h4>
+                  <ul className="space-y-2 text-sm text-green-900">
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600 mt-1">•</span>
+                      <span>Depozit ödənildikdən sonra kredit məbləği <strong>dərhal kartınıza köçürülür</strong></span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600 mt-1">•</span>
+                      <span><strong>Kreditiniz artıq hazırdır</strong> və istifadə edə bilərsiniz</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-green-600 mt-1">•</span>
+                      <span>Depozit ödənişi WhatsApp vasitəsilə həyata keçirilir</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-blue-50 border-2 border-blue-200 p-4 rounded-lg">
+              <p className="text-sm text-blue-800 text-center">
+                <strong>Əlaqə:</strong> Depozit ödənişi ilə bağlı sualınız varsa, aşağıdakı düyməyə klik edərək bizimlə əlaqə saxlayın.
               </p>
             </div>
 
