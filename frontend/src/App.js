@@ -186,9 +186,9 @@ const HomePage = () => {
       </section>
 
       {/* About AzPay */}
-      <section className="about-section py-20 px-4 bg-gradient-to-br from-blue-50 to-white">
+      <section className="about-section py-12 sm:py-20 px-4 bg-gradient-to-br from-blue-50 to-white">
         <div className="container mx-auto max-w-4xl">
-          <h2 className="text-4xl font-bold text-center mb-12 text-blue-900">AzPay haqqında</h2>
+          <h2 className="text-2xl sm:text-4xl font-bold text-center mb-8 sm:mb-12 text-blue-900">AzPay haqqında</h2>
           <Card className="border-blue-100 shadow-xl">
             <CardContent className="p-8">
               <p className="text-lg text-gray-700 leading-relaxed mb-4">
