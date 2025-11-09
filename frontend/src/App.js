@@ -115,17 +115,17 @@ const HomePage = () => {
             <p className="text-sm sm:text-lg text-gray-600 mb-8 sm:mb-10 max-w-2xl mx-auto px-4">
               Rəsmi gəlir arayışı tələb olunmur • Gecikməsi olanlar üçün kredit
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center px-4">
               <Button 
                 onClick={() => navigate('/application')} 
                 size="lg"
-                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-xl px-12 py-7 rounded-full shadow-2xl hover:shadow-xl transition-all hover:scale-105 font-bold"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-base sm:text-xl px-8 sm:px-12 py-5 sm:py-7 rounded-full shadow-2xl hover:shadow-xl transition-all hover:scale-105 font-bold w-full sm:w-auto"
                 data-testid="hero-apply-btn"
               >
                 Dərhal müraciət et →
               </Button>
-              <div className="flex items-center gap-2 text-gray-700">
-                <CheckCircle2 className="w-5 h-5 text-green-600" />
+              <div className="flex items-center gap-2 text-gray-700 text-sm sm:text-base">
+                <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-green-600 flex-shrink-0" />
                 <span className="font-semibold">5,000+ təsdiqlənmiş müraciət</span>
               </div>
             </div>
