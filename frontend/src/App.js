@@ -15,6 +15,19 @@ const API = `${BACKEND_URL}/api`;
 // Home Page
 const HomePage = () => {
   const navigate = useNavigate();
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await axios.get(`${API}/settings`);
+        setSettings(response.data);
+      } catch (error) {
+        console.error('Settings yüklənə bilmədi');
+      }
+    };
+    fetchSettings();
+  }, []);
 
   return (
     <div className="min-h-screen">
