@@ -39,24 +39,57 @@ const HomePage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-white to-blue-50"></div>
+      <section className="relative py-24 px-4 overflow-hidden min-h-[600px] flex items-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-blue-50 to-white"></div>
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-300 rounded-full blur-3xl"></div>
+        </div>
         <div className="container mx-auto relative z-10">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold mb-6 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 bg-clip-text text-transparent">
-              Kredit almaq indi daha asan
+          <div className="max-w-5xl mx-auto text-center">
+            <div className="mb-8 animate-bounce">
+              <div className="inline-block p-4 bg-white rounded-2xl shadow-xl">
+                <span className="text-5xl">💰</span>
+              </div>
+            </div>
+            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold mb-6 bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 bg-clip-text text-transparent leading-tight">
+              Kredit almaq indi<br/>daha asan və sürətli!
             </h1>
-            <p className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Rəsmi gəlir arayışı tələb olunmur. Gecikməniz varsa belə müraciət edə bilərsiniz.
+            <p className="text-xl sm:text-2xl text-gray-700 mb-4 max-w-3xl mx-auto font-medium">
+              15 dəqiqə ərzində 15,000 AZN-dək kredit
             </p>
-            <Button 
-              onClick={() => navigate('/application')} 
-              size="lg"
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-lg px-10 py-6 rounded-full shadow-lg hover:shadow-xl transition-all"
-              data-testid="hero-apply-btn"
-            >
-              İndi müraciət et
-            </Button>
+            <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
+              Rəsmi gəlir arayışı tələb olunmur • Gecikməsi olanlar üçün kredit
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Button 
+                onClick={() => navigate('/application')} 
+                size="lg"
+                className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-xl px-12 py-7 rounded-full shadow-2xl hover:shadow-xl transition-all hover:scale-105 font-bold"
+                data-testid="hero-apply-btn"
+              >
+                Dərhal müraciət et →
+              </Button>
+              <div className="flex items-center gap-2 text-gray-700">
+                <CheckCircle2 className="w-5 h-5 text-green-600" />
+                <span className="font-semibold">5,000+ təsdiqlənmiş müraciət</span>
+              </div>
+            </div>
+            
+            <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
+              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
+                <div className="text-3xl font-bold text-blue-700">15 dəq</div>
+                <div className="text-sm text-gray-600 mt-1">Sürətli cavab</div>
+              </div>
+              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
+                <div className="text-3xl font-bold text-blue-700">16%</div>
+                <div className="text-sm text-gray-600 mt-1">İllik faiz</div>
+              </div>
+              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
+                <div className="text-3xl font-bold text-blue-700">15,000₼</div>
+                <div className="text-sm text-gray-600 mt-1">Maksimum kredit</div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
