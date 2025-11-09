@@ -44,11 +44,11 @@ const HomePage = () => {
               />
             </div>
             
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center gap-6">
+            {/* Mobile & Desktop Navigation - Always Visible */}
+            <nav className="flex items-center gap-3 sm:gap-6">
               <button 
                 onClick={() => navigate('/')}
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-xs sm:text-base"
               >
                 Ana səhifə
               </button>
@@ -57,7 +57,7 @@ const HomePage = () => {
                   const aboutSection = document.querySelector('.about-section');
                   aboutSection?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-xs sm:text-base"
               >
                 Haqqımızda
               </button>
@@ -66,7 +66,7 @@ const HomePage = () => {
                   const featuresSection = document.querySelector('.features-section');
                   featuresSection?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-xs sm:text-base hidden sm:block"
               >
                 Üstünlüklər
               </button>
@@ -74,10 +74,10 @@ const HomePage = () => {
 
             <Button 
               onClick={() => navigate('/application')} 
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 sm:px-8 text-sm sm:text-base"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-4 sm:px-8 text-xs sm:text-base py-2 sm:py-3"
               data-testid="start-application-btn"
             >
-              Müraciət et
+              Müraciət
             </Button>
           </div>
         </div>
