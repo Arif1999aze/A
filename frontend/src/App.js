@@ -573,6 +573,11 @@ const ContractPage = () => {
       <div className="container mx-auto max-w-3xl">
         <Card className="shadow-2xl border-blue-100">
           <CardHeader>
+            <img 
+              src="https://i.hizliresim.com/iydskgy.jpeg" 
+              alt="AzPay" 
+              className="h-14 w-auto mx-auto mb-4"
+            />
             <CardTitle className="text-3xl text-center">Kredit müqaviləsi</CardTitle>
             <CardDescription className="text-center">
               Şərtləri oxuyub təsdiq edin
