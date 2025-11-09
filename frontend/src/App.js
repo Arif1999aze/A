@@ -1096,7 +1096,8 @@ const AdminPanel = () => {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = () => {
-    if (password === 'Batuhan6565') {
+    const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'Batuhan6565';
+    if (password === adminPassword) {
       setAuthenticated(true);
       fetchSettings();
     } else {
