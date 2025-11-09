@@ -804,9 +804,9 @@ const ContractPage = () => {
           </CardHeader>
           <CardContent className="p-4 sm:p-6">
             {/* Contract Info Summary */}
-            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 sm:p-6 rounded-xl mb-6 border-2 border-blue-200">
-              <h3 className="font-bold text-lg sm:text-xl text-blue-800 mb-4 text-center">Müqavilə Məlumatları</h3>
-              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-3 sm:p-6 rounded-xl mb-4 sm:mb-6 border-2 border-blue-200">
+              <h3 className="font-bold text-base sm:text-xl text-blue-800 mb-3 sm:mb-4 text-center">Müqavilə Məlumatları</h3>
+              <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-base">
                 <div className="bg-white p-3 rounded-lg">
                   <p className="text-gray-600 text-xs sm:text-sm">Kreditor</p>
                   <p className="font-bold text-blue-700">AzPay MMC</p>
