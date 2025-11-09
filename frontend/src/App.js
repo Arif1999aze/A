@@ -787,16 +787,16 @@ const ContractPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-6 sm:py-12 px-4">
       <div className="container mx-auto max-w-4xl">
         <Card className="shadow-2xl border-blue-100">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-            <div className="text-center mb-4">
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg py-8">
+            <div className="text-center mb-6">
               <img 
                 src="https://i.hizliresim.com/iydskgy.jpeg" 
                 alt="AzPay" 
-                className="h-16 w-auto mx-auto brightness-0 invert"
+                className="h-20 w-auto mx-auto brightness-0 invert"
               />
             </div>
-            <CardTitle className="text-2xl sm:text-3xl text-center">Kredit Müqaviləsi</CardTitle>
-            <CardDescription className="text-center text-blue-100 text-lg mt-2">
+            <CardTitle className="text-2xl sm:text-3xl text-center font-bold">Kredit Müqaviləsi</CardTitle>
+            <CardDescription className="text-center text-blue-100 text-xl mt-3 font-semibold">
               №{appId.substring(0, 8).toUpperCase()}
             </CardDescription>
           </CardHeader>
