@@ -827,7 +827,14 @@ const ContractPage = () => {
 
             {/* Contract Terms */}
             <div className="bg-gray-50 p-4 sm:p-6 rounded-lg max-h-96 overflow-y-auto mb-6 border border-gray-200" data-testid="contract-content">
-              <h3 className="font-bold text-base sm:text-lg mb-4 text-blue-700">Kredit müqaviləsi şərtləri</h3>
+              <div className="text-center mb-4">
+                <img 
+                  src="https://i.hizliresim.com/iydskgy.jpeg" 
+                  alt="AzPay" 
+                  className="h-12 w-auto mx-auto mb-2"
+                />
+              </div>
+              <h3 className="font-bold text-base sm:text-lg mb-4 text-blue-700 text-center">Kredit müqaviləsi şərtləri</h3>
               
               <div className="space-y-4 text-xs sm:text-sm text-gray-700 leading-relaxed">
                 <section>
