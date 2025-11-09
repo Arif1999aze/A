@@ -571,6 +571,13 @@ const CreditSelectionPage = () => {
       <div className="container mx-auto max-w-4xl">
         <Card className="shadow-2xl border-blue-100 mb-8">
           <CardHeader>
+            <div className="text-center mb-4">
+              <img 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                alt="AzPay" 
+                className="h-16 w-auto mx-auto"
+              />
+            </div>
             <CardTitle className="text-3xl text-center">Kredit məbləği seçin</CardTitle>
             <CardDescription className="text-center">
               Sizə uyğun məbləği seçərək davam edin
