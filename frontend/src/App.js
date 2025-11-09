@@ -149,9 +149,9 @@ const HomePage = () => {
       </section>
 
       {/* Features */}
-      <section className="features-section py-20 px-4">
+      <section className="features-section py-12 sm:py-20 px-4">
         <div className="container mx-auto">
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-8">
             <Card className="border-blue-100 hover:shadow-xl transition-all hover:-translate-y-1">
               <CardHeader>
                 <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center mb-4">
