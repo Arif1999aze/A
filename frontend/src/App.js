@@ -904,16 +904,16 @@ const ContractPage = () => {
               </div>
             </div>
 
-            <div className="flex items-start gap-3 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="flex items-start gap-2 sm:gap-3 mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
               <input
                 type="checkbox"
                 id="accept"
                 data-testid="accept-contract-checkbox"
                 checked={accepted}
                 onChange={(e) => setAccepted(e.target.checked)}
-                className="mt-1 w-5 h-5 text-blue-600 rounded cursor-pointer"
+                className="mt-1 w-4 h-4 sm:w-5 sm:h-5 text-blue-600 rounded cursor-pointer flex-shrink-0"
               />
-              <label htmlFor="accept" className="text-sm text-gray-700 cursor-pointer">
+              <label htmlFor="accept" className="text-xs sm:text-sm text-gray-700 cursor-pointer">
                 Mən yuxarıda göstərilən bütün şərtləri oxudum və qəbul edirəm. Kredit müqaviləsini imzalamağa razıyam.
               </label>
             </div>
