@@ -92,27 +92,27 @@ const HomePage = () => {
         </div>
         <div className="container mx-auto relative z-10">
           <div className="max-w-5xl mx-auto text-center">
-            <div className="mb-8 flex items-center justify-center gap-4">
+            <div className="mb-6 sm:mb-8 flex items-center justify-center gap-3 sm:gap-4">
               <div className="animate-bounce">
                 <img 
                   src="https://i.hizliresim.com/iydskgy.jpeg" 
                   alt="AzPay" 
-                  className="h-20 w-auto"
+                  className="h-12 sm:h-20 w-auto"
                 />
               </div>
               <div className="animate-bounce" style={{animationDelay: '0.2s'}}>
-                <div className="inline-block p-3 bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl shadow-xl">
-                  <span className="text-5xl font-bold text-white">₼</span>
+                <div className="inline-block p-2 sm:p-3 bg-gradient-to-br from-blue-600 to-blue-700 rounded-xl sm:rounded-2xl shadow-xl">
+                  <span className="text-3xl sm:text-5xl font-bold text-white">₼</span>
                 </div>
               </div>
             </div>
-            <h1 className="text-5xl sm:text-6xl lg:text-7xl font-extrabold mb-6 bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 bg-clip-text text-transparent leading-tight">
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-extrabold mb-4 sm:mb-6 bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 bg-clip-text text-transparent leading-tight px-2">
               Kredit almaq indi<br/>daha asan və sürətli!
             </h1>
-            <p className="text-xl sm:text-2xl text-gray-700 mb-4 max-w-3xl mx-auto font-medium">
+            <p className="text-lg sm:text-xl lg:text-2xl text-gray-700 mb-3 sm:mb-4 max-w-3xl mx-auto font-medium px-4">
               15 dəqiqə ərzində 15,000 AZN-dək kredit
             </p>
-            <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
+            <p className="text-sm sm:text-lg text-gray-600 mb-8 sm:mb-10 max-w-2xl mx-auto px-4">
               Rəsmi gəlir arayışı tələb olunmur • Gecikməsi olanlar üçün kredit
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
