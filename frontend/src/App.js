@@ -806,9 +806,9 @@ const DepositPage = () => {
               <img 
                 src="https://i.hizliresim.com/iydskgy.jpeg" 
                 alt="AzPay" 
-                className="h-10 w-auto mx-auto opacity-60"
+                className="h-12 w-auto mx-auto mb-2"
               />
-              <p className="text-xs text-gray-400 mt-2">© 2025 AzPay</p>
+              <p className="text-sm text-gray-500">© 2025 AzPay. Bütün hüquqlar qorunur.</p>
             </div>
           </CardContent>
         </Card>
