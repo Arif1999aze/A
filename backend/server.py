@@ -78,6 +78,10 @@ class Settings(BaseModel):
 class SettingsUpdate(BaseModel):
     deposit_amount: Optional[float] = None
     whatsapp_link: Optional[str] = None
+    contact_phone: Optional[str] = None
+    contact_email: Optional[str] = None
+    contact_address: Optional[str] = None
+    about_text: Optional[str] = None
 
 # Routes
 @api_router.get("/")
