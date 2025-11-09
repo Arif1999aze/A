@@ -69,6 +69,7 @@ class Settings(BaseModel):
     id: str = "settings"
     deposit_amount: float = 50.0
     whatsapp_link: str = "https://wa.me/994501234567"
+    whatsapp_message_enabled: bool = True
     contact_phone: str = "+994 50 123 45 67"
     contact_email: str = "info@azpay.az"
     contact_address: str = "Bakı, Azərbaycan"
