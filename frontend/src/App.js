@@ -731,8 +731,8 @@ const DepositPage = () => {
               alt="AzPay" 
               className="h-14 w-auto mx-auto mb-4"
             />
-            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <span className="text-4xl">💳</span>
+            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <span className="text-5xl font-bold text-white">₼</span>
             </div>
             <CardTitle className="text-3xl text-center">Depozit ödənişi</CardTitle>
             <CardDescription className="text-center">
