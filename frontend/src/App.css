@@ -116,3 +116,13 @@ input:focus {
 .pulse-success {
   animation: pulse-success 2s ease-in-out infinite;
 }
+
+/* Hide Emergent branding */
+[class*="emergent"], 
+[id*="emergent"],
+a[href*="emergent"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
