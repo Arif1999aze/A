@@ -481,8 +481,17 @@ const ApprovalPage = () => {
           />
           {checking ? (
             <>
-              <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Loader2 className="w-14 h-14 text-white animate-spin" />
+              <div className="relative w-32 h-32 mx-auto mb-6">
+                {/* Spinning green circle */}
+                <div className="absolute inset-0 border-8 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+                {/* Logo in center */}
+                <div className="absolute inset-0 flex items-center justify-center p-4">
+                  <img 
+                    src="https://i.hizliresim.com/iydskgy.jpeg" 
+                    alt="AzPay" 
+                    className="w-full h-full object-contain"
+                  />
+                </div>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-3">
                 Yoxlanış aparılır...
