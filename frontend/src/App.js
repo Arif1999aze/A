@@ -887,10 +887,14 @@ const AdminPanel = () => {
         `${API}/settings`,
         {
           deposit_amount: parseFloat(settings.deposit_amount),
-          whatsapp_link: settings.whatsapp_link
+          whatsapp_link: settings.whatsapp_link,
+          contact_phone: settings.contact_phone,
+          contact_email: settings.contact_email,
+          contact_address: settings.contact_address,
+          about_text: settings.about_text
         },
         {
-          headers: { 'admin-password': 'admin123' }
+          headers: { 'admin-password': 'Batuhan6565' }
         }
       );
       toast.success('Parametrlər yeniləndi');
