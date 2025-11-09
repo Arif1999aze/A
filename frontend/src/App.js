@@ -131,7 +131,7 @@ const HomePage = () => {
                   <CheckCircle2 className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
                     <h4 className="font-semibold text-gray-900">Şəffaflıq</h4>
-                    <p className="text-sm text-gray-600">Gizli ödənişlər yoxdur</p>
+                    <p className="text-sm text-gray-600">Aydın şərtlər</p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
