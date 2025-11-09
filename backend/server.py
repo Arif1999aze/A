@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException, Header
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -6,7 +6,7 @@ import os
 import logging
 from pathlib import Path
 from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
@@ -25,46 +25,162 @@ app = FastAPI()
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
+# Admin password from env
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin123')
 
 # Define Models
-class StatusCheck(BaseModel):
-    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+class CreditApplication(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    client_name: str
-    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    fin_code: str
+    id_series: str
+    full_name: str
+    phone: str
+    selected_amount: Optional[int] = None
+    card_number: Optional[str] = None
+    contract_signed: bool = False
+    deposit_paid: bool = False
+    status: str = "pending"  # pending, approved, completed
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
-class StatusCheckCreate(BaseModel):
-    client_name: str
+class CreditApplicationCreate(BaseModel):
+    fin_code: str
+    id_series: str
+    full_name: str
+    phone: str
 
-# Add your routes to the router instead of directly to app
+class CreditApplicationUpdate(BaseModel):
+    selected_amount: Optional[int] = None
+    card_number: Optional[str] = None
+    contract_signed: Optional[bool] = None
+    deposit_paid: Optional[bool] = None
+    status: Optional[str] = None
+
+class CreditOffer(BaseModel):
+    amount: int
+    duration_months: int
+    interest_rate: float
+    monthly_payment: float
+
+class Settings(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    
+    id: str = "settings"
+    deposit_amount: float = 50.0
+    whatsapp_link: str = "https://wa.me/994501234567"
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+class SettingsUpdate(BaseModel):
+    deposit_amount: Optional[float] = None
+    whatsapp_link: Optional[str] = None
+
+# Routes
 @api_router.get("/")
 async def root():
-    return {"message": "Hello World"}
+    return {"message": "AzPay Kredit Sistemi API"}
 
-@api_router.post("/status", response_model=StatusCheck)
-async def create_status_check(input: StatusCheckCreate):
-    status_dict = input.model_dump()
-    status_obj = StatusCheck(**status_dict)
+# Credit Application Routes
+@api_router.post("/applications", response_model=CreditApplication)
+async def create_application(input: CreditApplicationCreate):
+    app_dict = input.model_dump()
+    app_obj = CreditApplication(**app_dict)
+    app_obj.status = "approved"  # Auto-approve for demo
     
-    # Convert to dict and serialize datetime to ISO string for MongoDB
-    doc = status_obj.model_dump()
-    doc['timestamp'] = doc['timestamp'].isoformat()
+    doc = app_obj.model_dump()
+    doc['created_at'] = doc['created_at'].isoformat()
     
-    _ = await db.status_checks.insert_one(doc)
-    return status_obj
+    await db.applications.insert_one(doc)
+    return app_obj
 
-@api_router.get("/status", response_model=List[StatusCheck])
-async def get_status_checks():
-    # Exclude MongoDB's _id field from the query results
-    status_checks = await db.status_checks.find({}, {"_id": 0}).to_list(1000)
+@api_router.get("/applications/{app_id}", response_model=CreditApplication)
+async def get_application(app_id: str):
+    app = await db.applications.find_one({"id": app_id}, {"_id": 0})
+    if not app:
+        raise HTTPException(status_code=404, detail="Müraciət tapılmadı")
     
-    # Convert ISO string timestamps back to datetime objects
-    for check in status_checks:
-        if isinstance(check['timestamp'], str):
-            check['timestamp'] = datetime.fromisoformat(check['timestamp'])
+    if isinstance(app.get('created_at'), str):
+        app['created_at'] = datetime.fromisoformat(app['created_at'])
     
-    return status_checks
+    return app
+
+@api_router.put("/applications/{app_id}", response_model=CreditApplication)
+async def update_application(app_id: str, update: CreditApplicationUpdate):
+    app = await db.applications.find_one({"id": app_id}, {"_id": 0})
+    if not app:
+        raise HTTPException(status_code=404, detail="Müraciət tapılmadı")
+    
+    update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+    
+    if update_data:
+        await db.applications.update_one(
+            {"id": app_id},
+            {"$set": update_data}
+        )
+    
+    updated_app = await db.applications.find_one({"id": app_id}, {"_id": 0})
+    if isinstance(updated_app.get('created_at'), str):
+        updated_app['created_at'] = datetime.fromisoformat(updated_app['created_at'])
+    
+    return updated_app
+
+# Credit Offers
+@api_router.get("/credit-offers", response_model=List[CreditOffer])
+async def get_credit_offers():
+    # Pre-defined credit offers with monthly payments
+    offers = [
+        CreditOffer(amount=1000, duration_months=12, interest_rate=18.0, monthly_payment=91.68),
+        CreditOffer(amount=2000, duration_months=12, interest_rate=18.0, monthly_payment=183.36),
+        CreditOffer(amount=3000, duration_months=12, interest_rate=18.0, monthly_payment=275.04),
+        CreditOffer(amount=4000, duration_months=12, interest_rate=18.0, monthly_payment=366.72),
+        CreditOffer(amount=15000, duration_months=24, interest_rate=16.0, monthly_payment=725.60),
+    ]
+    return offers
+
+# Settings Routes
+@api_router.get("/settings", response_model=Settings)
+async def get_settings():
+    settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
+    
+    if not settings:
+        # Create default settings
+        default_settings = Settings()
+        doc = default_settings.model_dump()
+        doc['updated_at'] = doc['updated_at'].isoformat()
+        await db.settings.insert_one(doc)
+        return default_settings
+    
+    if isinstance(settings.get('updated_at'), str):
+        settings['updated_at'] = datetime.fromisoformat(settings['updated_at'])
+    
+    return settings
+
+@api_router.put("/settings", response_model=Settings)
+async def update_settings(update: SettingsUpdate, admin_password: str = Header(...)):
+    if admin_password != ADMIN_PASSWORD:
+        raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
+    
+    settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
+    
+    if not settings:
+        settings = Settings().model_dump()
+        settings['updated_at'] = settings['updated_at'].isoformat()
+        await db.settings.insert_one(settings)
+    
+    update_data = {k: v for k, v in update.model_dump().items() if v is not None}
+    update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
+    
+    if update_data:
+        await db.settings.update_one(
+            {"id": "settings"},
+            {"$set": update_data}
+        )
+    
+    updated_settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
+    if isinstance(updated_settings.get('updated_at'), str):
+        updated_settings['updated_at'] = datetime.fromisoformat(updated_settings['updated_at'])
+    
+    return updated_settings
 
 # Include the router in the main app
 app.include_router(api_router)
