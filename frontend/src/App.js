@@ -766,24 +766,67 @@ const ContractPage = () => {
     }
   };
 
+  const totalPayment = selectedOffer ? (selectedOffer.monthly_payment * selectedOffer.duration_months).toFixed(2) : 0;
+  const interestAmount = selectedOffer ? (totalPayment - selectedOffer.amount).toFixed(2) : 0;
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4">
-      <div className="container mx-auto max-w-3xl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-6 sm:py-12 px-4">
+      <div className="container mx-auto max-w-4xl">
         <Card className="shadow-2xl border-blue-100">
-          <CardHeader>
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
             <img 
               src="https://i.hizliresim.com/iydskgy.jpeg" 
               alt="AzPay" 
-              className="h-14 w-auto mx-auto mb-4"
+              className="h-14 w-auto mx-auto mb-4 brightness-0 invert"
             />
-            <CardTitle className="text-3xl text-center">Kredit müqaviləsi</CardTitle>
-            <CardDescription className="text-center">
-              Şərtləri oxuyub təsdiq edin
+            <CardTitle className="text-2xl sm:text-3xl text-center">Kredit Müqaviləsi</CardTitle>
+            <CardDescription className="text-center text-blue-100">
+              №{appId.substring(0, 8).toUpperCase()}
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="bg-gray-50 p-6 rounded-lg max-h-96 overflow-y-auto mb-6 border border-gray-200" data-testid="contract-content">
-              <h3 className="font-bold text-lg mb-4 text-blue-700">Kredit müqaviləsi şərtləri</h3>
+          <CardContent className="p-4 sm:p-6">
+            {/* Contract Info Summary */}
+            <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-4 sm:p-6 rounded-xl mb-6 border-2 border-blue-200">
+              <h3 className="font-bold text-lg sm:text-xl text-blue-800 mb-4 text-center">Müqavilə Məlumatları</h3>
+              <div className="grid sm:grid-cols-2 gap-3 sm:gap-4 text-sm sm:text-base">
+                <div className="bg-white p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs sm:text-sm">Kreditor</p>
+                  <p className="font-bold text-blue-700">AzPay MMC</p>
+                </div>
+                <div className="bg-white p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs sm:text-sm">Borc alan</p>
+                  <p className="font-bold text-gray-900">{application?.full_name || 'Yüklənir...'}</p>
+                </div>
+                <div className="bg-white p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs sm:text-sm">Kredit məbləği</p>
+                  <p className="font-bold text-blue-700 text-lg sm:text-xl">{selectedOffer?.amount || 0} AZN</p>
+                </div>
+                <div className="bg-white p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs sm:text-sm">Müddət</p>
+                  <p className="font-bold text-gray-900">{selectedOffer?.duration_months || 0} ay</p>
+                </div>
+                <div className="bg-white p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs sm:text-sm">Aylıq ödəniş</p>
+                  <p className="font-bold text-green-600 text-lg sm:text-xl">{selectedOffer?.monthly_payment || 0} AZN</p>
+                </div>
+                <div className="bg-white p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs sm:text-sm">İllik faiz dərəcəsi</p>
+                  <p className="font-bold text-gray-900">{selectedOffer?.interest_rate || 0}%</p>
+                </div>
+                <div className="bg-white p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs sm:text-sm">Cəmi ödəniş</p>
+                  <p className="font-bold text-gray-900">{totalPayment} AZN</p>
+                </div>
+                <div className="bg-white p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs sm:text-sm">Faiz məbləği</p>
+                  <p className="font-bold text-gray-900">{interestAmount} AZN</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Contract Terms */}
+            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg max-h-96 overflow-y-auto mb-6 border border-gray-200" data-testid="contract-content">
+              <h3 className="font-bold text-base sm:text-lg mb-4 text-blue-700">Kredit müqaviləsi şərtləri</h3>
               
               <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
                 <section>
