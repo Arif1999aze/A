@@ -199,7 +199,7 @@ const HomePage = () => {
                 Missiyamız hər kəsə maliyyə imkanlarına əlçatanlığı təmin etməkdir. Rəsmi gəlir arayışı olmayan, 
                 kredit tarixində gecikmələr olan şəxslər belə bizdən kredit ala bilərlər.
               </p>
-              <div className="grid sm:grid-cols-2 gap-4 mt-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4 sm:mt-6">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="w-6 h-6 text-blue-600 mt-1 flex-shrink-0" />
                   <div>
