@@ -763,6 +763,15 @@ const DepositPage = () => {
             <p className="text-center text-sm text-gray-500">
               Ödənişdən sonra təsdiq üçün 5-10 dəqiqə gözləyin
             </p>
+            
+            <div className="text-center pt-6 border-t border-gray-200">
+              <img 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                alt="AzPay" 
+                className="h-10 w-auto mx-auto opacity-60"
+              />
+              <p className="text-xs text-gray-400 mt-2">© 2025 AzPay</p>
+            </div>
           </CardContent>
         </Card>
       </div>
