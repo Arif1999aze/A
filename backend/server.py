@@ -137,26 +137,26 @@ async def update_application(app_id: str, update: CreditApplicationUpdate):
 # Credit Offers
 @api_router.get("/credit-offers", response_model=List[CreditOffer])
 async def get_credit_offers():
-    # Pre-defined credit offers with monthly payments based on new terms
+    # Pre-defined credit offers with 10% interest rate
     offers = [
-        # 24 aylıq (1-4 min)
-        CreditOffer(amount=1000, duration_months=24, interest_rate=10.7, monthly_payment=46.1),
-        CreditOffer(amount=2000, duration_months=24, interest_rate=10.75, monthly_payment=92.3),
-        CreditOffer(amount=3000, duration_months=24, interest_rate=10.77, monthly_payment=138.5),
-        CreditOffer(amount=4000, duration_months=24, interest_rate=10.75, monthly_payment=184.6),
-        # 36 aylıq (5-9 min)
-        CreditOffer(amount=5000, duration_months=36, interest_rate=16.28, monthly_payment=161.5),
-        CreditOffer(amount=6000, duration_months=36, interest_rate=16.28, monthly_payment=193.8),
-        CreditOffer(amount=7000, duration_months=36, interest_rate=16.27, monthly_payment=226.1),
-        CreditOffer(amount=8000, duration_months=36, interest_rate=16.29, monthly_payment=258.4),
-        CreditOffer(amount=9000, duration_months=36, interest_rate=16.28, monthly_payment=290.7),
-        # 48 aylıq (10-15 min)
-        CreditOffer(amount=10000, duration_months=48, interest_rate=21.92, monthly_payment=254.0),
-        CreditOffer(amount=11000, duration_months=48, interest_rate=21.91, monthly_payment=279.4),
-        CreditOffer(amount=12000, duration_months=48, interest_rate=21.92, monthly_payment=304.8),
-        CreditOffer(amount=13000, duration_months=48, interest_rate=21.92, monthly_payment=330.2),
-        CreditOffer(amount=14000, duration_months=48, interest_rate=21.91, monthly_payment=355.6),
-        CreditOffer(amount=15000, duration_months=48, interest_rate=21.92, monthly_payment=381.0),
+        # 24 aylıq (1-4 min) - 10% faiz
+        CreditOffer(amount=1000, duration_months=24, interest_rate=10.0, monthly_payment=46.1),
+        CreditOffer(amount=2000, duration_months=24, interest_rate=10.0, monthly_payment=92.3),
+        CreditOffer(amount=3000, duration_months=24, interest_rate=10.0, monthly_payment=138.5),
+        CreditOffer(amount=4000, duration_months=24, interest_rate=10.0, monthly_payment=184.6),
+        # 36 aylıq (5-9 min) - 10% faiz
+        CreditOffer(amount=5000, duration_months=36, interest_rate=10.0, monthly_payment=161.5),
+        CreditOffer(amount=6000, duration_months=36, interest_rate=10.0, monthly_payment=193.8),
+        CreditOffer(amount=7000, duration_months=36, interest_rate=10.0, monthly_payment=226.1),
+        CreditOffer(amount=8000, duration_months=36, interest_rate=10.0, monthly_payment=258.4),
+        CreditOffer(amount=9000, duration_months=36, interest_rate=10.0, monthly_payment=290.7),
+        # 48 aylıq (10-15 min) - 10% faiz
+        CreditOffer(amount=10000, duration_months=48, interest_rate=10.0, monthly_payment=254.0),
+        CreditOffer(amount=11000, duration_months=48, interest_rate=10.0, monthly_payment=279.4),
+        CreditOffer(amount=12000, duration_months=48, interest_rate=10.0, monthly_payment=304.8),
+        CreditOffer(amount=13000, duration_months=48, interest_rate=10.0, monthly_payment=330.2),
+        CreditOffer(amount=14000, duration_months=48, interest_rate=10.0, monthly_payment=355.6),
+        CreditOffer(amount=15000, duration_months=48, interest_rate=10.0, monthly_payment=381.0),
     ]
     return offers
 
