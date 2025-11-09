@@ -852,7 +852,14 @@ const AdminPanel = () => {
   const navigate = useNavigate();
   const [password, setPassword] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
-  const [settings, setSettings] = useState({ deposit_amount: 50, whatsapp_link: '' });
+  const [settings, setSettings] = useState({ 
+    deposit_amount: 50, 
+    whatsapp_link: '',
+    contact_phone: '',
+    contact_email: '',
+    contact_address: '',
+    about_text: ''
+  });
   const [loading, setLoading] = useState(false);
 
   const handleLogin = () => {
