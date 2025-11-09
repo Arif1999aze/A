@@ -731,6 +731,24 @@ const ContractPage = () => {
   const appId = window.location.pathname.split('/').pop();
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [application, setApplication] = useState(null);
+  const [selectedOffer, setSelectedOffer] = useState(null);
+
+  useEffect(() => {
+    const fetchApplicationData = async () => {
+      try {
+        const appResponse = await axios.get(`${API}/applications/${appId}`);
+        setApplication(appResponse.data);
+        
+        const offersResponse = await axios.get(`${API}/credit-offers`);
+        const offer = offersResponse.data.find(o => o.amount === appResponse.data.selected_amount);
+        setSelectedOffer(offer);
+      } catch (error) {
+        console.error('Məlumatlar yüklənə bilmədi');
+      }
+    };
+    fetchApplicationData();
+  }, [appId]);
 
   const handleAccept = async () => {
     setLoading(true);
