@@ -296,29 +296,57 @@ const ApplicationForm = () => {
 const ApprovalPage = () => {
   const navigate = useNavigate();
   const appId = window.location.pathname.split('/').pop();
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    setTimeout(() => {
+    // Progress animation
+    const progressInterval = setInterval(() => {
+      setProgress((prev) => {
+        if (prev >= 100) return 100;
+        return prev + (100 / 15);
+      });
+    }, 1000);
+
+    // Navigate after 15 seconds
+    const timeout = setTimeout(() => {
       navigate(`/credit-selection/${appId}`);
-    }, 3000);
+    }, 15000);
+
+    return () => {
+      clearInterval(progressInterval);
+      clearTimeout(timeout);
+    };
   }, [navigate, appId]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
       <Card className="max-w-md w-full shadow-2xl border-blue-100">
         <CardContent className="p-12 text-center">
-          <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
+          <img 
+            src="https://i.hizliresim.com/iydskgy.jpeg" 
+            alt="AzPay" 
+            className="h-16 w-auto mx-auto mb-6"
+          />
+          <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
             <CheckCircle2 className="w-14 h-14 text-white" />
           </div>
           <h2 className="text-3xl font-bold text-gray-900 mb-3" data-testid="approval-title">
             15,000 AZN kredit təsdiq edildi!
           </h2>
-          <p className="text-gray-600 text-lg">
-            Təbrik edirik! İndi kredit məbləğinizi seçə bilərsiniz.
+          <p className="text-gray-600 text-lg mb-6">
+            Məlumatlarınız yoxlanılır...
           </p>
-          <div className="mt-6">
-            <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-600" />
-            <p className="text-sm text-gray-500 mt-2">Yönləndirilirsiniz...</p>
+          
+          <div className="space-y-3">
+            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+              <div 
+                className="bg-gradient-to-r from-blue-600 to-blue-500 h-2 rounded-full transition-all duration-1000"
+                style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+            <p className="text-sm text-gray-500">
+              {Math.round(progress)}% tamamlandı
+            </p>
           </div>
         </CardContent>
       </Card>
