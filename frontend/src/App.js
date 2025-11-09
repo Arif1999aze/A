@@ -585,52 +585,52 @@ const ContractPage = () => {
           </CardHeader>
           <CardContent>
             <div className="bg-gray-50 p-6 rounded-lg max-h-96 overflow-y-auto mb-6 border border-gray-200" data-testid="contract-content">
-              <h3 className="font-bold text-lg mb-4">Kredit müqaviləsi şərtləri</h3>
+              <h3 className="font-bold text-lg mb-4 text-blue-700">Kredit müqaviləsi şərtləri</h3>
               
-              <div className="space-y-4 text-sm text-gray-700">
+              <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
                 <section>
-                  <h4 className="font-semibold mb-2">1. Ümumi müddəalar</h4>
+                  <h4 className="font-semibold mb-2 text-gray-900">1. Ümumi müddəalar</h4>
                   <p>Bu müqavilə AzPay MMC (bundan sonra "Kreditor") ilə müştəri (bundan sonra "Borc alan") arasında bağlanmışdır.</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2">2. Kreditin məbləği və müddəti</h4>
+                  <h4 className="font-semibold mb-2 text-gray-900">2. Kreditin məbləği və müddəti</h4>
                   <p>Kreditor borc alana seçilmiş məbləğdə kredit verir. Kredit müqavilədə göstərilən müddətdə qaytarılmalıdır.</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2">3. Faiz dərəcəsi</h4>
+                  <h4 className="font-semibold mb-2 text-gray-900">3. Faiz dərəcəsi</h4>
                   <p>Kredit üzrə illik faiz dərəcəsi müqavilədə göstərilən məbləğə uyğundur (16-18%).</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2">4. Ödəniş qaydası</h4>
+                  <h4 className="font-semibold mb-2 text-gray-900">4. Ödəniş qaydası</h4>
                   <p>Borc alan hər ay göstərilən tarixdə aylıq ödənişi həyata keçirməlidir. Gecikmə halında əlavə cərimə tətbiq oluna bilər.</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2">5. Depozit</h4>
+                  <h4 className="font-semibold mb-2 text-gray-900">5. Depozit</h4>
                   <p>Kreditin aktivləşdirilməsi üçün borc alan depozit ödənişi etməlidir. Depozit məbləği sistem tərəfindən göstərilir.</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2">6. Erkən ödəmə</h4>
+                  <h4 className="font-semibold mb-2 text-gray-900">6. Erkən ödəmə</h4>
                   <p>Borc alan istənilən vaxt krediti tam və ya qismən erkən qaytara bilər. Erkən ödəmə halında faiz yenidən hesablanır.</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2">7. Məxfilik</h4>
+                  <h4 className="font-semibold mb-2 text-gray-900">7. Məxfilik</h4>
                   <p>Kreditor müştəri məlumatlarının məxfiliyini təmin edir və üçüncü şəxslərə vermir.</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2">8. Mübahisələrin həlli</h4>
+                  <h4 className="font-semibold mb-2 text-gray-900">8. Mübahisələrin həlli</h4>
                   <p>Müqavilə ilə bağlı mübahisələr danışıqlar yolu ilə, əldə edilmədiyi halda isə məhkəmə qaydasında həll olunur.</p>
                 </section>
               </div>
             </div>
 
-            <div className="flex items-start gap-3 mb-6">
+            <div className="flex items-start gap-3 mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
               <input
                 type="checkbox"
                 id="accept"
@@ -642,6 +642,14 @@ const ContractPage = () => {
               <label htmlFor="accept" className="text-sm text-gray-700 cursor-pointer">
                 Mən yuxarıda göstərilən bütün şərtləri oxudum və qəbul edirəm. Kredit müqaviləsini imzalamağa razıyam.
               </label>
+            </div>
+            
+            <div className="text-center mb-4">
+              <img 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                alt="AzPay" 
+                className="h-10 w-auto mx-auto opacity-70"
+              />
             </div>
 
             <Button
