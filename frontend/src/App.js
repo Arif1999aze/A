@@ -178,7 +178,7 @@ const HomePage = () => {
                   <TrendingUp className="w-7 h-7 text-white" />
                 </div>
                 <CardTitle>Əlverişli faizlər</CardTitle>
-                <CardDescription>16-18% illik faiz dərəcəsi ilə kredit imkanı</CardDescription>
+                <CardDescription>10% illik faiz dərəcəsi ilə kredit imkanı</CardDescription>
               </CardHeader>
             </Card>
           </div>
