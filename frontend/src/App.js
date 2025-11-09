@@ -1047,6 +1047,7 @@ const AdminPanel = () => {
   const [settings, setSettings] = useState({ 
     deposit_amount: 50, 
     whatsapp_link: '',
+    whatsapp_message_enabled: true,
     contact_phone: '',
     contact_email: '',
     contact_address: '',
