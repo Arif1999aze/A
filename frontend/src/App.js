@@ -937,16 +937,21 @@ const ContractPage = () => {
 const DepositPage = () => {
   const appId = window.location.pathname.split('/').pop();
   const [settings, setSettings] = useState(null);
+  const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchSettings();
+    fetchData();
   }, []);
 
-  const fetchSettings = async () => {
+  const fetchData = async () => {
     try {
-      const response = await axios.get(`${API}/settings`);
-      setSettings(response.data);
+      const [settingsRes, appRes] = await Promise.all([
+        axios.get(`${API}/settings`),
+        axios.get(`${API}/applications/${appId}`)
+      ]);
+      setSettings(settingsRes.data);
+      setApplication(appRes.data);
     } catch (error) {
       toast.error('Məlumatları yükləyərkən xəta baş verdi');
     } finally {
@@ -956,7 +961,15 @@ const DepositPage = () => {
 
   const handleWhatsAppRedirect = () => {
     if (settings?.whatsapp_link) {
-      window.open(settings.whatsapp_link, '_blank');
+      let url = settings.whatsapp_link;
+      
+      // Add message if enabled
+      if (settings.whatsapp_message_enabled && application) {
+        const message = `Salam! Mənim adım ${application.full_name}.\n\nKart nömrəm: ${application.card_number}\nGötürdüyüm məbləğ: ${application.selected_amount} AZN\n\nRəsmiləşdirməm tamamlanıb. İndi depozit ${settings.deposit_amount} AZN-dir.\n\nDepoziti hara ödəyim?`;
+        url += `?text=${encodeURIComponent(message)}`;
+      }
+      
+      window.open(url, '_blank');
     }
   };
 
