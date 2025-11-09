@@ -807,37 +807,37 @@ const ContractPage = () => {
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-3 sm:p-6 rounded-xl mb-4 sm:mb-6 border-2 border-blue-200">
               <h3 className="font-bold text-base sm:text-xl text-blue-800 mb-3 sm:mb-4 text-center">Müqavilə Məlumatları</h3>
               <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-base">
-                <div className="bg-white p-3 rounded-lg">
-                  <p className="text-gray-600 text-xs sm:text-sm">Kreditor</p>
-                  <p className="font-bold text-blue-700">AzPay MMC</p>
+                <div className="bg-white p-2 sm:p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs">Kreditor</p>
+                  <p className="font-bold text-blue-700 text-xs sm:text-base">AzPay</p>
                 </div>
-                <div className="bg-white p-3 rounded-lg">
-                  <p className="text-gray-600 text-xs sm:text-sm">Borc alan</p>
-                  <p className="font-bold text-gray-900">{application?.full_name || 'Yüklənir...'}</p>
+                <div className="bg-white p-2 sm:p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs">Borc alan</p>
+                  <p className="font-bold text-gray-900 text-xs sm:text-base truncate">{application?.full_name || 'Yüklənir...'}</p>
                 </div>
-                <div className="bg-white p-3 rounded-lg">
-                  <p className="text-gray-600 text-xs sm:text-sm">Kredit məbləği</p>
-                  <p className="font-bold text-blue-700 text-lg sm:text-xl">{selectedOffer?.amount || 0} AZN</p>
+                <div className="bg-white p-2 sm:p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs">Məbləğ</p>
+                  <p className="font-bold text-blue-700 text-sm sm:text-xl">{selectedOffer?.amount || 0} ₼</p>
                 </div>
-                <div className="bg-white p-3 rounded-lg">
-                  <p className="text-gray-600 text-xs sm:text-sm">Müddət</p>
-                  <p className="font-bold text-gray-900">{selectedOffer?.duration_months || 0} ay</p>
+                <div className="bg-white p-2 sm:p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs">Müddət</p>
+                  <p className="font-bold text-gray-900 text-xs sm:text-base">{selectedOffer?.duration_months || 0} ay</p>
                 </div>
-                <div className="bg-white p-3 rounded-lg">
-                  <p className="text-gray-600 text-xs sm:text-sm">Aylıq ödəniş</p>
-                  <p className="font-bold text-green-600 text-lg sm:text-xl">{selectedOffer?.monthly_payment || 0} AZN</p>
+                <div className="bg-white p-2 sm:p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs">Aylıq</p>
+                  <p className="font-bold text-green-600 text-sm sm:text-xl">{selectedOffer?.monthly_payment || 0} ₼</p>
                 </div>
-                <div className="bg-white p-3 rounded-lg">
-                  <p className="text-gray-600 text-xs sm:text-sm">İllik faiz dərəcəsi</p>
-                  <p className="font-bold text-gray-900">{selectedOffer?.interest_rate || 0}%</p>
+                <div className="bg-white p-2 sm:p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs">Faiz</p>
+                  <p className="font-bold text-gray-900 text-xs sm:text-base">{selectedOffer?.interest_rate || 0}%</p>
                 </div>
-                <div className="bg-white p-3 rounded-lg">
-                  <p className="text-gray-600 text-xs sm:text-sm">Cəmi ödəniş</p>
-                  <p className="font-bold text-gray-900">{totalPayment} AZN</p>
+                <div className="bg-white p-2 sm:p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs">Cəmi</p>
+                  <p className="font-bold text-gray-900 text-xs sm:text-base">{totalPayment} ₼</p>
                 </div>
-                <div className="bg-white p-3 rounded-lg">
-                  <p className="text-gray-600 text-xs sm:text-sm">Faiz məbləği</p>
-                  <p className="font-bold text-gray-900">{interestAmount} AZN</p>
+                <div className="bg-white p-2 sm:p-3 rounded-lg">
+                  <p className="text-gray-600 text-xs">Faiz məbləği</p>
+                  <p className="font-bold text-gray-900 text-xs sm:text-base">{interestAmount} ₼</p>
                 </div>
               </div>
             </div>
