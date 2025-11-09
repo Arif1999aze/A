@@ -149,7 +149,7 @@ const HomePage = () => {
       </section>
 
       {/* Features */}
-      <section className="py-20 px-4">
+      <section className="features-section py-20 px-4">
         <div className="container mx-auto">
           <div className="grid md:grid-cols-3 gap-8">
             <Card className="border-blue-100 hover:shadow-xl transition-all hover:-translate-y-1">
