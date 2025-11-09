@@ -476,25 +476,36 @@ const ApprovalPage = () => {
         <CardContent className="p-12 text-center">
           {checking ? (
             <>
-              <div className="relative w-32 h-32 mx-auto mb-6">
-                {/* Spinning green circle */}
-                <div className="absolute inset-0 border-8 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+              <img 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                alt="AzPay" 
+                className="h-16 w-auto mx-auto mb-8"
+              />
+              <div className="relative w-40 h-40 mx-auto mb-8">
+                {/* Outer spinning ring */}
+                <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-green-500 border-r-green-400 animate-spin"></div>
+                {/* Inner spinning ring */}
+                <div className="absolute inset-3 rounded-full border-4 border-transparent border-b-blue-500 border-l-blue-400 animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+                {/* Center circle with gradient */}
+                <div className="absolute inset-6 rounded-full bg-gradient-to-br from-green-400 to-blue-500 flex items-center justify-center shadow-lg">
+                  <span className="text-4xl font-bold text-white">✓</span>
+                </div>
               </div>
               <h2 className="text-3xl font-bold text-gray-900 mb-3">
                 Yoxlanış aparılır...
               </h2>
               <p className="text-gray-600 text-lg mb-6">
-                Məlumatlarınız yoxlanılır
+                Məlumatlarınız təhlil edilir
               </p>
               
               <div className="space-y-3">
-                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden shadow-inner">
                   <div 
-                    className="bg-gradient-to-r from-blue-600 to-blue-500 h-2 rounded-full transition-all duration-1000"
+                    className="bg-gradient-to-r from-green-500 via-blue-500 to-green-500 h-3 rounded-full transition-all duration-1000 shadow-lg"
                     style={{ width: `${progress}%` }}
                   ></div>
                 </div>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-gray-500 font-semibold">
                   {Math.round(progress)}% tamamlandı
                 </p>
               </div>
