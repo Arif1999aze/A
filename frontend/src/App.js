@@ -760,11 +760,6 @@ const DepositPage = () => {
       <div className="container mx-auto max-w-2xl">
         <Card className="shadow-2xl border-blue-100">
           <CardHeader>
-            <img 
-              src="https://i.hizliresim.com/iydskgy.jpeg" 
-              alt="AzPay" 
-              className="h-14 w-auto mx-auto mb-4"
-            />
             <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
               <span className="text-5xl font-bold text-white">₼</span>
             </div>
