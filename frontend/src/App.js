@@ -596,29 +596,29 @@ const CreditSelectionPage = () => {
                   onClick={() => setSelectedOffer(offer)}
                   data-testid={`credit-offer-${offer.amount}`}
                 >
-                  <CardContent className="p-6">
-                    <div className="text-center mb-4 relative">
+                  <CardContent className="p-3 sm:p-6">
+                    <div className="text-center mb-2 sm:mb-4 relative">
                       {selectedOffer?.amount === offer.amount && (
-                        <div className="absolute -top-2 -right-2">
-                          <CheckCircle2 className="w-6 h-6 text-blue-600" />
+                        <div className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2">
+                          <CheckCircle2 className="w-4 h-4 sm:w-6 sm:h-6 text-blue-600" />
                         </div>
                       )}
-                      <div className="inline-block px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full mb-3">
-                        <h3 className="text-3xl font-bold text-white">{offer.amount} ₼</h3>
+                      <div className="inline-block px-2 py-1 sm:px-4 sm:py-2 bg-gradient-to-r from-blue-600 to-blue-700 rounded-full mb-2 sm:mb-3">
+                        <h3 className="text-lg sm:text-3xl font-bold text-white">{offer.amount} ₼</h3>
                       </div>
                     </div>
-                    <div className="space-y-3 text-sm">
-                      <div className="flex justify-between items-center p-2 bg-white rounded-lg">
+                    <div className="space-y-1.5 sm:space-y-3 text-xs sm:text-sm">
+                      <div className="flex justify-between items-center p-1.5 sm:p-2 bg-white rounded-lg">
                         <span className="text-gray-600">Müddət:</span>
                         <span className="font-semibold text-gray-900">{offer.duration_months} ay</span>
                       </div>
-                      <div className="flex justify-between items-center p-2 bg-white rounded-lg">
-                        <span className="text-gray-600">İllik faiz:</span>
+                      <div className="flex justify-between items-center p-1.5 sm:p-2 bg-white rounded-lg">
+                        <span className="text-gray-600">Faiz:</span>
                         <span className="font-semibold text-gray-900">{offer.interest_rate}%</span>
                       </div>
-                      <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-100 to-blue-50 rounded-lg border border-blue-200">
-                        <span className="text-gray-700 font-medium">Aylıq ödəniş:</span>
-                        <span className="font-bold text-blue-700 text-lg">{offer.monthly_payment.toFixed(2)} ₼</span>
+                      <div className="flex justify-between items-center p-2 sm:p-3 bg-gradient-to-r from-blue-100 to-blue-50 rounded-lg border border-blue-200">
+                        <span className="text-gray-700 font-medium text-xs sm:text-sm">Aylıq:</span>
+                        <span className="font-bold text-blue-700 text-sm sm:text-lg">{offer.monthly_payment.toFixed(2)} ₼</span>
                       </div>
                     </div>
                   </CardContent>
