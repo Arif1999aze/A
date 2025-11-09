@@ -84,7 +84,7 @@ const HomePage = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="relative py-24 px-4 overflow-hidden min-h-[600px] flex items-center">
+      <section className="relative py-12 sm:py-24 px-4 overflow-hidden min-h-[500px] sm:min-h-[600px] flex items-center">
         <div className="absolute inset-0 bg-gradient-to-br from-blue-100 via-blue-50 to-white"></div>
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full blur-3xl"></div>
