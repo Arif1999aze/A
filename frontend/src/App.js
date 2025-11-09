@@ -843,7 +843,7 @@ const ContractPage = () => {
             </div>
 
             {/* Contract Terms */}
-            <div className="bg-gray-50 p-4 sm:p-6 rounded-lg max-h-96 overflow-y-auto mb-6 border border-gray-200" data-testid="contract-content">
+            <div className="bg-gray-50 p-3 sm:p-6 rounded-lg max-h-64 sm:max-h-96 overflow-y-auto mb-4 sm:mb-6 border border-gray-200" data-testid="contract-content">
               <div className="text-center mb-4">
                 <img 
                   src="https://i.hizliresim.com/iydskgy.jpeg" 
