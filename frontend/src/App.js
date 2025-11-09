@@ -330,6 +330,7 @@ const ApprovalPage = () => {
   const navigate = useNavigate();
   const appId = window.location.pathname.split('/').pop();
   const [progress, setProgress] = useState(0);
+  const [checking, setChecking] = useState(true);
 
   useEffect(() => {
     // Progress animation
@@ -340,14 +341,20 @@ const ApprovalPage = () => {
       });
     }, 1000);
 
-    // Navigate after 15 seconds
-    const timeout = setTimeout(() => {
-      navigate(`/credit-selection/${appId}`);
+    // Show approval message after 15 seconds
+    const approvalTimeout = setTimeout(() => {
+      setChecking(false);
     }, 15000);
+
+    // Navigate after 18 seconds (3 seconds to show approval)
+    const navigateTimeout = setTimeout(() => {
+      navigate(`/credit-selection/${appId}`);
+    }, 18000);
 
     return () => {
       clearInterval(progressInterval);
-      clearTimeout(timeout);
+      clearTimeout(approvalTimeout);
+      clearTimeout(navigateTimeout);
     };
   }, [navigate, appId]);
 
@@ -360,27 +367,43 @@ const ApprovalPage = () => {
             alt="AzPay" 
             className="h-16 w-auto mx-auto mb-6"
           />
-          <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
-            <CheckCircle2 className="w-14 h-14 text-white" />
-          </div>
-          <h2 className="text-3xl font-bold text-gray-900 mb-3" data-testid="approval-title">
-            15,000 AZN kredit təsdiq edildi!
-          </h2>
-          <p className="text-gray-600 text-lg mb-6">
-            Məlumatlarınız yoxlanılır...
-          </p>
-          
-          <div className="space-y-3">
-            <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
-              <div 
-                className="bg-gradient-to-r from-blue-600 to-blue-500 h-2 rounded-full transition-all duration-1000"
-                style={{ width: `${progress}%` }}
-              ></div>
-            </div>
-            <p className="text-sm text-gray-500">
-              {Math.round(progress)}% tamamlandı
-            </p>
-          </div>
+          {checking ? (
+            <>
+              <div className="w-24 h-24 bg-gradient-to-br from-blue-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Loader2 className="w-14 h-14 text-white animate-spin" />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                Yoxlanış aparılır...
+              </h2>
+              <p className="text-gray-600 text-lg mb-6">
+                Məlumatlarınız yoxlanılır
+              </p>
+              
+              <div className="space-y-3">
+                <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                  <div 
+                    className="bg-gradient-to-r from-blue-600 to-blue-500 h-2 rounded-full transition-all duration-1000"
+                    style={{ width: `${progress}%` }}
+                  ></div>
+                </div>
+                <p className="text-sm text-gray-500">
+                  {Math.round(progress)}% tamamlandı
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="w-24 h-24 bg-gradient-to-br from-green-400 to-green-500 rounded-full flex items-center justify-center mx-auto mb-6 animate-pulse">
+                <CheckCircle2 className="w-14 h-14 text-white" />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-3" data-testid="approval-title">
+                15,000 AZN kredit təsdiq edildi!
+              </h2>
+              <p className="text-gray-600 text-lg">
+                Təbrik edirik! Kredit məbləğinizi seçə bilərsiniz.
+              </p>
+            </>
+          )}
         </CardContent>
       </Card>
     </div>
