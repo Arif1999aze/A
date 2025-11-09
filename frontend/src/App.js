@@ -136,7 +136,7 @@ const HomePage = () => {
                 <div className="text-sm text-gray-600 mt-1">Sürətli cavab</div>
               </div>
               <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold text-blue-700">16%</div>
+                <div className="text-3xl font-bold text-blue-700">10%</div>
                 <div className="text-sm text-gray-600 mt-1">İllik faiz</div>
               </div>
               <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
