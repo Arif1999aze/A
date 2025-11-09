@@ -856,7 +856,7 @@ const AdminPanel = () => {
   const [loading, setLoading] = useState(false);
 
   const handleLogin = () => {
-    if (password === 'admin123') {
+    if (password === 'Batuhan6565') {
       setAuthenticated(true);
       fetchSettings();
     } else {
