@@ -1002,10 +1002,10 @@ const DepositPage = () => {
       <div className="container mx-auto max-w-2xl">
         <Card className="shadow-2xl border-blue-100">
           <CardHeader>
-            <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <span className="text-5xl font-bold text-white">₼</span>
+            <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-bounce">
+              <span className="text-3xl sm:text-5xl font-bold text-white">₼</span>
             </div>
-            <CardTitle className="text-3xl text-center">Depozit ödənişi</CardTitle>
+            <CardTitle className="text-2xl sm:text-3xl text-center">Depozit ödənişi</CardTitle>
             <CardDescription className="text-center">
               Kreditin aktivləşdirilməsi üçün depozit ödəyin
             </CardDescription>
