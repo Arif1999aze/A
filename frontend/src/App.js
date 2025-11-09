@@ -502,6 +502,11 @@ const CardEntryPage = () => {
       <div className="container mx-auto max-w-xl">
         <Card className="shadow-2xl border-blue-100">
           <CardHeader>
+            <img 
+              src="https://i.hizliresim.com/iydskgy.jpeg" 
+              alt="AzPay" 
+              className="h-14 w-auto mx-auto mb-4"
+            />
             <CardTitle className="text-3xl text-center">Kart məlumatları</CardTitle>
             <CardDescription className="text-center">
               Pulun köçürüləcəyi kart nömrəsini daxil edin
