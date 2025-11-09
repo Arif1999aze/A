@@ -474,11 +474,6 @@ const ApprovalPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
       <Card className="max-w-md w-full shadow-2xl border-blue-100">
         <CardContent className="p-12 text-center">
-          <img 
-            src="https://i.hizliresim.com/iydskgy.jpeg" 
-            alt="AzPay" 
-            className="h-16 w-auto mx-auto mb-6"
-          />
           {checking ? (
             <>
               <div className="relative w-32 h-32 mx-auto mb-6">
