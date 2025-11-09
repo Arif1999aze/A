@@ -204,15 +204,71 @@ const HomePage = () => {
 
       {/* Footer */}
       <footer className="bg-gradient-to-r from-blue-900 to-blue-800 text-white py-12 px-4">
-        <div className="container mx-auto text-center">
-          <img 
-            src="https://i.hizliresim.com/iydskgy.jpeg" 
-            alt="AzPay" 
-            className="h-16 w-auto mx-auto mb-4"
-          />
-          <p className="text-blue-100 text-lg">
-            © <span onClick={() => navigate('/admin')} className="cursor-pointer hover:text-white transition-colors">2025</span> AzPay. Bütün hüquqlar qorunur.
-          </p>
+        <div className="container mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            {/* Logo and About */}
+            <div className="text-center md:text-left">
+              <img 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                alt="AzPay" 
+                className="h-14 w-auto mx-auto md:mx-0 mb-4"
+              />
+              <p className="text-blue-100 text-sm leading-relaxed">
+                {settings?.about_text || 'AzPay - Azərbaycanda rəqəmsal maliyyə xidmətləri sahəsində fəaliyyət göstərən innovativ şirkətdir.'}
+              </p>
+            </div>
+
+            {/* Contact Info */}
+            <div className="text-center md:text-left">
+              <h3 className="text-xl font-bold mb-4">Əlaqə</h3>
+              <div className="space-y-3 text-blue-100">
+                <div className="flex items-center justify-center md:justify-start gap-2">
+                  <span className="text-lg">📞</span>
+                  <span className="text-sm">{settings?.contact_phone || '+994 50 123 45 67'}</span>
+                </div>
+                <div className="flex items-center justify-center md:justify-start gap-2">
+                  <span className="text-lg">✉️</span>
+                  <span className="text-sm">{settings?.contact_email || 'info@azpay.az'}</span>
+                </div>
+                <div className="flex items-center justify-center md:justify-start gap-2">
+                  <span className="text-lg">📍</span>
+                  <span className="text-sm">{settings?.contact_address || 'Bakı, Azərbaycan'}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div className="text-center md:text-left">
+              <h3 className="text-xl font-bold mb-4">Sürətli keçidlər</h3>
+              <div className="space-y-2">
+                <div>
+                  <button 
+                    onClick={() => navigate('/application')}
+                    className="text-blue-100 hover:text-white transition-colors text-sm"
+                  >
+                    Müraciət et
+                  </button>
+                </div>
+                <div>
+                  <button 
+                    onClick={() => {
+                      const aboutSection = document.querySelector('.about-section');
+                      aboutSection?.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="text-blue-100 hover:text-white transition-colors text-sm"
+                  >
+                    Haqqımızda
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-blue-700 pt-6 text-center">
+            <p className="text-blue-100">
+              © <span onClick={() => navigate('/admin')} className="cursor-pointer hover:text-white transition-colors">2025</span> AzPay. Bütün hüquqlar qorunur.
+            </p>
+          </div>
         </div>
       </footer>
     </div>
