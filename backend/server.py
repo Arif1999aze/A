@@ -177,6 +177,7 @@ async def get_settings():
 async def update_settings(update: SettingsUpdate, admin_password: str = Header(...)):
     if admin_password != ADMIN_PASSWORD:
         raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
+    print(f"Received password: {admin_password}, Expected: {ADMIN_PASSWORD}")
     
     settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
     
