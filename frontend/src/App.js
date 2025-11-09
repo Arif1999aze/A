@@ -689,12 +689,13 @@ const ContractPage = () => {
               </label>
             </div>
             
-            <div className="text-center mb-4">
+            <div className="text-center mb-4 pt-4 border-t border-gray-200">
               <img 
                 src="https://i.hizliresim.com/iydskgy.jpeg" 
                 alt="AzPay" 
-                className="h-10 w-auto mx-auto opacity-70"
+                className="h-12 w-auto mx-auto mb-2"
               />
+              <p className="text-xs text-gray-500">© 2025 AzPay. Bütün hüquqlar qorunur.</p>
             </div>
 
             <Button
