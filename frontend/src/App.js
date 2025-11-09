@@ -45,12 +45,12 @@ const HomePage = () => {
             </div>
             
             {/* Mobile & Desktop Navigation - Always Visible */}
-            <nav className="flex items-center gap-3 sm:gap-6">
+            <nav className="flex items-center gap-2 sm:gap-6">
               <button 
                 onClick={() => navigate('/')}
                 className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-xs sm:text-base"
               >
-                Ana səhifə
+                Ana
               </button>
               <button 
                 onClick={() => {
@@ -66,15 +66,15 @@ const HomePage = () => {
                   const featuresSection = document.querySelector('.features-section');
                   featuresSection?.scrollIntoView({ behavior: 'smooth' });
                 }}
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-xs sm:text-base hidden sm:block"
+                className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-xs sm:text-base"
               >
-                Üstünlüklər
+                Üstünlük
               </button>
             </nav>
 
             <Button 
               onClick={() => navigate('/application')} 
-              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-4 sm:px-8 text-xs sm:text-base py-2 sm:py-3"
+              className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-3 sm:px-8 text-xs sm:text-base py-2 sm:py-3"
               data-testid="start-application-btn"
             >
               Müraciət
