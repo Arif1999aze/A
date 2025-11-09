@@ -1182,6 +1182,20 @@ const AdminPanel = () => {
               />
             </div>
 
+            <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <input
+                type="checkbox"
+                id="whatsapp_message"
+                data-testid="admin-whatsapp-message-input"
+                checked={settings.whatsapp_message_enabled}
+                onChange={(e) => setSettings({ ...settings, whatsapp_message_enabled: e.target.checked })}
+                className="w-5 h-5 text-blue-600 rounded cursor-pointer"
+              />
+              <Label htmlFor="whatsapp_message" className="cursor-pointer m-0">
+                WhatsApp-da avtomatik mesaj göndərilsin (müştəri məlumatları ilə)
+              </Label>
+            </div>
+
             <div>
               <Label htmlFor="contact_phone">Əlaqə telefonu</Label>
               <Input
