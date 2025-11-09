@@ -1117,6 +1117,7 @@ const AdminPanel = () => {
   const handleUpdate = async () => {
     setLoading(true);
     try {
+      const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'Batuhan6565';
       await axios.put(
         `${API}/settings`,
         {
@@ -1129,7 +1130,7 @@ const AdminPanel = () => {
           about_text: settings.about_text
         },
         {
-          headers: { 'admin-password': 'Batuhan6565' }
+          headers: { 'admin-password': adminPassword }
         }
       );
       toast.success('Parametrlər yeniləndi');
