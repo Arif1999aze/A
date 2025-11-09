@@ -130,18 +130,18 @@ const HomePage = () => {
               </div>
             </div>
             
-            <div className="mt-12 grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold text-blue-700">15 dəq</div>
-                <div className="text-sm text-gray-600 mt-1">Sürətli cavab</div>
+            <div className="mt-8 sm:mt-12 grid grid-cols-3 gap-3 sm:gap-8 max-w-2xl mx-auto px-2">
+              <div className="bg-white/80 backdrop-blur-sm p-3 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg">
+                <div className="text-xl sm:text-3xl font-bold text-blue-700">15 dəq</div>
+                <div className="text-xs sm:text-sm text-gray-600 mt-1">Sürətli cavab</div>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold text-blue-700">10%</div>
-                <div className="text-sm text-gray-600 mt-1">İllik faiz</div>
+              <div className="bg-white/80 backdrop-blur-sm p-3 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg">
+                <div className="text-xl sm:text-3xl font-bold text-blue-700">10%</div>
+                <div className="text-xs sm:text-sm text-gray-600 mt-1">İllik faiz</div>
               </div>
-              <div className="bg-white/80 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
-                <div className="text-3xl font-bold text-blue-700">15,000₼</div>
-                <div className="text-sm text-gray-600 mt-1">Maksimum kredit</div>
+              <div className="bg-white/80 backdrop-blur-sm p-3 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg">
+                <div className="text-lg sm:text-3xl font-bold text-blue-700">15,000₼</div>
+                <div className="text-xs sm:text-sm text-gray-600 mt-1">Maks kredit</div>
               </div>
             </div>
           </div>
