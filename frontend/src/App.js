@@ -828,45 +828,53 @@ const ContractPage = () => {
             <div className="bg-gray-50 p-4 sm:p-6 rounded-lg max-h-96 overflow-y-auto mb-6 border border-gray-200" data-testid="contract-content">
               <h3 className="font-bold text-base sm:text-lg mb-4 text-blue-700">Kredit müqaviləsi şərtləri</h3>
               
-              <div className="space-y-4 text-sm text-gray-700 leading-relaxed">
+              <div className="space-y-4 text-xs sm:text-sm text-gray-700 leading-relaxed">
                 <section>
-                  <h4 className="font-semibold mb-2 text-gray-900">1. Ümumi müddəalar</h4>
-                  <p>Bu müqavilə AzPay MMC (bundan sonra "Kreditor") ilə müştəri (bundan sonra "Borc alan") arasında bağlanmışdır.</p>
+                  <h4 className="font-semibold mb-2 text-gray-900">1. Tərəflər</h4>
+                  <p><strong>Kreditor:</strong> AzPay MMC (bundan sonra "Kreditor")</p>
+                  <p><strong>Borc alan:</strong> {application?.full_name || '...'} (bundan sonra "Borc alan")</p>
+                  <p><strong>FIN kod:</strong> {application?.fin_code || '...'}</p>
+                  <p><strong>Şəxsiyyət vəsiqəsi:</strong> {application?.id_series || '...'}</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2 text-gray-900">2. Kreditin məbləği və müddəti</h4>
-                  <p>Kreditor borc alana seçilmiş məbləğdə kredit verir. Kredit müqavilədə göstərilən müddətdə qaytarılmalıdır.</p>
+                  <h4 className="font-semibold mb-2 text-gray-900">2. Kreditin məbləği və şərtləri</h4>
+                  <p>Kreditor Borc alana <strong className="text-blue-700">{selectedOffer?.amount || 0} AZN</strong> məbləğində kredit verir.</p>
+                  <p>Müddət: <strong>{selectedOffer?.duration_months || 0} ay</strong></p>
+                  <p>İllik faiz dərəcəsi: <strong>{selectedOffer?.interest_rate || 0}%</strong></p>
+                  <p>Aylıq ödəniş: <strong className="text-green-600">{selectedOffer?.monthly_payment || 0} AZN</strong></p>
+                  <p>Cəmi ödəniş: <strong>{totalPayment} AZN</strong></p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2 text-gray-900">3. Faiz dərəcəsi</h4>
-                  <p>Kredit üzrə illik faiz dərəcəsi müqavilədə göstərilən məbləğə uyğundur (16-18%).</p>
+                  <h4 className="font-semibold mb-2 text-gray-900">3. Ödəniş qaydası</h4>
+                  <p>Borc alan hər ay {selectedOffer?.monthly_payment || 0} AZN məbləğində ödəniş etməlidir. Ödənişlər <strong>{application?.card_number ? `****${application.card_number.slice(-4)}` : '...'}</strong> nömrəli karta köçürülür.</p>
+                  <p>Gecikməə halında hər gün üçün 0.1% cərimə tətbiq olunur.</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2 text-gray-900">4. Ödəniş qaydası</h4>
-                  <p>Borc alan hər ay göstərilən tarixdə aylıq ödənişi həyata keçirməlidir. Gecikmə halında əlavə cərimə tətbiq oluna bilər.</p>
+                  <h4 className="font-semibold mb-2 text-gray-900">4. Depozit ödənişi</h4>
+                  <p>Kreditin aktivləşdirilməsi üçün Borc alan depozit ödənişi etməlidir. Depozit kredtin tam ödənilməsindən sonra geri qaytarılır.</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2 text-gray-900">5. Depozit</h4>
-                  <p>Kreditin aktivləşdirilməsi üçün borc alan depozit ödənişi etməlidir. Depozit məbləği sistem tərəfindən göstərilir.</p>
+                  <h4 className="font-semibold mb-2 text-gray-900">5. Erkən ödəmə</h4>
+                  <p>Borc alan istənilən vaxt krediti erkən qaytara bilər. Erkən ödəmə halında faiz yalnız istifadə olunmuş müddət üçün hesablanır.</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2 text-gray-900">6. Erkən ödəmə</h4>
-                  <p>Borc alan istənilən vaxt krediti tam və ya qismən erkən qaytara bilər. Erkən ödəmə halında faiz yenidən hesablanır.</p>
+                  <h4 className="font-semibold mb-2 text-gray-900">6. Tərəflərin öhdəlikləri</h4>
+                  <p><strong>Kreditor öhdəlikləri:</strong> Kredit məbləğini müqavilədə göstərilən şərtlərlə vermək, məlumatların məxfiliyini təmin etmək.</p>
+                  <p><strong>Borc alan öhdəlikləri:</strong> Kreditin vaxtında qaytarılması, ödəniş cədvəlinə riayət etmək.</p>
                 </section>
 
                 <section>
-                  <h4 className="font-semibold mb-2 text-gray-900">7. Məxfilik</h4>
-                  <p>Kreditor müştəri məlumatlarının məxfiliyini təmin edir və üçüncü şəxslərə vermir.</p>
+                  <h4 className="font-semibold mb-2 text-gray-900">7. Mübahisələrin həlli</h4>
+                  <p>Müqavilə ilə bağlı mübahisələr ilk növbədə danışıqlar yolu ilə həll edilir. Razılaşmaya gəlinmədiyi halda Azərbaycan Respublikasının qanunvericiliyinə uyğun olaraq məhkəmə qaydası ilə həll olunur.</p>
                 </section>
 
-                <section>
-                  <h4 className="font-semibold mb-2 text-gray-900">8. Mübahisələrin həlli</h4>
-                  <p>Müqavilə ilə bağlı mübahisələr danışıqlar yolu ilə, əldə edilmədiyi halda isə məhkəmə qaydasında həll olunur.</p>
+                <section className="mt-6 pt-4 border-t-2 border-blue-200">
+                  <p className="text-center text-gray-900 font-semibold">Müqavilə tarixı: {new Date().toLocaleDateString('az-AZ')}</p>
                 </section>
               </div>
             </div>
