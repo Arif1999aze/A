@@ -43,3 +43,45 @@
     @apply mx-auto px-4 sm:px-6 lg:px-8;
   }
 }
+
+/* Payment Button Animation */
+@keyframes colorPulse {
+  0% {
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    transform: scale(1);
+  }
+  25% {
+    background: linear-gradient(to right, #dc2626, #b91c1c);
+    transform: scale(1.05);
+  }
+  50% {
+    background: linear-gradient(to right, #16a34a, #15803d);
+    transform: scale(1);
+  }
+  75% {
+    background: linear-gradient(to right, #dc2626, #b91c1c);
+    transform: scale(1.05);
+  }
+  100% {
+    background: linear-gradient(to right, #2563eb, #1d4ed8);
+    transform: scale(1);
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Apply animation to payment button */
+[data-testid="payment-start-btn"] {
+  animation: colorPulse 3s ease-in-out infinite, bounce 2s ease-in-out infinite;
+}
+
+[data-testid="payment-start-btn"]:hover {
+  animation-play-state: paused;
+}
