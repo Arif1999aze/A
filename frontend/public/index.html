@@ -56,64 +56,43 @@
         
         <!-- Custom SUPSIS Styling -->
         <style>
-            /* Hide ALL default SUPSIS widget buttons and launcher */
-            #supsis-widget-button,
-            #supsis-launcher,
-            #supsis-widget-launcher,
-            .supsis-widget-button,
-            .supsis-launcher,
-            .supsis-widget-launcher,
-            [class*="supsis-widget"],
-            [class*="supsis-button"],
-            [class*="supsis-launcher"],
-            [id*="supsis-button"],
-            [id*="supsis-widget"],
-            [id*="supsis-launcher"],
-            iframe[src*="supsis"]:not([id*="chat"]) {
-                display: none !important;
-                visibility: hidden !important;
-                opacity: 0 !important;
-                pointer-events: none !important;
-                width: 0 !important;
-                height: 0 !important;
-            }
-            
-            /* Target any floating button */
-            div[style*="position: fixed"][style*="bottom"][style*="right"]:has(iframe),
-            div[style*="position: fixed"][style*="z-index"]:has([class*="supsis"]) {
-                display: none !important;
-            }
-            
-            /* Center SUPSIS chat window */
-            #supsis-chat-container,
-            #supsis-chat-window,
-            [class*="supsis-chat"],
-            [id*="supsis-chat"] {
+            /* SUPSIS Chat iframe - Show and center it */
+            #supsis-iframe {
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
                 position: fixed !important;
                 top: 50% !important;
                 left: 50% !important;
                 transform: translate(-50%, -50%) !important;
-                right: auto !important;
-                bottom: auto !important;
-                width: 90% !important;
-                max-width: 500px !important;
+                width: 450px !important;
                 height: 600px !important;
-                max-height: 90vh !important;
+                max-height: 85vh !important;
                 border-radius: 16px !important;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.4) !important;
                 z-index: 9999 !important;
+                border: none !important;
             }
             
-            /* Mobile responsive */
+            /* Mobile responsive for chat iframe */
             @media (max-width: 640px) {
-                #supsis-chat-container,
-                #supsis-chat-window,
-                [class*="supsis-chat"],
-                [id*="supsis-chat"] {
-                    width: 95% !important;
-                    max-width: none !important;
+                #supsis-iframe {
+                    width: 90vw !important;
                     height: 80vh !important;
+                    border-radius: 12px !important;
                 }
+            }
+            
+            /* Hide SUPSIS iframe by default (will be shown via JavaScript) */
+            body:not(.supsis-chat-open) #supsis-iframe {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
+            }
+            
+            /* Show chat iframe when chat is open */
+            body.supsis-chat-open #supsis-iframe {
+                display: block !important;
             }
             
             /* Add backdrop when chat is open */
@@ -124,9 +103,9 @@
                 left: 0;
                 right: 0;
                 bottom: 0;
-                background: rgba(0, 0, 0, 0.5);
+                background: rgba(0, 0, 0, 0.6);
                 z-index: 9998;
-                backdrop-filter: blur(4px);
+                backdrop-filter: blur(5px);
             }
         </style>
     </head>
