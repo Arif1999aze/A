@@ -53,6 +53,66 @@
         <script>window.supsis=window.supsis||function(){(supsis.q=supsis.q||[]).push(arguments)};supsis.l=+new Date;</script>
         <script src="https://azpay.visitor.supsis.live/static/js/loader.js" type="text/javascript" async defer></script>
         <!-- End of SUPSIS Embed Code -->
+        
+        <!-- Custom SUPSIS Styling -->
+        <style>
+            /* Hide default SUPSIS widget button */
+            #supsis-widget-button,
+            #supsis-launcher,
+            [class*="supsis-widget"],
+            [class*="supsis-button"],
+            [id*="supsis-button"] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
+            }
+            
+            /* Center SUPSIS chat window */
+            #supsis-chat-container,
+            #supsis-chat-window,
+            [class*="supsis-chat"],
+            [id*="supsis-chat"] {
+                position: fixed !important;
+                top: 50% !important;
+                left: 50% !important;
+                transform: translate(-50%, -50%) !important;
+                right: auto !important;
+                bottom: auto !important;
+                width: 90% !important;
+                max-width: 500px !important;
+                height: 600px !important;
+                max-height: 90vh !important;
+                border-radius: 16px !important;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
+                z-index: 9999 !important;
+            }
+            
+            /* Mobile responsive */
+            @media (max-width: 640px) {
+                #supsis-chat-container,
+                #supsis-chat-window,
+                [class*="supsis-chat"],
+                [id*="supsis-chat"] {
+                    width: 95% !important;
+                    max-width: none !important;
+                    height: 80vh !important;
+                }
+            }
+            
+            /* Add backdrop when chat is open */
+            body.supsis-chat-open::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 9998;
+                backdrop-filter: blur(4px);
+            }
+        </style>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
