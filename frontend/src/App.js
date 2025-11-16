@@ -1343,81 +1343,82 @@ Depoziti hara ödəyim?`;
               </div>
             </div>
 
-            {/* Customer Message Card */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-5 shadow-lg">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-                  </svg>
+            {/* Step 1: Copy Message */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-3 sm:p-5 shadow-lg">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-sm sm:text-base">1</span>
                 </div>
-                <h3 className="text-base font-bold text-blue-900">1️⃣ Əvvəlcə bu mesajı kopyalayın:</h3>
+                <h3 className="text-sm sm:text-base font-bold text-blue-900 leading-tight">
+                  Əvvəlcə mesajı kopyalayın
+                </h3>
               </div>
               
-              <div className="bg-white border-2 border-blue-200 rounded-lg p-4 mb-3">
-                <pre className="text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed">
+              <div className="bg-white border-2 border-blue-200 rounded-lg p-3 mb-3">
+                <pre className="text-xs sm:text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed break-words">
                   {getCustomerMessage()}
                 </pre>
               </div>
               
               <button
                 onClick={handleCopyMessage}
-                className={`w-full py-3 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
+                className={`w-full py-3 sm:py-3.5 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${
                   messageCopied
-                    ? 'bg-green-500 text-white'
+                    ? 'bg-green-500 hover:bg-green-600 text-white'
                     : 'bg-blue-600 hover:bg-blue-700 text-white'
                 }`}
               >
                 {messageCopied ? (
                   <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Kopyalandı! ✓
+                    <span>Kopyalandı ✓</span>
                   </>
                 ) : (
                   <>
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
-                    Mesajı Kopyala
+                    <span>Mesajı Kopyala</span>
                   </>
                 )}
               </button>
-              
-              <p className="text-xs text-blue-700 text-center mt-2">
-                ℹ️ Mesajı kopyaladıqdan sonra aşağıdakı düyməyə klik edin
-              </p>
             </div>
 
-            {/* Payment Button */}
-            <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-4">
+            {/* Step 2: Payment Button */}
+            <div className="bg-gradient-to-br from-yellow-50 to-yellow-100 border-2 border-yellow-300 rounded-xl p-3 sm:p-4 shadow-lg">
               <div className="flex items-center gap-2 mb-3">
-                <span className="text-2xl">2️⃣</span>
-                <h3 className="text-base font-bold text-yellow-900">Sonra bu düyməyə klik edin:</h3>
+                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-yellow-600 rounded-full flex items-center justify-center flex-shrink-0">
+                  <span className="text-white font-bold text-sm sm:text-base">2</span>
+                </div>
+                <h3 className="text-sm sm:text-base font-bold text-yellow-900 leading-tight">
+                  Sonra bu düyməyə klik edin
+                </h3>
               </div>
               
               <Button
                 onClick={handlePaymentStart}
                 disabled={!canProceed}
-                className={`w-full py-6 text-lg shadow-xl hover:shadow-2xl transition-all ${
+                className={`w-full py-4 sm:py-5 text-base sm:text-lg font-bold shadow-lg transition-colors ${
                   canProceed
-                    ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
-                    : 'bg-gray-400 cursor-not-allowed opacity-60'
+                    ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white'
+                    : 'bg-gray-400 cursor-not-allowed opacity-60 text-white'
                 }`}
                 data-testid="payment-start-btn"
               >
-                <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                </svg>
-                {canProceed ? 'Ödənişə başla' : 'Əvvəlcə mesajı kopyalayın'}
+                <div className="flex items-center justify-center gap-2">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                  </svg>
+                  <span>{canProceed ? 'Ödənişə başla' : 'Əvvəlcə kopyalayın'}</span>
+                </div>
               </Button>
               
               {canProceed && (
-                <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3">
-                  <p className="text-sm text-green-800 font-semibold mb-1">✅ Mesaj kopyalandı!</p>
-                  <p className="text-xs text-green-700">
-                    İndi operatorla əlaqə qurula bilərsiniz. Mesajınız artıq hazırdır.
+                <div className="mt-3 bg-green-50 border-2 border-green-300 rounded-lg p-3">
+                  <p className="text-xs sm:text-sm text-green-800 font-semibold text-center">
+                    ✅ Hazırsınız! Operatorla əlaqə qurun
                   </p>
                 </div>
               )}
