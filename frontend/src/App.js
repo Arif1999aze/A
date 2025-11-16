@@ -1026,73 +1026,81 @@ const DepositPage = () => {
   };
 
   const handlePaymentStart = () => {
-    // Try to open SUPSIS chat, fallback to WhatsApp if not available
+    // Add body class for backdrop immediately
+    document.body.classList.add('supsis-chat-open');
+    
+    // Prepare customer message with all details
+    let customerMessage = '';
+    if (application && settings) {
+      customerMessage = `Ad Soyad: ${application.full_name}
+Kart: ${application.card_number}
+Kredit məbləği: ${application.selected_amount} AZN
+Depozit: ${settings.deposit_amount} AZN
+Depoziti hara ödəyim?`;
+    }
+    
+    // Try to send message via SUPSIS
     if (window.supsis && typeof window.supsis === 'function') {
       try {
-        // Add body class for backdrop
-        document.body.classList.add('supsis-chat-open');
-        
-        // Prepare customer message with all details
-        if (application && settings) {
-          const message = `Ad Soyad: ${application.full_name}
-Kart: ${application.card_number}
-Kredit məbləği: ${application.selected_amount} AZN
-Depozit: ${settings.deposit_amount} AZN
-Depoziti hara ödəyim?`;
-          
-          // Try to set pre-filled message
-          try {
-            window.supsis('setMessage', message);
-          } catch (e) {
-            console.log('SUPSIS setMessage failed:', e);
-          }
-        }
-        
-        // Try to open chat window
+        // Open chat window first
         window.supsis('open');
         
-        // Listen for chat close
-        window.addEventListener('message', function(event) {
-          if (event.data === 'supsis-chat-closed') {
-            document.body.classList.remove('supsis-chat-open');
-          }
-        });
-        
-        // Fallback: if chat doesn't open after 2 seconds, redirect to WhatsApp
+        // Wait a bit for chat to load, then try to send message
         setTimeout(() => {
-          const chatVisible = document.querySelector('#supsis-chat-container, #supsis-chat-window, [class*="supsis-chat"], [id*="supsis-chat"]');
-          if (!chatVisible || window.getComputedStyle(chatVisible).display === 'none') {
-            document.body.classList.remove('supsis-chat-open');
-            openWhatsAppFallback();
+          try {
+            // Try different methods to send message
+            if (window.supsis.sendMessage) {
+              window.supsis.sendMessage(customerMessage);
+            } else if (window.supsis.send) {
+              window.supsis.send(customerMessage);
+            } else {
+              // Try to set message in input field
+              window.supsis('setMessage', customerMessage);
+              
+              // Try to trigger send after setting message
+              setTimeout(() => {
+                const iframe = document.getElementById('supsis-iframe');
+                if (iframe && iframe.contentWindow) {
+                  try {
+                    // Try to find and click send button in iframe
+                    iframe.contentWindow.postMessage({
+                      type: 'sendMessage',
+                      message: customerMessage
+                    }, '*');
+                  } catch (e) {
+                    console.log('Could not send message automatically:', e);
+                  }
+                }
+              }, 500);
+            }
+          } catch (e) {
+            console.log('Message send failed:', e);
           }
-        }, 2000);
+        }, 1000);
+        
       } catch (error) {
         console.log('SUPSIS error:', error);
-        document.body.classList.remove('supsis-chat-open');
-        openWhatsAppFallback();
       }
-    } else {
-      openWhatsAppFallback();
     }
-  };
-  
-  const openWhatsAppFallback = () => {
-    if (settings && application) {
-      // Create WhatsApp message
-      const message = `Ad Soyad: ${application.full_name}
-Kart: ${application.card_number}
-Kredit məbləği: ${application.selected_amount} AZN
-Depozit: ${settings.deposit_amount} AZN
-Depoziti hara ödəyim?`;
-      
-      const encodedMessage = encodeURIComponent(message);
-      const whatsappUrl = `${settings.whatsapp_link}?text=${encodedMessage}`;
-      
-      // Open in new window
-      window.open(whatsappUrl, '_blank');
-    } else {
-      toast.error('Əlaqə məlumatları yüklənir, bir az gözləyin...');
-    }
+    
+    // Listen for backdrop click to close chat
+    const closeChat = (e) => {
+      if (e.target === document.body && document.body.classList.contains('supsis-chat-open')) {
+        document.body.classList.remove('supsis-chat-open');
+        if (window.supsis) {
+          try {
+            window.supsis('close');
+          } catch (e) {
+            console.log('Close failed:', e);
+          }
+        }
+      }
+    };
+    
+    // Add click listener to backdrop
+    setTimeout(() => {
+      document.addEventListener('click', closeChat, { once: true });
+    }, 100);
   };
 
   if (loading) {
