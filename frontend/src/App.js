@@ -949,8 +949,8 @@ const ContractPage = () => {
   );
 };
 
-// Chat Modal with SUPSIS Integration
-const ChatbotModal = ({ isOpen, onClose, customerData, settings }) => {
+// No custom modal needed - using SUPSIS directly
+const ChatbotModal_REMOVED = ({ isOpen, onClose, customerData, settings }) => {
   const [supsisReady, setSupsisReady] = React.useState(false);
   const [showWelcome, setShowWelcome] = React.useState(true);
 
