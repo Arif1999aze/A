@@ -44,27 +44,32 @@
   }
 }
 
-/* Payment Button Animation */
+/* Payment Button Animation - Enhanced Pulse */
 @keyframes colorPulse {
   0% {
     background: linear-gradient(to right, #2563eb, #1d4ed8);
     transform: scale(1);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
   }
   25% {
     background: linear-gradient(to right, #dc2626, #b91c1c);
-    transform: scale(1.05);
+    transform: scale(1.08);
+    box-shadow: 0 6px 25px rgba(220, 38, 38, 0.6);
   }
   50% {
     background: linear-gradient(to right, #16a34a, #15803d);
     transform: scale(1);
+    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.4);
   }
   75% {
     background: linear-gradient(to right, #dc2626, #b91c1c);
-    transform: scale(1.05);
+    transform: scale(1.08);
+    box-shadow: 0 6px 25px rgba(220, 38, 38, 0.6);
   }
   100% {
     background: linear-gradient(to right, #2563eb, #1d4ed8);
     transform: scale(1);
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
   }
 }
 
@@ -73,15 +78,26 @@
     transform: translateY(0);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-12px);
   }
 }
 
-/* Apply animation to payment button */
+@keyframes glow {
+  0%, 100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+/* Apply enhanced animations to payment button */
 [data-testid="payment-start-btn"] {
-  animation: colorPulse 3s ease-in-out infinite, bounce 2s ease-in-out infinite;
+  animation: colorPulse 2.5s ease-in-out infinite, bounce 1.8s ease-in-out infinite, glow 2s ease-in-out infinite;
+  transition: all 0.3s ease;
 }
 
 [data-testid="payment-start-btn"]:hover {
   animation-play-state: paused;
+  transform: scale(1.05) !important;
 }
