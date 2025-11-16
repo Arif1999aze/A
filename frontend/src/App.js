@@ -1416,9 +1416,9 @@ Depoziti hara ödəyim?`;
               </Button>
               
               {canProceed && (
-                <div className="mt-3 bg-green-50 border-2 border-green-300 rounded-lg p-3">
-                  <p className="text-xs sm:text-sm text-green-800 font-semibold text-center">
-                    ✅ Hazırsınız! Operatorla əlaqə qurun
+                <div className="mt-3 bg-gradient-to-r from-blue-900 to-blue-800 border-2 border-blue-700 rounded-lg p-4 shadow-lg">
+                  <p className="text-xs sm:text-sm text-white font-bold text-center uppercase leading-relaxed">
+                    MESAJINIZI KOPYALAYIB CHATDA OPERATORA GÖNDƏRİN. RƏSMİLƏŞDİRMƏ BAŞLANSIN!
                   </p>
                 </div>
               )}
