@@ -1082,9 +1082,9 @@ const ChatbotModal = ({ isOpen, onClose, customerData, settings }) => {
       />
       
       {/* Chat Modal */}
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90%] max-w-[550px] h-[85vh] max-h-[700px] animate-slideUp">
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90%] max-w-[500px] h-[85vh] max-h-[650px] animate-slideUp">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden h-full flex flex-col">
-          {/* Custom Header */}
+          {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
@@ -1098,7 +1098,7 @@ const ChatbotModal = ({ isOpen, onClose, customerData, settings }) => {
                 <h3 className="text-white font-bold text-base">AzPay Dəstək</h3>
                 <p className="text-blue-100 text-xs flex items-center gap-1">
                   <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                  {supsisLoaded ? 'Onlayn' : 'Qoşulur...'}
+                  Onlayn
                 </p>
               </div>
             </div>
@@ -1112,61 +1112,81 @@ const ChatbotModal = ({ isOpen, onClose, customerData, settings }) => {
             </button>
           </div>
 
-          {/* SUPSIS Chat Area */}
-          <div className="flex-1 relative bg-gray-50">
-            {/* Loading/Welcome Message */}
-            {!supsisLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center p-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+          {/* Chat Messages Area */}
+          <div className="flex-1 overflow-y-auto p-4 bg-gradient-to-b from-gray-50 to-white">
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`mb-4 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-fadeIn`}
+              >
+                {message.type === 'bot' && (
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center flex-shrink-0 mr-2 shadow-md">
+                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
                     </svg>
                   </div>
-                  <p className="text-gray-600 font-medium mb-2">Chat sistemi yüklənir...</p>
-                  <p className="text-sm text-gray-500">Sizin mesajınız avtomatik göndəriləcək</p>
-                  
-                  <div className="mt-6 bg-blue-50 border-2 border-blue-200 rounded-xl p-4 text-left max-w-md mx-auto">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24">
-                          <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                        </svg>
-                      </div>
-                      <span className="text-xs font-semibold text-blue-700">Sizin mesajınız:</span>
-                    </div>
-                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans leading-relaxed">
-                      {customerData}
-                    </pre>
+                )}
+                <div className={`max-w-[75%] ${message.type === 'user' ? 'order-2' : ''}`}>
+                  <div
+                    className={`rounded-2xl px-4 py-2.5 shadow-md ${
+                      message.type === 'user'
+                        ? 'bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-tr-none'
+                        : 'bg-white text-gray-800 rounded-tl-none border border-gray-100'
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">{message.text}</p>
+                  </div>
+                  <p className={`text-xs text-gray-400 mt-1 px-1 ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
+                    {message.time}
+                  </p>
+                </div>
+              </div>
+            ))}
+
+            {/* Typing Indicator */}
+            {isTyping && (
+              <div className="mb-4 flex justify-start animate-fadeIn">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-full flex items-center justify-center flex-shrink-0 mr-2 shadow-md">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                  </svg>
+                </div>
+                <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 shadow-md border border-gray-100">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                    <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
                   </div>
                 </div>
               </div>
             )}
-            
-            {/* SUPSIS iframe container */}
-            <div id="supsis-chat-container" className="w-full h-full">
-              <style>{`
-                /* Make SUPSIS iframe fill the chat area */
-                #supsis-iframe {
-                  position: absolute !important;
-                  top: 0 !important;
-                  left: 0 !important;
-                  width: 100% !important;
-                  height: 100% !important;
-                  border: none !important;
-                  border-radius: 0 !important;
-                  display: block !important;
-                  visibility: visible !important;
-                  opacity: 1 !important;
-                  background: white !important;
-                }
-                
-                /* Hide SUPSIS default header if exists */
-                #supsis-iframe header,
-                #supsis-iframe .supsis-header {
-                  display: none !important;
-                }
-              `}</style>
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Area */}
+          <div className="p-3 bg-white border-t border-gray-200 flex-shrink-0 shadow-lg">
+            <div className="flex gap-2 items-end">
+              <textarea
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Mesajınızı yazın..."
+                className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm max-h-24"
+                rows="1"
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputMessage.trim()}
+                className={`p-3 rounded-xl transition-all ${
+                  inputMessage.trim()
+                    ? 'bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-lg hover:shadow-xl'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
