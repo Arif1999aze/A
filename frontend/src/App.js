@@ -1414,9 +1414,12 @@ Depoziti hara ödəyim?`;
               </Button>
               
               {canProceed && (
-                <p className="text-xs text-green-700 text-center mt-2 font-semibold">
-                  ✅ Chat səhifəsində mesajı yapışdırın (Ctrl+V və ya uzun basıb "Yapışdır")
-                </p>
+                <div className="mt-3 bg-green-50 border border-green-200 rounded-lg p-3">
+                  <p className="text-sm text-green-800 font-semibold mb-1">✅ Mesaj kopyalandı!</p>
+                  <p className="text-xs text-green-700">
+                    İndi operatorla əlaqə qurula bilərsiniz. Mesajınız artıq hazırdır.
+                  </p>
+                </div>
               )}
             </div>
 
