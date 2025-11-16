@@ -58,19 +58,82 @@
         <style>
             /* Hide SUPSIS chat launcher on mobile (below 768px) */
             @media (max-width: 768px) {
-                /* Hide all SUPSIS launcher elements */
-                div[id*="supsis-launcher"],
-                div[class*="supsis-launcher"],
-                iframe[id*="supsis-widget"],
-                iframe[id*="supsis-button"],
-                div[style*="position: fixed"][style*="bottom"][style*="right"]:has(iframe) {
+                /* Target all possible SUPSIS launcher selectors */
+                body > div[style*="position: fixed"],
+                body > div[style*="position:fixed"],
+                div[id*="supsis"],
+                div[class*="supsis"],
+                iframe[id*="supsis"],
+                iframe[src*="supsis"],
+                [data-supsis],
+                #supsis-launcher,
+                #supsis-widget,
+                #supsis-button,
+                .supsis-launcher,
+                .supsis-widget,
+                .supsis-button {
                     display: none !important;
                     visibility: hidden !important;
                     opacity: 0 !important;
                     pointer-events: none !important;
+                    width: 0 !important;
+                    height: 0 !important;
+                    position: absolute !important;
+                    left: -9999px !important;
+                }
+                
+                /* Force hide any fixed bottom-right elements that might be chat */
+                body > div[style*="bottom"][style*="right"] {
+                    display: none !important;
                 }
             }
         </style>
+        
+        <!-- JavaScript to force hide SUPSIS on mobile -->
+        <script>
+            // Force hide SUPSIS launcher on mobile devices
+            function hideMobileLauncher() {
+                if (window.innerWidth <= 768) {
+                    // Find and hide all SUPSIS elements
+                    const selectors = [
+                        'div[id*="supsis"]',
+                        'div[class*="supsis"]',
+                        'iframe[id*="supsis"]',
+                        'iframe[src*="supsis"]',
+                        '[data-supsis]'
+                    ];
+                    
+                    selectors.forEach(selector => {
+                        const elements = document.querySelectorAll(selector);
+                        elements.forEach(el => {
+                            el.style.display = 'none';
+                            el.style.visibility = 'hidden';
+                            el.style.opacity = '0';
+                            el.style.pointerEvents = 'none';
+                        });
+                    });
+                    
+                    // Also check for fixed position divs at bottom-right
+                    const allDivs = document.querySelectorAll('body > div');
+                    allDivs.forEach(div => {
+                        const style = window.getComputedStyle(div);
+                        if (style.position === 'fixed' && 
+                            (style.bottom !== 'auto' || style.right !== 'auto')) {
+                            div.style.display = 'none';
+                        }
+                    });
+                }
+            }
+            
+            // Run on load
+            window.addEventListener('load', hideMobileLauncher);
+            
+            // Run periodically to catch dynamically added elements
+            setInterval(hideMobileLauncher, 1000);
+            
+            // Run on resize
+            window.addEventListener('resize', hideMobileLauncher);
+        </script>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
