@@ -1026,9 +1026,6 @@ const DepositPage = () => {
   };
 
   const handlePaymentStart = () => {
-    // Add body class for backdrop immediately
-    document.body.classList.add('supsis-chat-open');
-    
     // Prepare customer message with all details
     let customerMessage = '';
     if (application && settings) {
@@ -1039,68 +1036,21 @@ Depozit: ${settings.deposit_amount} AZN
 Depoziti hara ödəyim?`;
     }
     
-    // Try to send message via SUPSIS
-    if (window.supsis && typeof window.supsis === 'function') {
-      try {
-        // Open chat window first
-        window.supsis('open');
-        
-        // Wait a bit for chat to load, then try to send message
-        setTimeout(() => {
-          try {
-            // Try different methods to send message
-            if (window.supsis.sendMessage) {
-              window.supsis.sendMessage(customerMessage);
-            } else if (window.supsis.send) {
-              window.supsis.send(customerMessage);
-            } else {
-              // Try to set message in input field
-              window.supsis('setMessage', customerMessage);
-              
-              // Try to trigger send after setting message
-              setTimeout(() => {
-                const iframe = document.getElementById('supsis-iframe');
-                if (iframe && iframe.contentWindow) {
-                  try {
-                    // Try to find and click send button in iframe
-                    iframe.contentWindow.postMessage({
-                      type: 'sendMessage',
-                      message: customerMessage
-                    }, '*');
-                  } catch (e) {
-                    console.log('Could not send message automatically:', e);
-                  }
-                }
-              }, 500);
-            }
-          } catch (e) {
-            console.log('Message send failed:', e);
-          }
-        }, 1000);
-        
-      } catch (error) {
-        console.log('SUPSIS error:', error);
-      }
+    // Open SUPSIS chat in new popup window
+    if (window.openSupsisChat) {
+      window.openSupsisChat(customerMessage);
+    } else {
+      // Fallback: Open SUPSIS directly
+      const supsisUrl = 'https://azpay.visitor.supsis.live/';
+      const isMobile = window.innerWidth <= 768;
+      const windowWidth = isMobile ? window.innerWidth : Math.min(500, window.innerWidth * 0.9);
+      const windowHeight = isMobile ? window.innerHeight : Math.min(700, window.innerHeight * 0.9);
+      const left = (window.innerWidth - windowWidth) / 2 + window.screenX;
+      const top = (window.innerHeight - windowHeight) / 2 + window.screenY;
+      
+      const features = `width=${windowWidth},height=${windowHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
+      window.open(supsisUrl, 'SupsisChat', features);
     }
-    
-    // Listen for backdrop click to close chat
-    const closeChat = (e) => {
-      if (e.target === document.body && document.body.classList.contains('supsis-chat-open')) {
-        document.body.classList.remove('supsis-chat-open');
-        if (window.supsis) {
-          try {
-            window.supsis('close');
-          } catch (e) {
-            console.log('Close failed:', e);
-          }
-        }
-      }
-    };
-    
-    // Add click listener to backdrop
-    setTimeout(() => {
-      document.addEventListener('click', closeChat, { once: true });
-    }, 100);
   };
 
   if (loading) {
