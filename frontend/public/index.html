@@ -54,60 +54,72 @@
         <script src="https://azpay.visitor.supsis.live/static/js/loader.js" type="text/javascript" async defer></script>
         <!-- End of SUPSIS Embed Code -->
         
-        <!-- Custom SUPSIS Styling -->
+        <!-- Custom SUPSIS Styling - Hide all SUPSIS elements -->
         <style>
-            /* Hide SUPSIS iframe by default */
-            body:not(.supsis-chat-open) #supsis-iframe {
+            /* Hide ALL SUPSIS default elements - launcher, widgets, buttons */
+            div[id*="supsis"],
+            div[class*="supsis"],
+            iframe[id*="supsis"],
+            iframe[src*="supsis"] {
                 display: none !important;
                 width: 0 !important;
                 height: 0 !important;
                 opacity: 0 !important;
-            }
-            
-            /* Show and center SUPSIS iframe when chat is open - MUST come after hide rule */
-            body.supsis-chat-open #supsis-iframe {
-                display: block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
+                visibility: hidden !important;
                 position: fixed !important;
-                top: 50% !important;
-                left: 50% !important;
-                transform: translate(-50%, -50%) !important;
-                width: 450px !important;
-                min-width: 450px !important;
-                height: 600px !important;
-                min-height: 600px !important;
-                max-height: 85vh !important;
-                border-radius: 16px !important;
-                box-shadow: 0 20px 60px rgba(0,0,0,0.4) !important;
-                z-index: 9999 !important;
-                border: none !important;
-            }
-            
-            /* Mobile responsive for chat iframe */
-            @media (max-width: 640px) {
-                body.supsis-chat-open #supsis-iframe {
-                    width: 90vw !important;
-                    min-width: 90vw !important;
-                    height: 80vh !important;
-                    min-height: 80vh !important;
-                    border-radius: 12px !important;
-                }
-            }
-            
-            /* Add backdrop when chat is open */
-            body.supsis-chat-open::before {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background: rgba(0, 0, 0, 0.6);
-                z-index: 9998;
-                backdrop-filter: blur(5px);
+                pointer-events: none !important;
             }
         </style>
+        
+        <!-- SUPSIS Auto-Open Script -->
+        <script>
+            // Function to open SUPSIS in new window
+            window.openSupsisChat = function(customerMessage) {
+                // SUPSIS chat URL
+                const supsisUrl = 'https://azpay.visitor.supsis.live/';
+                
+                // Calculate window size based on screen
+                const isMobile = window.innerWidth <= 768;
+                const windowWidth = isMobile ? window.innerWidth : Math.min(500, window.innerWidth * 0.9);
+                const windowHeight = isMobile ? window.innerHeight : Math.min(700, window.innerHeight * 0.9);
+                
+                // Center the window
+                const left = (window.innerWidth - windowWidth) / 2 + window.screenX;
+                const top = (window.innerHeight - windowHeight) / 2 + window.screenY;
+                
+                // Window features
+                const features = `
+                    width=${windowWidth},
+                    height=${windowHeight},
+                    left=${left},
+                    top=${top},
+                    resizable=yes,
+                    scrollbars=yes,
+                    status=yes
+                `.replace(/\s/g, '');
+                
+                // Open in new window
+                const chatWindow = window.open(supsisUrl, 'SupsisChat', features);
+                
+                // Try to send message after window loads
+                if (chatWindow && customerMessage) {
+                    setTimeout(() => {
+                        try {
+                            // Store message for SUPSIS to read
+                            localStorage.setItem('supsis_auto_message', customerMessage);
+                            chatWindow.postMessage({
+                                type: 'supsis_message',
+                                message: customerMessage
+                            }, '*');
+                        } catch (e) {
+                            console.log('Message send attempt:', e);
+                        }
+                    }, 2000);
+                }
+                
+                return chatWindow;
+            };
+        </script>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
