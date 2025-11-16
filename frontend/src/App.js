@@ -958,6 +958,56 @@ const DepositPage = () => {
 
   useEffect(() => {
     fetchData();
+    
+    // Hide SUPSIS launcher icon using JavaScript
+    const hideLauncher = () => {
+      // Try multiple selectors to catch the launcher
+      const selectors = [
+        '#supsis-launcher',
+        '#supsis-widget-launcher',
+        '#supsis-widget-button',
+        '.supsis-launcher',
+        '.supsis-widget-launcher',
+        '[class*="supsis-widget"]',
+        '[class*="supsis-button"]',
+        '[id*="supsis-launcher"]',
+        '[id*="supsis-widget"]'
+      ];
+      
+      let found = false;
+      selectors.forEach(selector => {
+        const elements = document.querySelectorAll(selector);
+        elements.forEach(el => {
+          el.style.display = 'none';
+          el.style.visibility = 'hidden';
+          el.style.opacity = '0';
+          el.style.pointerEvents = 'none';
+          found = true;
+        });
+      });
+      
+      // Also check for any fixed position divs with iframes (SUPSIS often uses this pattern)
+      const allDivs = document.querySelectorAll('div');
+      allDivs.forEach(div => {
+        const style = window.getComputedStyle(div);
+        if (style.position === 'fixed' && 
+            (style.bottom !== 'auto' || style.right !== 'auto') &&
+            div.querySelector('iframe')) {
+          const iframeSrc = div.querySelector('iframe')?.src || '';
+          if (iframeSrc.includes('supsis') && !iframeSrc.includes('chat')) {
+            div.style.display = 'none';
+          }
+        }
+      });
+      
+      // If not found yet, try again after a short delay
+      if (!found) {
+        setTimeout(hideLauncher, 200);
+      }
+    };
+    
+    // Start hiding after component mounts
+    hideLauncher();
   }, []);
 
   const fetchData = async () => {
