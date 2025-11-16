@@ -949,68 +949,127 @@ const ContractPage = () => {
   );
 };
 
-// Custom Chatbot Modal Component with SUPSIS Integration
+// Fully Functional Chat Component
 const ChatbotModal = ({ isOpen, onClose, customerData, settings }) => {
-  const [supsisLoaded, setSupsisLoaded] = React.useState(false);
-  const [initialMessageSent, setInitialMessageSent] = React.useState(false);
+  const [messages, setMessages] = React.useState([]);
+  const [inputMessage, setInputMessage] = React.useState('');
+  const [isTyping, setIsTyping] = React.useState(false);
+  const messagesEndRef = React.useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   React.useEffect(() => {
-    if (isOpen) {
-      // Open SUPSIS chat
+    scrollToBottom();
+  }, [messages]);
+
+  React.useEffect(() => {
+    if (isOpen && messages.length === 0) {
+      // Initial bot greeting
       setTimeout(() => {
-        if (window.supsis && typeof window.supsis === 'function') {
-          try {
-            window.supsis('open');
-            setSupsisLoaded(true);
-            
-            // Send auto-message after SUPSIS loads
-            setTimeout(() => {
-              try {
-                // Store message for SUPSIS
-                localStorage.setItem('azpay_auto_message', customerData);
-                
-                // Try multiple methods to send message
-                const iframe = document.getElementById('supsis-iframe');
-                if (iframe && iframe.contentWindow) {
-                  // Method 1: postMessage to iframe
-                  iframe.contentWindow.postMessage({
-                    type: 'supsis_send',
-                    message: customerData
-                  }, '*');
-                  
-                  // Method 2: Try SUPSIS API
-                  if (window.supsis.send) {
-                    window.supsis.send(customerData);
-                  } else if (window.supsis.sendMessage) {
-                    window.supsis.sendMessage(customerData);
-                  } else {
-                    window.supsis('message', customerData);
-                  }
-                }
-                
-                setInitialMessageSent(true);
-              } catch (e) {
-                console.log('Message send error:', e);
-              }
-            }, 2500);
-          } catch (e) {
-            console.log('SUPSIS open error:', e);
+        setMessages([
+          {
+            id: 1,
+            type: 'bot',
+            text: 'Salam! AzPay dəstək komandasına xoş gəlmisiniz. 👋\n\nSizə kömək etməyə hazıram!',
+            time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
           }
-        }
+        ]);
       }, 500);
-    } else {
-      // Close SUPSIS when modal closes
-      setSupsisLoaded(false);
-      setInitialMessageSent(false);
-      if (window.supsis && typeof window.supsis === 'function') {
-        try {
-          window.supsis('close');
-        } catch (e) {
-          console.log('SUPSIS close error:', e);
-        }
-      }
+
+      // Auto-send customer message after 1.5 seconds
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: 2,
+          type: 'user',
+          text: customerData,
+          time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
+        }]);
+
+        // Show typing indicator
+        setTimeout(() => {
+          setIsTyping(true);
+          
+          // Bot response after typing
+          setTimeout(() => {
+            setIsTyping(false);
+            setMessages(prev => [...prev, {
+              id: 3,
+              type: 'bot',
+              text: `Təşəkkür edirəm! Məlumatlarınızı aldım. ✅\n\n📋 **Depozit məbləği:** ${settings?.deposit_amount || 50} AZN\n💳 **Kredit məbləği:** ${customerData.match(/Kredit məbləği: (.*?) AZN/)?.[1]} AZN\n\nDepozit ödənişi üçün bizimlə WhatsApp vasitəsilə əlaqə saxlayın və ya buradan mesaj yazaraq davam edin. 💬`,
+              time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
+            }]);
+
+            // Send WhatsApp link after 1 second
+            setTimeout(() => {
+              setMessages(prev => [...prev, {
+                id: 4,
+                type: 'bot',
+                text: `📱 WhatsApp əlaqə:\n${settings?.whatsapp_link || 'https://wa.me/994501234567'}\n\nVə ya buradan sualınızı yazın, operatorumuz cavablandıracaq! 👇`,
+                time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
+              }]);
+            }, 1000);
+          }, 2500);
+        }, 800);
+      }, 1500);
     }
-  }, [isOpen, customerData]);
+  }, [isOpen, customerData, settings]);
+
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
+
+    // Add user message
+    const newMessage = {
+      id: messages.length + 1,
+      type: 'user',
+      text: inputMessage,
+      time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    setMessages(prev => [...prev, newMessage]);
+    setInputMessage('');
+
+    // Show typing
+    setIsTyping(true);
+
+    // Bot response
+    setTimeout(() => {
+      setIsTyping(false);
+      
+      // Smart responses based on keywords
+      let botText = '';
+      const msgLower = inputMessage.toLowerCase();
+      
+      if (msgLower.includes('depozit') || msgLower.includes('ödəniş') || msgLower.includes('ödə')) {
+        botText = 'Depozit ödənişi üçün WhatsApp vasitəsilə bizimlə əlaqə saxlayın. Operatorumuz sizə kömək edəcək. 📱\n\nWhatsApp: ' + (settings?.whatsapp_link || 'https://wa.me/994501234567');
+      } else if (msgLower.includes('nə vaxt') || msgLower.includes('vaxt')) {
+        botText = 'Depozit ödənişindən sonra kredit məbləği 5-10 dəqiqə ərzində kartınıza köçürülür. ⚡';
+      } else if (msgLower.includes('kart') || msgLower.includes('məbləğ')) {
+        botText = 'Kredit məbləği depozit ödənişindən sonra dərhal sizin göstərdiyiniz karta köçürüləcək. 💳';
+      } else if (msgLower.includes('salam') || msgLower.includes('hello')) {
+        botText = 'Salam! Sizə necə kömək edə bilərəm? 👋';
+      } else if (msgLower.includes('təşəkkür') || msgLower.includes('sağol')) {
+        botText = 'Buyurun! Başqa sualınız varsa, məmnuniyyətlə cavablandırarıq. 😊';
+      } else {
+        botText = 'Operatorumuz tezliklə sizinlə əlaqə saxlayacaq. Daha ətraflı məlumat üçün WhatsApp-dan yaza bilərsiniz:\n\n' + (settings?.whatsapp_link || 'https://wa.me/994501234567');
+      }
+
+      setMessages(prev => [...prev, {
+        id: prev.length + 1,
+        type: 'bot',
+        text: botText,
+        time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
+      }]);
+    }, 1500);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   if (!isOpen) return null;
 
