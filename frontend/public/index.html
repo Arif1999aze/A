@@ -26,18 +26,67 @@
     -->
         <title>AzPay | Kredit Sistemi</title>
         
-        <!-- Clear old cached data on mobile to prevent stale state -->
+        <!-- AGGRESSIVE CACHE BUSTING - Force fresh content on every load -->
         <script>
-            // Clear old localStorage data on mobile browsers to prevent cache issues
-            if (window.innerWidth <= 768 && !sessionStorage.getItem('cache_cleared_v2')) {
-                // Clear only azpay-related items, not all localStorage
-                const keys = Object.keys(localStorage);
-                keys.forEach(key => {
+            // Version number - increment this after each deployment
+            const APP_VERSION = 'v1.0.3';
+            
+            // Force hard reload if version changed
+            const storedVersion = localStorage.getItem('azpay_app_version');
+            if (storedVersion !== APP_VERSION) {
+                console.log('New version detected, clearing cache...');
+                
+                // Clear all azpay data
+                Object.keys(localStorage).forEach(key => {
                     if (key.startsWith('azpay_')) {
                         localStorage.removeItem(key);
                     }
                 });
-                sessionStorage.setItem('cache_cleared_v2', 'true');
+                Object.keys(sessionStorage).forEach(key => {
+                    sessionStorage.removeItem(key);
+                });
+                
+                // Store new version
+                localStorage.setItem('azpay_app_version', APP_VERSION);
+                
+                // Force hard reload to clear browser cache
+                if (storedVersion) {
+                    console.log('Performing hard reload...');
+                    window.location.reload(true);
+                }
+            }
+            
+            // Auto-refresh detection - check for new version every 30 seconds
+            function checkForUpdates() {
+                fetch(window.location.href, {
+                    method: 'HEAD',
+                    cache: 'no-cache',
+                    headers: {
+                        'Cache-Control': 'no-cache',
+                        'Pragma': 'no-cache'
+                    }
+                }).then(response => {
+                    const etag = response.headers.get('etag');
+                    const storedEtag = sessionStorage.getItem('page_etag');
+                    
+                    if (storedEtag && etag && storedEtag !== etag) {
+                        console.log('New deployment detected, reloading...');
+                        window.location.reload(true);
+                    } else if (!storedEtag && etag) {
+                        sessionStorage.setItem('page_etag', etag);
+                    }
+                }).catch(() => {
+                    // Silently fail - no network
+                });
+            }
+            
+            // Check for updates after page loads
+            if (document.readyState === 'complete') {
+                setTimeout(checkForUpdates, 30000);
+            } else {
+                window.addEventListener('load', () => {
+                    setTimeout(checkForUpdates, 30000);
+                });
             }
         </script>
         
