@@ -1191,19 +1191,44 @@ const DepositPage = () => {
   };
 
   const handlePaymentStart = () => {
-    // Open custom chatbot modal
-    setChatbotOpen(true);
-  };
-
-  const getCustomerMessage = () => {
-    if (application && settings) {
-      return `Ad Soyad: ${application.full_name}
+    // Open SUPSIS chat directly
+    if (window.supsis && typeof window.supsis === 'function') {
+      try {
+        // Open SUPSIS
+        window.supsis('open');
+        
+        // Prepare customer message
+        const customerMessage = `Ad Soyad: ${application.full_name}
 Kart: ${application.card_number}
 Kredit məbləği: ${application.selected_amount} AZN
 Depozit: ${settings.deposit_amount} AZN
 Depoziti hara ödəyim?`;
+        
+        // Try to send message after 2 seconds
+        setTimeout(() => {
+          try {
+            // Store in localStorage
+            localStorage.setItem('azpay_customer_message', customerMessage);
+            
+            // Try to send message
+            if (window.supsis.send) {
+              window.supsis.send(customerMessage);
+            } else if (window.supsis.sendMessage) {
+              window.supsis.sendMessage(customerMessage);
+            } else {
+              window.supsis('message', customerMessage);
+            }
+          } catch (e) {
+            console.log('Message send attempt:', e);
+          }
+        }, 2000);
+      } catch (e) {
+        console.log('SUPSIS open error:', e);
+        toast.error('Chat sistemi yüklənir, bir az gözləyin...');
+      }
+    } else {
+      toast.error('Chat sistemi yüklənir, bir az gözləyin...');
     }
-    return '';
   };
 
   if (loading) {
