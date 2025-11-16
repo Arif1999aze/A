@@ -56,16 +56,32 @@
         
         <!-- Custom SUPSIS Styling -->
         <style>
-            /* Hide default SUPSIS widget button */
+            /* Hide ALL default SUPSIS widget buttons and launcher */
             #supsis-widget-button,
             #supsis-launcher,
+            #supsis-widget-launcher,
+            .supsis-widget-button,
+            .supsis-launcher,
+            .supsis-widget-launcher,
             [class*="supsis-widget"],
             [class*="supsis-button"],
-            [id*="supsis-button"] {
+            [class*="supsis-launcher"],
+            [id*="supsis-button"],
+            [id*="supsis-widget"],
+            [id*="supsis-launcher"],
+            iframe[src*="supsis"]:not([id*="chat"]) {
                 display: none !important;
                 visibility: hidden !important;
                 opacity: 0 !important;
                 pointer-events: none !important;
+                width: 0 !important;
+                height: 0 !important;
+            }
+            
+            /* Target any floating button */
+            div[style*="position: fixed"][style*="bottom"][style*="right"]:has(iframe),
+            div[style*="position: fixed"][style*="z-index"]:has([class*="supsis"]) {
+                display: none !important;
             }
             
             /* Center SUPSIS chat window */
