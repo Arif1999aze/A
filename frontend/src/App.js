@@ -1121,6 +1121,41 @@ const DepositPage = () => {
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // Hide chat badge on mobile
+  useEffect(() => {
+    const hideChatsOnMobile = () => {
+      if (window.innerWidth <= 768) {
+        // Remove Emergent badge
+        const badge = document.getElementById('ls-openButton');
+        if (badge) {
+          badge.remove();
+        }
+        
+        // Hide any bottom-right fixed elements
+        document.querySelectorAll('body > div').forEach(div => {
+          const rect = div.getBoundingClientRect();
+          const style = window.getComputedStyle(div);
+          
+          if (style.position === 'fixed' && 
+              rect.bottom > window.innerHeight - 100 &&
+              rect.right > window.innerWidth - 100) {
+            div.remove();
+          }
+        });
+      }
+    };
+
+    // Run multiple times
+    hideChatsOnMobile();
+    setTimeout(hideChatsOnMobile, 1000);
+    setTimeout(hideChatsOnMobile, 2000);
+    setTimeout(hideChatsOnMobile, 3000);
+    
+    const interval = setInterval(hideChatsOnMobile, 1000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   useEffect(() => {
     fetchData();
     
