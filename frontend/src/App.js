@@ -975,17 +975,24 @@ const DepositPage = () => {
     }
   };
 
-  const handleWhatsAppRedirect = () => {
-    if (settings?.whatsapp_link) {
-      let url = settings.whatsapp_link;
+  const handlePaymentStart = () => {
+    // Open SUPSIS chat
+    if (window.supsis) {
+      window.supsis('open');
       
-      // Add message if enabled
-      if (settings.whatsapp_message_enabled && application) {
+      // Send customer information automatically if enabled
+      if (settings?.whatsapp_message_enabled && application) {
         const message = `Salam! Mənim adım ${application.full_name}.\n\nKart nömrəm: ${application.card_number}\nGötürdüyüm məbləğ: ${application.selected_amount} AZN\n\nRəsmiləşdirməm tamamlanıb. İndi depozit ${settings.deposit_amount} AZN-dir.\n\nDepoziti hara ödəyim?`;
-        url += `?text=${encodeURIComponent(message)}`;
+        
+        // Wait for chat to open, then send message
+        setTimeout(() => {
+          if (window.supsis) {
+            window.supsis('sendMessage', message);
+          }
+        }, 1000);
       }
-      
-      window.open(url, '_blank');
+    } else {
+      toast.error('Chat sistemi yüklənir, bir az gözləyin...');
     }
   };
 
