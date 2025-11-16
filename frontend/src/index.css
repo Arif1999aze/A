@@ -91,15 +91,19 @@
   }
 }
 
-/* Apply enhanced animations to payment button */
-[data-testid="payment-start-btn"] {
-  animation: colorPulse 2.5s ease-in-out infinite, bounce 1.8s ease-in-out infinite, glow 2s ease-in-out infinite;
+/* Apply enhanced animations to payment button - only when enabled */
+[data-testid="payment-start-btn"]:not(:disabled) {
+  animation: colorPulse 3s ease-in-out infinite;
   transition: all 0.3s ease;
 }
 
-[data-testid="payment-start-btn"]:hover {
-  animation-play-state: paused;
-  transform: scale(1.05) !important;
+[data-testid="payment-start-btn"]:disabled {
+  animation: none;
+}
+
+[data-testid="payment-start-btn"]:hover:not(:disabled) {
+  transform: scale(1.03);
+  filter: brightness(1.1);
 }
 
 /* Chatbot Modal Animations */
