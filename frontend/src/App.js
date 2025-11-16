@@ -978,6 +978,9 @@ const DepositPage = () => {
   const handlePaymentStart = () => {
     // Open SUPSIS chat
     if (window.supsis) {
+      // Add body class for backdrop
+      document.body.classList.add('supsis-chat-open');
+      
       // Prepare customer message if enabled
       if (settings?.whatsapp_message_enabled && application) {
         const message = `Salam! Mənim adım ${application.full_name}.\n\nKart nömrəm: ${application.card_number}\nGötürdüyüm məbləğ: ${application.selected_amount} AZN\n\nRəsmiləşdirməm tamamlanıb. İndi depozit ${settings.deposit_amount} AZN-dir.\n\nDepoziti hara ödəyim?`;
@@ -988,6 +991,13 @@ const DepositPage = () => {
       
       // Open chat window
       window.supsis('open');
+      
+      // Listen for chat close
+      window.addEventListener('message', function(event) {
+        if (event.data === 'supsis-chat-closed') {
+          document.body.classList.remove('supsis-chat-open');
+        }
+      });
     } else {
       toast.error('Chat sistemi yüklənir, bir az gözləyin...');
     }
