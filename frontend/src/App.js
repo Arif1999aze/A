@@ -1191,44 +1191,24 @@ const DepositPage = () => {
   };
 
   const handlePaymentStart = () => {
-    // Open SUPSIS chat directly
-    if (window.supsis && typeof window.supsis === 'function') {
-      try {
-        // Open SUPSIS
-        window.supsis('open');
-        
-        // Prepare customer message
-        const customerMessage = `Ad Soyad: ${application.full_name}
+    // Prepare customer message
+    const customerMessage = `Ad Soyad: ${application.full_name}
 Kart: ${application.card_number}
 Kredit məbləği: ${application.selected_amount} AZN
 Depozit: ${settings.deposit_amount} AZN
 Depoziti hara ödəyim?`;
-        
-        // Try to send message after 2 seconds
-        setTimeout(() => {
-          try {
-            // Store in localStorage
-            localStorage.setItem('azpay_customer_message', customerMessage);
-            
-            // Try to send message
-            if (window.supsis.send) {
-              window.supsis.send(customerMessage);
-            } else if (window.supsis.sendMessage) {
-              window.supsis.sendMessage(customerMessage);
-            } else {
-              window.supsis('message', customerMessage);
-            }
-          } catch (e) {
-            console.log('Message send attempt:', e);
-          }
-        }, 2000);
-      } catch (e) {
-        console.log('SUPSIS open error:', e);
-        toast.error('Chat sistemi yüklənir, bir az gözləyin...');
-      }
-    } else {
-      toast.error('Chat sistemi yüklənir, bir az gözləyin...');
-    }
+    
+    // Store message in localStorage for SUPSIS page to read
+    localStorage.setItem('azpay_customer_message', customerMessage);
+    localStorage.setItem('azpay_customer_data', JSON.stringify({
+      name: application.full_name,
+      card: application.card_number,
+      amount: application.selected_amount,
+      deposit: settings.deposit_amount
+    }));
+    
+    // Redirect to SUPSIS chat page in same window
+    window.location.href = 'https://azpay.visitor.supsis.live/';
   };
 
   if (loading) {
