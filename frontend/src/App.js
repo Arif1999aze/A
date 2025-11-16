@@ -949,66 +949,97 @@ const ContractPage = () => {
   );
 };
 
-// Custom Chatbot Modal Component
+// Custom Chatbot Modal Component with Built-in Chat UI
 const ChatbotModal = ({ isOpen, onClose, customerData, settings }) => {
-  const [messageSent, setMessageSent] = React.useState(false);
+  const [messages, setMessages] = React.useState([]);
+  const [inputMessage, setInputMessage] = React.useState('');
+  const [isTyping, setIsTyping] = React.useState(false);
+  const messagesEndRef = React.useRef(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
 
   React.useEffect(() => {
-    if (isOpen) {
-      // Open SUPSIS chat after modal opens
+    scrollToBottom();
+  }, [messages]);
+
+  React.useEffect(() => {
+    if (isOpen && messages.length === 0) {
+      // Add initial messages
       setTimeout(() => {
-        if (window.supsis && typeof window.supsis === 'function') {
-          try {
-            window.supsis('open');
-            
-            // Try to send message automatically after 2 seconds
-            setTimeout(() => {
-              try {
-                // Store message for SUPSIS
-                localStorage.setItem('azpay_customer_message', customerData);
-                
-                // Try to set and send message via SUPSIS
-                if (window.supsis.send) {
-                  window.supsis.send(customerData);
-                  setMessageSent(true);
-                } else if (window.supsis.sendMessage) {
-                  window.supsis.sendMessage(customerData);
-                  setMessageSent(true);
-                } else {
-                  // Set message in input field
-                  window.supsis('setMessage', customerData);
-                  
-                  // Try to trigger send via postMessage
-                  const iframe = document.getElementById('supsis-iframe');
-                  if (iframe && iframe.contentWindow) {
-                    iframe.contentWindow.postMessage({
-                      type: 'sendMessage',
-                      message: customerData
-                    }, '*');
-                  }
-                  setMessageSent(true);
-                }
-              } catch (e) {
-                console.log('Auto-send attempt:', e);
-              }
-            }, 2000);
-          } catch (e) {
-            console.log('SUPSIS open error:', e);
+        setMessages([
+          {
+            id: 1,
+            type: 'bot',
+            text: 'Salam! AzPay dəstək komandasına xoş gəlmisiniz. Sizə necə kömək edə bilərəm?',
+            time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
           }
-        }
+        ]);
       }, 500);
-    } else {
-      // Close SUPSIS when modal closes
-      setMessageSent(false);
-      if (window.supsis && typeof window.supsis === 'function') {
-        try {
-          window.supsis('close');
-        } catch (e) {
-          console.log('SUPSIS close error:', e);
-        }
-      }
+
+      // Auto-send customer data after 1 second
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: prev.length + 1,
+          type: 'user',
+          text: customerData,
+          time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
+        }]);
+
+        // Bot typing indicator
+        setTimeout(() => {
+          setIsTyping(true);
+          setTimeout(() => {
+            setIsTyping(false);
+            setMessages(prev => [...prev, {
+              id: prev.length + 1,
+              type: 'bot',
+              text: `Təşəkkür edirəm! Məlumatlarınızı aldım. \n\nDepozit ödənişi üçün bizimlə WhatsApp vasitəsilə əlaqə saxlaya bilərsiniz: ${settings?.whatsapp_link || 'https://wa.me/994501234567'}\n\nVə ya burada mesaj yazaraq canlı operator ilə danışa bilərsiniz.`,
+              time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
+            }]);
+          }, 2000);
+        }, 1000);
+      }, 1500);
     }
-  }, [isOpen, customerData]);
+  }, [isOpen, customerData, settings]);
+
+  const handleSendMessage = () => {
+    if (!inputMessage.trim()) return;
+
+    // Add user message
+    const newUserMessage = {
+      id: messages.length + 1,
+      type: 'user',
+      text: inputMessage,
+      time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
+    };
+    
+    setMessages(prev => [...prev, newUserMessage]);
+    setInputMessage('');
+
+    // Show typing indicator
+    setIsTyping(true);
+
+    // Simulate bot response after 2 seconds
+    setTimeout(() => {
+      setIsTyping(false);
+      const botResponse = {
+        id: messages.length + 2,
+        type: 'bot',
+        text: 'Operatorumuz tezliklə sizinlə əlaqə saxlayacaq. Zəhmət olmasa bir az gözləyin...',
+        time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
+      };
+      setMessages(prev => [...prev, botResponse]);
+    }, 2000);
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      handleSendMessage();
+    }
+  };
 
   if (!isOpen) return null;
 
@@ -1021,20 +1052,23 @@ const ChatbotModal = ({ isOpen, onClose, customerData, settings }) => {
       />
       
       {/* Chat Modal */}
-      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90%] max-w-[600px] h-[85vh] max-h-[750px] animate-slideUp">
+      <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-[9999] w-[90%] max-w-[500px] h-[85vh] max-h-[650px] animate-slideUp">
         <div className="bg-white rounded-2xl shadow-2xl overflow-hidden h-full flex flex-col">
           {/* Header */}
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 p-4 flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-                <svg className="w-6 h-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
-                </svg>
+                <img 
+                  src="https://i.hizliresim.com/iydskgy.jpeg" 
+                  alt="AzPay" 
+                  className="w-8 h-8 rounded-full object-cover"
+                />
               </div>
               <div>
-                <h3 className="text-white font-bold text-lg">AzPay Dəstək</h3>
-                <p className="text-blue-100 text-xs">
-                  {messageSent ? 'Canlı operator' : 'Qoşulur...'}
+                <h3 className="text-white font-bold text-base">AzPay Dəstək</h3>
+                <p className="text-blue-100 text-xs flex items-center gap-1">
+                  <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+                  Onlayn
                 </p>
               </div>
             </div>
@@ -1048,43 +1082,83 @@ const ChatbotModal = ({ isOpen, onClose, customerData, settings }) => {
             </button>
           </div>
 
-          {/* SUPSIS Chat Container */}
-          <div className="flex-1 relative bg-gray-50 supsis-chat-container" id="supsis-chat-iframe">
-            {/* Show customer message while SUPSIS loads */}
-            {!messageSent && (
-              <div className="absolute inset-0 flex items-center justify-center p-6">
-                <div className="text-center">
-                  <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
-                    <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+          {/* Chat Messages */}
+          <div className="flex-1 overflow-y-auto p-4 bg-gray-50" style={{backgroundImage: 'linear-gradient(to bottom, #f9fafb 0%, #f3f4f6 100%)'}}>
+            {messages.map((message) => (
+              <div
+                key={message.id}
+                className={`mb-4 flex ${message.type === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                {message.type === 'bot' && (
+                  <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mr-2">
+                    <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
                     </svg>
                   </div>
-                  <p className="text-gray-600 mb-4">Chat sistemi yüklənir...</p>
-                  <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 text-left max-w-md mx-auto">
-                    <p className="text-xs text-blue-600 font-semibold mb-2">Sizin mesajınız:</p>
-                    <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">
-                      {customerData}
-                    </pre>
+                )}
+                <div className={`max-w-[75%] ${message.type === 'user' ? 'order-2' : ''}`}>
+                  <div
+                    className={`rounded-2xl px-4 py-2.5 shadow-sm ${
+                      message.type === 'user'
+                        ? 'bg-blue-600 text-white rounded-tr-none'
+                        : 'bg-white text-gray-800 rounded-tl-none border border-gray-200'
+                    }`}
+                  >
+                    <p className="text-sm whitespace-pre-wrap break-words">{message.text}</p>
+                  </div>
+                  <p className={`text-xs text-gray-400 mt-1 ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
+                    {message.time}
+                  </p>
+                </div>
+              </div>
+            ))}
+
+            {/* Typing Indicator */}
+            {isTyping && (
+              <div className="mb-4 flex justify-start">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0 mr-2">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                  </svg>
+                </div>
+                <div className="bg-white rounded-2xl rounded-tl-none px-4 py-3 shadow-sm border border-gray-200">
+                  <div className="flex gap-1">
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
                   </div>
                 </div>
               </div>
             )}
-            
-            {/* SUPSIS iframe will load here automatically */}
-            <style>{`
-              #supsis-iframe {
-                position: absolute !important;
-                top: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-                border: none !important;
-                border-radius: 0 !important;
-                display: block !important;
-                visibility: visible !important;
-                opacity: 1 !important;
-              }
-            `}</style>
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* Input Area */}
+          <div className="p-3 bg-white border-t border-gray-200 flex-shrink-0">
+            <div className="flex gap-2 items-end">
+              <textarea
+                value={inputMessage}
+                onChange={(e) => setInputMessage(e.target.value)}
+                onKeyPress={handleKeyPress}
+                placeholder="Mesajınızı yazın..."
+                className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                rows="1"
+                style={{maxHeight: '100px'}}
+              />
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputMessage.trim()}
+                className={`p-3 rounded-xl transition-all ${
+                  inputMessage.trim()
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-lg'
+                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
       </div>
