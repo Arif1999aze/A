@@ -49,7 +49,25 @@
             }
         </script>
         
-        <!-- AzPay Chat System - No external dependencies needed -->
+        <!-- Start of SUPSIS Embed Code --> 
+        <script>window.supsis=window.supsis||function(){(supsis.q=supsis.q||[]).push(arguments)};supsis.l=+new Date;</script>
+        <script src="https://azpay.visitor.supsis.live/static/js/loader.js" type="text/javascript" async defer></script>
+        <!-- End of SUPSIS Embed Code -->
+        
+        <!-- Hide SUPSIS default launcher, we'll show it in our modal -->
+        <style>
+            /* Hide default SUPSIS launcher button */
+            body > div[style*="position: fixed"][style*="bottom"][style*="right"] {
+                display: none !important;
+            }
+            
+            div[id*="supsis"]:not(#supsis-iframe),
+            div[class*="supsis-launcher"],
+            iframe[id*="supsis-button"],
+            iframe[id*="supsis-widget"]:not(#supsis-iframe) {
+                display: none !important;
+            }
+        </style>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
