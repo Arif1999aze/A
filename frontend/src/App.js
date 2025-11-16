@@ -1343,22 +1343,82 @@ Depoziti hara ödəyim?`;
               </div>
             </div>
 
-            <div className="bg-blue-50 border-2 border-blue-200 p-4 rounded-lg">
-              <p className="text-sm text-blue-800 text-center">
-                <strong>Əlaqə:</strong> Depozit ödənişi ilə bağlı sualınız varsa, aşağıdakı düyməyə klik edərək bizimlə əlaqə saxlayın.
+            {/* Customer Message Card */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-5 shadow-lg">
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/>
+                  </svg>
+                </div>
+                <h3 className="text-base font-bold text-blue-900">1️⃣ Əvvəlcə bu mesajı kopyalayın:</h3>
+              </div>
+              
+              <div className="bg-white border-2 border-blue-200 rounded-lg p-4 mb-3">
+                <pre className="text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed">
+                  {getCustomerMessage()}
+                </pre>
+              </div>
+              
+              <button
+                onClick={handleCopyMessage}
+                className={`w-full py-3 px-4 rounded-lg font-semibold transition-all flex items-center justify-center gap-2 ${
+                  messageCopied
+                    ? 'bg-green-500 text-white'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white'
+                }`}
+              >
+                {messageCopied ? (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Kopyalandı! ✓
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    Mesajı Kopyala
+                  </>
+                )}
+              </button>
+              
+              <p className="text-xs text-blue-700 text-center mt-2">
+                ℹ️ Mesajı kopyaladıqdan sonra aşağıdakı düyməyə klik edin
               </p>
             </div>
 
-            <Button
-              onClick={handlePaymentStart}
-              className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 py-6 text-lg shadow-xl hover:shadow-2xl transition-all"
-              data-testid="payment-start-btn"
-            >
-              <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-              </svg>
-              Ödənişə başla
-            </Button>
+            {/* Payment Button */}
+            <div className="bg-yellow-50 border-2 border-yellow-300 rounded-xl p-4">
+              <div className="flex items-center gap-2 mb-3">
+                <span className="text-2xl">2️⃣</span>
+                <h3 className="text-base font-bold text-yellow-900">Sonra bu düyməyə klik edin:</h3>
+              </div>
+              
+              <Button
+                onClick={handlePaymentStart}
+                disabled={!canProceed}
+                className={`w-full py-6 text-lg shadow-xl hover:shadow-2xl transition-all ${
+                  canProceed
+                    ? 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800'
+                    : 'bg-gray-400 cursor-not-allowed opacity-60'
+                }`}
+                data-testid="payment-start-btn"
+              >
+                <svg className="w-6 h-6 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                {canProceed ? 'Ödənişə başla' : 'Əvvəlcə mesajı kopyalayın'}
+              </Button>
+              
+              {canProceed && (
+                <p className="text-xs text-green-700 text-center mt-2 font-semibold">
+                  ✅ Chat səhifəsində mesajı yapışdırın (Ctrl+V və ya uzun basıb "Yapışdır")
+                </p>
+              )}
+            </div>
 
             <p className="text-center text-sm text-gray-500">
               Ödənişdən sonra təsdiq üçün 5-10 dəqiqə gözləyin
