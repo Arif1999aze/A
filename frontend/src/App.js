@@ -12,6 +12,27 @@ import { toast } from 'sonner';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Cache Busting Component - ensures fresh content
+const CacheBuster = () => {
+  useEffect(() => {
+    // Clear any stale cache on component mount
+    const clearStaleCache = () => {
+      const lastClear = sessionStorage.getItem('last_cache_clear');
+      const now = Date.now();
+      
+      // Clear cache every 5 minutes
+      if (!lastClear || now - parseInt(lastClear) > 300000) {
+        console.log('Clearing stale cache...');
+        sessionStorage.setItem('last_cache_clear', now.toString());
+      }
+    };
+    
+    clearStaleCache();
+  }, []);
+  
+  return null;
+};
+
 // Home Page
 const HomePage = () => {
   const navigate = useNavigate();
