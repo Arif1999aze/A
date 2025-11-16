@@ -1120,7 +1120,6 @@ const DepositPage = () => {
   const [settings, setSettings] = useState(null);
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [chatbotOpen, setChatbotOpen] = useState(false);
 
   useEffect(() => {
     fetchData();
