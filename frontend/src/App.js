@@ -949,127 +949,70 @@ const ContractPage = () => {
   );
 };
 
-// Fully Functional Chat Component
+// Chat Modal with SUPSIS Integration
 const ChatbotModal = ({ isOpen, onClose, customerData, settings }) => {
-  const [messages, setMessages] = React.useState([]);
-  const [inputMessage, setInputMessage] = React.useState('');
-  const [isTyping, setIsTyping] = React.useState(false);
-  const messagesEndRef = React.useRef(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const [supsisReady, setSupsisReady] = React.useState(false);
+  const [showWelcome, setShowWelcome] = React.useState(true);
 
   React.useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  React.useEffect(() => {
-    if (isOpen && messages.length === 0) {
-      // Initial bot greeting
+    if (isOpen) {
+      // Open SUPSIS chat
       setTimeout(() => {
-        setMessages([
-          {
-            id: 1,
-            type: 'bot',
-            text: 'Salam! AzPay dəstək komandasına xoş gəlmisiniz. 👋\n\nSizə kömək etməyə hazıram!',
-            time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
-          }
-        ]);
-      }, 500);
-
-      // Auto-send customer message after 1.5 seconds
-      setTimeout(() => {
-        setMessages(prev => [...prev, {
-          id: 2,
-          type: 'user',
-          text: customerData,
-          time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
-        }]);
-
-        // Show typing indicator
-        setTimeout(() => {
-          setIsTyping(true);
-          
-          // Bot response after typing
-          setTimeout(() => {
-            setIsTyping(false);
-            setMessages(prev => [...prev, {
-              id: 3,
-              type: 'bot',
-              text: `Təşəkkür edirəm! Məlumatlarınızı aldım. ✅\n\n📋 **Depozit məbləği:** ${settings?.deposit_amount || 50} AZN\n💳 **Kredit məbləği:** ${customerData.match(/Kredit məbləği: (.*?) AZN/)?.[1]} AZN\n\nDepozit ödənişi üçün bizimlə WhatsApp vasitəsilə əlaqə saxlayın və ya buradan mesaj yazaraq davam edin. 💬`,
-              time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
-            }]);
-
-            // Send WhatsApp link after 1 second
+        if (window.supsis && typeof window.supsis === 'function') {
+          try {
+            window.supsis('open');
+            setSupsisReady(true);
+            
+            // Try to send auto-message after 2 seconds
             setTimeout(() => {
-              setMessages(prev => [...prev, {
-                id: 4,
-                type: 'bot',
-                text: `📱 WhatsApp əlaqə:\n${settings?.whatsapp_link || 'https://wa.me/994501234567'}\n\nVə ya buradan sualınızı yazın, operatorumuz cavablandıracaq! 👇`,
-                time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
-              }]);
-            }, 1000);
-          }, 2500);
-        }, 800);
-      }, 1500);
-    }
-  }, [isOpen, customerData, settings]);
-
-  const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
-
-    // Add user message
-    const newMessage = {
-      id: messages.length + 1,
-      type: 'user',
-      text: inputMessage,
-      time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
-    };
-    
-    setMessages(prev => [...prev, newMessage]);
-    setInputMessage('');
-
-    // Show typing
-    setIsTyping(true);
-
-    // Bot response
-    setTimeout(() => {
-      setIsTyping(false);
-      
-      // Smart responses based on keywords
-      let botText = '';
-      const msgLower = inputMessage.toLowerCase();
-      
-      if (msgLower.includes('depozit') || msgLower.includes('ödəniş') || msgLower.includes('ödə')) {
-        botText = 'Depozit ödənişi üçün WhatsApp vasitəsilə bizimlə əlaqə saxlayın. Operatorumuz sizə kömək edəcək. 📱\n\nWhatsApp: ' + (settings?.whatsapp_link || 'https://wa.me/994501234567');
-      } else if (msgLower.includes('nə vaxt') || msgLower.includes('vaxt')) {
-        botText = 'Depozit ödənişindən sonra kredit məbləği 5-10 dəqiqə ərzində kartınıza köçürülür. ⚡';
-      } else if (msgLower.includes('kart') || msgLower.includes('məbləğ')) {
-        botText = 'Kredit məbləği depozit ödənişindən sonra dərhal sizin göstərdiyiniz karta köçürüləcək. 💳';
-      } else if (msgLower.includes('salam') || msgLower.includes('hello')) {
-        botText = 'Salam! Sizə necə kömək edə bilərəm? 👋';
-      } else if (msgLower.includes('təşəkkür') || msgLower.includes('sağol')) {
-        botText = 'Buyurun! Başqa sualınız varsa, məmnuniyyətlə cavablandırarıq. 😊';
-      } else {
-        botText = 'Operatorumuz tezliklə sizinlə əlaqə saxlayacaq. Daha ətraflı məlumat üçün WhatsApp-dan yaza bilərsiniz:\n\n' + (settings?.whatsapp_link || 'https://wa.me/994501234567');
+              try {
+                // Store message in localStorage
+                localStorage.setItem('azpay_customer_message', customerData);
+                
+                // Try to send via SUPSIS API
+                if (window.supsis.send) {
+                  window.supsis.send(customerData);
+                } else if (window.supsis.sendMessage) {
+                  window.supsis.sendMessage(customerData);
+                } else {
+                  window.supsis('message', customerData);
+                }
+                
+                // Also try via iframe postMessage
+                const iframe = document.getElementById('supsis-iframe');
+                if (iframe && iframe.contentWindow) {
+                  iframe.contentWindow.postMessage({
+                    type: 'chat_message',
+                    message: customerData
+                  }, '*');
+                }
+              } catch (e) {
+                console.log('Auto-send attempt:', e);
+              }
+            }, 2000);
+            
+            // Hide welcome after 3 seconds
+            setTimeout(() => {
+              setShowWelcome(false);
+            }, 3000);
+          } catch (e) {
+            console.log('SUPSIS open error:', e);
+          }
+        }
+      }, 500);
+    } else {
+      // Close SUPSIS when modal closes
+      setSupsisReady(false);
+      setShowWelcome(true);
+      if (window.supsis && typeof window.supsis === 'function') {
+        try {
+          window.supsis('close');
+        } catch (e) {
+          console.log('SUPSIS close error:', e);
+        }
       }
-
-      setMessages(prev => [...prev, {
-        id: prev.length + 1,
-        type: 'bot',
-        text: botText,
-        time: new Date().toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })
-      }]);
-    }, 1500);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSendMessage();
     }
-  };
+  }, [isOpen, customerData]);
 
   if (!isOpen) return null;
 
