@@ -1031,9 +1031,13 @@ const DepositPage = () => {
       // Add body class for backdrop
       document.body.classList.add('supsis-chat-open');
       
-      // Prepare customer message if enabled
-      if (settings?.whatsapp_message_enabled && application) {
-        const message = `Salam! Mənim adım ${application.full_name}.\n\nKart nömrəm: ${application.card_number}\nGötürdüyüm məbləğ: ${application.selected_amount} AZN\n\nRəsmiləşdirməm tamamlanıb. İndi depozit ${settings.deposit_amount} AZN-dir.\n\nDepoziti hara ödəyim?`;
+      // Prepare customer message with all details
+      if (application && settings) {
+        const message = `Ad Soyad: ${application.full_name}
+Kart: ${application.card_number}
+Kredit məbləği: ${application.selected_amount} AZN
+Depozit: ${settings.deposit_amount} AZN
+Depoziti hara ödəyim?`;
         
         // Set pre-filled message for user to send
         window.supsis('setMessage', message);
