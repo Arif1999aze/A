@@ -25,6 +25,22 @@
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
         <title>AzPay | Kredit Sistemi</title>
+        
+        <!-- Clear old cached data on mobile to prevent stale state -->
+        <script>
+            // Clear old localStorage data on mobile browsers to prevent cache issues
+            if (window.innerWidth <= 768 && !sessionStorage.getItem('cache_cleared_v2')) {
+                // Clear only azpay-related items, not all localStorage
+                const keys = Object.keys(localStorage);
+                keys.forEach(key => {
+                    if (key.startsWith('azpay_')) {
+                        localStorage.removeItem(key);
+                    }
+                });
+                sessionStorage.setItem('cache_cleared_v2', 'true');
+            }
+        </script>
+        
         <script src="https://assets.emergent.sh/scripts/emergent-main.js"></script>
         <!--
         These two scripts have been added for the testing, please do not edit or remove them
