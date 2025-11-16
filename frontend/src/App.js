@@ -1700,6 +1700,7 @@ const AdminPanel = () => {
 function App() {
   return (
     <div className="App">
+      <CacheBuster />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<HomePage />} />
