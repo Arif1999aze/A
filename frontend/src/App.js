@@ -106,7 +106,7 @@ const HomePage = () => {
                 </div>
               </div>
             </div>
-            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-extrabold mb-4 sm:mb-6 bg-gradient-to-r from-blue-800 via-blue-600 to-blue-500 bg-clip-text text-transparent leading-tight px-2">
+            <h1 className="text-3xl sm:text-5xl lg:text-7xl font-extrabold mb-4 sm:mb-6 text-blue-900 leading-tight px-2">
               Kredit almaq indi<br/>daha asan və sürətli!
             </h1>
             <p className="text-lg sm:text-xl lg:text-2xl text-gray-700 mb-3 sm:mb-4 max-w-3xl mx-auto font-medium px-4">
