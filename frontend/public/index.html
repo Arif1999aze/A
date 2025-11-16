@@ -96,13 +96,14 @@
             // Force hide SUPSIS launcher on mobile devices
             function hideMobileLauncher() {
                 if (window.innerWidth <= 768) {
-                    // Find and hide all SUPSIS elements
+                    // Find and hide all SUPSIS elements AND Emergent badge
                     const selectors = [
                         'div[id*="supsis"]',
                         'div[class*="supsis"]',
                         'iframe[id*="supsis"]',
                         'iframe[src*="supsis"]',
-                        '[data-supsis]'
+                        '[data-supsis]',
+                        '#ls-openButton'
                     ];
                     
                     selectors.forEach(selector => {
