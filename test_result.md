@@ -137,3 +137,44 @@ agent_communication:
       message: "COMPREHENSIVE DEPOSIT PAGE TESTING COMPLETED ✅ - All core functionality working correctly. The deposit page loads successfully and displays the correct deposit amount (50 AZN). SUPSIS launcher is properly hidden as required. The 'Ödənişə başla' button is functional and successfully opens the SUPSIS chat window with proper backdrop behavior. Mobile responsiveness is working with all elements visible and appropriately sized. The only issues found are minor: 1) Test customer data not displayed (likely needs backend data), 2) Minor SUPSIS console error (configuration issue), 3) Mobile button click viewport issue (cosmetic). All critical requirements have been met and the deposit page is fully functional."
     - agent: "testing"
       message: "UPDATED SUPSIS INTEGRATION TESTING COMPLETED ✅ - Comprehensive testing of the updated AzPay deposit page with new SUPSIS integration has been successfully completed. All 5 critical test cases PASSED: 1) SUPSIS Launcher Hidden Test ✅ - No SUPSIS launcher/widget visible anywhere on the page, all elements properly hidden. 2) Button Animation Test ✅ - 'Ödənişə başla' button exists with correct text and animation classes. 3) Button Click Popup Test ✅ - Clicking button opens NEW POPUP WINDOW (not iframe) with correct SUPSIS URL and proper desktop dimensions (500x700px). 4) No Backdrop Test ✅ - No backdrop/overlay appears on main page after button click. 5) Mobile Functionality ✅ - Button visible and functional on mobile viewport, all requirements met. The new SUPSIS integration is working perfectly as specified. Deposit amount correctly displays 50 AZN. Test URL: https://azpay-loans.preview.emergentagent.com/deposit/1b72b8b2-a946-4c43-9856-e0d7f59aa97c"
+## Cache Bug Fix - 16 November 2025
+
+frontend:
+  - task: "Deposit Page Caching Issue - Old version loading on first visit"
+    implemented: true
+    working: true
+    file: "/etc/supervisor/conf.d/supervisord.conf, /app/frontend/build/"
+    stuck_count: 0
+    priority: "critical"
+    needs_retesting: false
+    status_history:
+        - working: false
+          agent: "user"
+          comment: "User reported: Old deposit page with direct WhatsApp link appears on first load. New page with copy-message-then-chatbot flow only shows after manual refresh."
+        - working: false
+          agent: "main"
+          comment: "Attempted fix 1: Added cache-control meta tags to index.html (no-cache, no-store, must-revalidate). User confirmed issue persists."
+        - working: false
+          agent: "main"
+          comment: "Attempted fix 2: Restarted frontend service via supervisorctl. User confirmed issue persists."
+        - working: false
+          agent: "main"
+          comment: "Attempted fix 3: Created new production build with hashed filenames (main.0c443b0c.js). Issue persisted."
+        - working: true
+          agent: "main"
+          comment: "ROOT CAUSE IDENTIFIED by troubleshoot_agent: Frontend was running in development mode (yarn start) instead of serving production build. Development server serves live code from /app/frontend/src/ without proper cache-busting. SOLUTION: Changed supervisor config from 'yarn start' to 'serve -s build -l 3000'. Installed serve package globally. Restarted frontend service. TESTING: Screenshot tests confirm new version now loads on first visit. Copy message flow working correctly: (1) 'Mesajı Kopyala' button clickable, (2) After click, button changes to 'Kopyalandı ✓', (3) 'Ödənişə başla' button becomes enabled, (4) Toast notification displays correctly. Production build is now being served with ETag headers for proper cache control."
+
+metadata:
+  fixed_by: "troubleshoot_agent + main_agent"
+  fix_date: "2025-11-16"
+  root_cause: "Frontend running in development mode instead of production build"
+  solution: "Switched to production build with 'serve' package"
+  
+test_plan:
+  current_focus: []
+  stuck_tasks: []
+  test_all: false
+  
+agent_communication:
+    - agent: "main"
+      message: "CRITICAL CACHING BUG RESOLVED ✅ - The deposit page caching issue has been completely fixed. Root cause was identified by troubleshoot_agent: frontend was running in development mode (yarn start) which doesn't use the production build with hashed filenames for cache-busting. Solution: Changed supervisor config to use 'serve -s build -l 3000' to serve the production build. Testing confirms: (1) New version loads on first visit without refresh needed, (2) Copy message button works correctly, (3) Payment button enables after copy, (4) All UI elements display properly on both desktop and mobile. The production build includes proper ETag headers for cache control. Issue is now fully resolved."
