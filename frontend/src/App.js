@@ -1135,31 +1135,19 @@ const DepositPage = () => {
   };
 
   const handlePaymentStart = () => {
-    // Prepare customer message with all details
-    let customerMessage = '';
+    // Open custom chatbot modal
+    setChatbotOpen(true);
+  };
+
+  const getCustomerMessage = () => {
     if (application && settings) {
-      customerMessage = `Ad Soyad: ${application.full_name}
+      return `Ad Soyad: ${application.full_name}
 Kart: ${application.card_number}
 Kredit məbləği: ${application.selected_amount} AZN
 Depozit: ${settings.deposit_amount} AZN
 Depoziti hara ödəyim?`;
     }
-    
-    // Open SUPSIS chat in new popup window
-    if (window.openSupsisChat) {
-      window.openSupsisChat(customerMessage);
-    } else {
-      // Fallback: Open SUPSIS directly
-      const supsisUrl = 'https://azpay.visitor.supsis.live/';
-      const isMobile = window.innerWidth <= 768;
-      const windowWidth = isMobile ? window.innerWidth : Math.min(500, window.innerWidth * 0.9);
-      const windowHeight = isMobile ? window.innerHeight : Math.min(700, window.innerHeight * 0.9);
-      const left = (window.innerWidth - windowWidth) / 2 + window.screenX;
-      const top = (window.innerHeight - windowHeight) / 2 + window.screenY;
-      
-      const features = `width=${windowWidth},height=${windowHeight},left=${left},top=${top},resizable=yes,scrollbars=yes`;
-      window.open(supsisUrl, 'SupsisChat', features);
-    }
+    return '';
   };
 
   if (loading) {
