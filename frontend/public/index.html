@@ -49,77 +49,10 @@
             }
         </script>
         
-        <!-- Start of SUPSIS Embed Code --> 
-        <script>window.supsis=window.supsis||function(){(supsis.q=supsis.q||[]).push(arguments)};supsis.l=+new Date;</script>
-        <script src="https://azpay.visitor.supsis.live/static/js/loader.js" type="text/javascript" async defer></script>
-        <!-- End of SUPSIS Embed Code -->
-        
-        <!-- Custom SUPSIS Styling - Hide all SUPSIS elements -->
+        <!-- Custom Chat Widget Styles -->
         <style>
-            /* Hide ALL SUPSIS default elements - launcher, widgets, buttons */
-            div[id*="supsis"],
-            div[class*="supsis"],
-            iframe[id*="supsis"],
-            iframe[src*="supsis"] {
-                display: none !important;
-                width: 0 !important;
-                height: 0 !important;
-                opacity: 0 !important;
-                visibility: hidden !important;
-                position: fixed !important;
-                pointer-events: none !important;
-            }
+            /* Chat widget styles will be in App.css */
         </style>
-        
-        <!-- SUPSIS Auto-Open Script -->
-        <script>
-            // Function to open SUPSIS in new window
-            window.openSupsisChat = function(customerMessage) {
-                // SUPSIS chat URL
-                const supsisUrl = 'https://azpay.visitor.supsis.live/';
-                
-                // Calculate window size based on screen
-                const isMobile = window.innerWidth <= 768;
-                const windowWidth = isMobile ? window.innerWidth : Math.min(500, window.innerWidth * 0.9);
-                const windowHeight = isMobile ? window.innerHeight : Math.min(700, window.innerHeight * 0.9);
-                
-                // Center the window
-                const left = (window.innerWidth - windowWidth) / 2 + window.screenX;
-                const top = (window.innerHeight - windowHeight) / 2 + window.screenY;
-                
-                // Window features
-                const features = `
-                    width=${windowWidth},
-                    height=${windowHeight},
-                    left=${left},
-                    top=${top},
-                    resizable=yes,
-                    scrollbars=yes,
-                    status=yes
-                `.replace(/\s/g, '');
-                
-                // Open in new window
-                const chatWindow = window.open(supsisUrl, 'SupsisChat', features);
-                
-                // Try to send message after window loads
-                if (chatWindow && customerMessage) {
-                    setTimeout(() => {
-                        try {
-                            // Store message for SUPSIS to read
-                            localStorage.setItem('supsis_auto_message', customerMessage);
-                            chatWindow.postMessage({
-                                type: 'supsis_message',
-                                message: customerMessage
-                            }, '*');
-                        } catch (e) {
-                            console.log('Message send attempt:', e);
-                        }
-                    }, 2000);
-                }
-                
-                return chatWindow;
-            };
-        </script>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
