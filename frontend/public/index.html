@@ -56,8 +56,16 @@
         
         <!-- Custom SUPSIS Styling -->
         <style>
-            /* SUPSIS Chat iframe - Show and center it */
-            #supsis-iframe {
+            /* Hide SUPSIS iframe by default */
+            body:not(.supsis-chat-open) #supsis-iframe {
+                display: none !important;
+                width: 0 !important;
+                height: 0 !important;
+                opacity: 0 !important;
+            }
+            
+            /* Show and center SUPSIS iframe when chat is open - MUST come after hide rule */
+            body.supsis-chat-open #supsis-iframe {
                 display: block !important;
                 visibility: visible !important;
                 opacity: 1 !important;
@@ -66,7 +74,9 @@
                 left: 50% !important;
                 transform: translate(-50%, -50%) !important;
                 width: 450px !important;
+                min-width: 450px !important;
                 height: 600px !important;
+                min-height: 600px !important;
                 max-height: 85vh !important;
                 border-radius: 16px !important;
                 box-shadow: 0 20px 60px rgba(0,0,0,0.4) !important;
@@ -78,24 +88,11 @@
             @media (max-width: 640px) {
                 body.supsis-chat-open #supsis-iframe {
                     width: 90vw !important;
+                    min-width: 90vw !important;
                     height: 80vh !important;
+                    min-height: 80vh !important;
                     border-radius: 12px !important;
                 }
-            }
-            
-            /* Hide SUPSIS iframe by default (will be shown via JavaScript) */
-            body:not(.supsis-chat-open) #supsis-iframe {
-                display: none !important;
-                width: 0 !important;
-                height: 0 !important;
-            }
-            
-            /* Show chat iframe when chat is open */
-            body.supsis-chat-open #supsis-iframe {
-                display: block !important;
-                width: 450px !important;
-                height: 600px !important;
-                max-height: 85vh !important;
             }
             
             /* Add backdrop when chat is open */
