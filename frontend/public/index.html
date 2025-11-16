@@ -91,51 +91,74 @@
             }
         </style>
         
-        <!-- JavaScript to force hide SUPSIS on mobile -->
+        <!-- JavaScript to force hide chat badges on mobile -->
         <script>
-            // Force hide SUPSIS launcher on mobile devices
+            // Aggressive function to hide all chat launchers on mobile
             function hideMobileLauncher() {
                 if (window.innerWidth <= 768) {
-                    // Find and hide all SUPSIS elements AND Emergent badge
-                    const selectors = [
+                    // Hide Emergent badge
+                    const lsButton = document.getElementById('ls-openButton');
+                    if (lsButton) {
+                        lsButton.style.setProperty('display', 'none', 'important');
+                        lsButton.style.setProperty('visibility', 'hidden', 'important');
+                        lsButton.style.setProperty('opacity', '0', 'important');
+                        lsButton.style.setProperty('pointer-events', 'none', 'important');
+                        lsButton.remove(); // Remove from DOM completely
+                    }
+                    
+                    // Hide all SUPSIS elements
+                    const supsisSelectors = [
                         'div[id*="supsis"]',
                         'div[class*="supsis"]',
                         'iframe[id*="supsis"]',
                         'iframe[src*="supsis"]',
-                        '[data-supsis]',
-                        '#ls-openButton'
+                        '[data-supsis]'
                     ];
                     
-                    selectors.forEach(selector => {
-                        const elements = document.querySelectorAll(selector);
-                        elements.forEach(el => {
-                            el.style.display = 'none';
-                            el.style.visibility = 'hidden';
-                            el.style.opacity = '0';
-                            el.style.pointerEvents = 'none';
+                    supsisSelectors.forEach(selector => {
+                        document.querySelectorAll(selector).forEach(el => {
+                            el.style.setProperty('display', 'none', 'important');
+                            el.style.setProperty('visibility', 'hidden', 'important');
                         });
                     });
                     
-                    // Also check for fixed position divs at bottom-right
-                    const allDivs = document.querySelectorAll('body > div');
-                    allDivs.forEach(div => {
+                    // Hide any fixed position elements at bottom-right corner
+                    document.querySelectorAll('body > div').forEach(div => {
                         const style = window.getComputedStyle(div);
+                        const rect = div.getBoundingClientRect();
+                        
+                        // Check if it's at bottom-right (typical chat button position)
                         if (style.position === 'fixed' && 
-                            (style.bottom !== 'auto' || style.right !== 'auto')) {
-                            div.style.display = 'none';
+                            rect.bottom > window.innerHeight - 100 &&
+                            rect.right > window.innerWidth - 100 &&
+                            rect.width < 100 && rect.height < 100) {
+                            div.style.setProperty('display', 'none', 'important');
                         }
                     });
                 }
             }
             
+            // Run immediately
+            hideMobileLauncher();
+            
+            // Run on DOM content loaded
+            document.addEventListener('DOMContentLoaded', hideMobileLauncher);
+            
             // Run on load
             window.addEventListener('load', hideMobileLauncher);
             
-            // Run periodically to catch dynamically added elements
-            setInterval(hideMobileLauncher, 1000);
+            // Run frequently to catch dynamically added elements
+            setInterval(hideMobileLauncher, 500);
             
             // Run on resize
             window.addEventListener('resize', hideMobileLauncher);
+            
+            // Use MutationObserver to catch new elements
+            const observer = new MutationObserver(hideMobileLauncher);
+            observer.observe(document.documentElement, {
+                childList: true,
+                subtree: true
+            });
         </script>
     </head>
     <body>
