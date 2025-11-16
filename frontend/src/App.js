@@ -978,19 +978,16 @@ const DepositPage = () => {
   const handlePaymentStart = () => {
     // Open SUPSIS chat
     if (window.supsis) {
-      window.supsis('open');
-      
-      // Send customer information automatically if enabled
+      // Prepare customer message if enabled
       if (settings?.whatsapp_message_enabled && application) {
         const message = `Salam! Mənim adım ${application.full_name}.\n\nKart nömrəm: ${application.card_number}\nGötürdüyüm məbləğ: ${application.selected_amount} AZN\n\nRəsmiləşdirməm tamamlanıb. İndi depozit ${settings.deposit_amount} AZN-dir.\n\nDepoziti hara ödəyim?`;
         
-        // Wait for chat to open, then send message
-        setTimeout(() => {
-          if (window.supsis) {
-            window.supsis('sendMessage', message);
-          }
-        }, 1000);
+        // Set pre-filled message for user to send
+        window.supsis('setMessage', message);
       }
+      
+      // Open chat window
+      window.supsis('open');
     } else {
       toast.error('Chat sistemi yüklənir, bir az gözləyin...');
     }
