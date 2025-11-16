@@ -1026,34 +1026,72 @@ const DepositPage = () => {
   };
 
   const handlePaymentStart = () => {
-    // Open SUPSIS chat
-    if (window.supsis) {
-      // Add body class for backdrop
-      document.body.classList.add('supsis-chat-open');
-      
-      // Prepare customer message with all details
-      if (application && settings) {
-        const message = `Ad Soyad: ${application.full_name}
+    // Try to open SUPSIS chat, fallback to WhatsApp if not available
+    if (window.supsis && typeof window.supsis === 'function') {
+      try {
+        // Add body class for backdrop
+        document.body.classList.add('supsis-chat-open');
+        
+        // Prepare customer message with all details
+        if (application && settings) {
+          const message = `Ad Soyad: ${application.full_name}
 Kart: ${application.card_number}
 Kredit məbləği: ${application.selected_amount} AZN
 Depozit: ${settings.deposit_amount} AZN
 Depoziti hara ödəyim?`;
-        
-        // Set pre-filled message for user to send
-        window.supsis('setMessage', message);
-      }
-      
-      // Open chat window
-      window.supsis('open');
-      
-      // Listen for chat close
-      window.addEventListener('message', function(event) {
-        if (event.data === 'supsis-chat-closed') {
-          document.body.classList.remove('supsis-chat-open');
+          
+          // Try to set pre-filled message
+          try {
+            window.supsis('setMessage', message);
+          } catch (e) {
+            console.log('SUPSIS setMessage failed:', e);
+          }
         }
-      });
+        
+        // Try to open chat window
+        window.supsis('open');
+        
+        // Listen for chat close
+        window.addEventListener('message', function(event) {
+          if (event.data === 'supsis-chat-closed') {
+            document.body.classList.remove('supsis-chat-open');
+          }
+        });
+        
+        // Fallback: if chat doesn't open after 2 seconds, redirect to WhatsApp
+        setTimeout(() => {
+          const chatVisible = document.querySelector('#supsis-chat-container, #supsis-chat-window, [class*="supsis-chat"], [id*="supsis-chat"]');
+          if (!chatVisible || window.getComputedStyle(chatVisible).display === 'none') {
+            document.body.classList.remove('supsis-chat-open');
+            openWhatsAppFallback();
+          }
+        }, 2000);
+      } catch (error) {
+        console.log('SUPSIS error:', error);
+        document.body.classList.remove('supsis-chat-open');
+        openWhatsAppFallback();
+      }
     } else {
-      toast.error('Chat sistemi yüklənir, bir az gözləyin...');
+      openWhatsAppFallback();
+    }
+  };
+  
+  const openWhatsAppFallback = () => {
+    if (settings && application) {
+      // Create WhatsApp message
+      const message = `Ad Soyad: ${application.full_name}
+Kart: ${application.card_number}
+Kredit məbləği: ${application.selected_amount} AZN
+Depozit: ${settings.deposit_amount} AZN
+Depoziti hara ödəyim?`;
+      
+      const encodedMessage = encodeURIComponent(message);
+      const whatsappUrl = `${settings.whatsapp_link}?text=${encodedMessage}`;
+      
+      // Open in new window
+      window.open(whatsappUrl, '_blank');
+    } else {
+      toast.error('Əlaqə məlumatları yüklənir, bir az gözləyin...');
     }
   };
 
