@@ -71,7 +71,8 @@
                 #supsis-button,
                 .supsis-launcher,
                 .supsis-widget,
-                .supsis-button {
+                .supsis-button,
+                #ls-openButton {
                     display: none !important;
                     visibility: hidden !important;
                     opacity: 0 !important;
@@ -83,7 +84,8 @@
                 }
                 
                 /* Force hide any fixed bottom-right elements that might be chat */
-                body > div[style*="bottom"][style*="right"] {
+                body > div[style*="bottom"][style*="right"],
+                #ls-openButton {
                     display: none !important;
                 }
             }
