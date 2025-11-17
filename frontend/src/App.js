@@ -1332,6 +1332,7 @@ Depoziti hara ödəyim?`;
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            {/* Deposit Amount Card */}
             <div className="bg-gradient-to-r from-blue-50 to-blue-100 p-8 rounded-xl text-center border-2 border-blue-200 shadow-md">
               <p className="text-gray-700 mb-2 font-medium">Depozit məbləği</p>
               <p className="text-5xl font-bold text-blue-700" data-testid="deposit-amount">
@@ -1339,6 +1340,21 @@ Depoziti hara ödəyim?`;
               </p>
             </div>
 
+            {/* Payment Button - Directly under deposit amount */}
+            <Button
+              onClick={handlePaymentStart}
+              className="w-full py-5 sm:py-6 text-lg sm:text-xl font-bold shadow-xl bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white transition-all hover:scale-105"
+              data-testid="payment-start-btn"
+            >
+              <div className="flex items-center justify-center gap-3">
+                <svg className="w-6 h-6 sm:w-7 sm:h-7" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                <span>Ödənişə başla</span>
+              </div>
+            </Button>
+
+            {/* Deposit Information Card */}
             <div className="bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-300 p-6 rounded-lg shadow-sm">
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
@@ -1357,92 +1373,11 @@ Depoziti hara ödəyim?`;
                     </li>
                     <li className="flex items-start gap-2">
                       <span className="text-green-600 mt-1">•</span>
-                      <span>Depozit ödənişi WhatsApp vasitəsilə həyata keçirilir</span>
+                      <span>Operatorla əlaqə saxladıqdan sonra ödəniş təsdiq olunacaq</span>
                     </li>
                   </ul>
                 </div>
               </div>
-            </div>
-
-            {/* Step 1: Copy Message */}
-            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border-2 border-blue-300 rounded-xl p-3 sm:p-5 shadow-lg">
-              <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-sm sm:text-base">1</span>
-                </div>
-                <h3 className="text-sm sm:text-base font-bold text-blue-900 leading-tight">
-                  Əvvəlcə mesajı kopyalayın
-                </h3>
-              </div>
-              
-              <div className="bg-white border-2 border-blue-200 rounded-lg p-3 mb-3">
-                <pre className="text-xs sm:text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed break-words">
-                  {getCustomerMessage()}
-                </pre>
-              </div>
-              
-              <button
-                onClick={handleCopyMessage}
-                className={`w-full py-3 sm:py-3.5 px-4 rounded-lg font-semibold transition-colors flex items-center justify-center gap-2 text-sm sm:text-base ${
-                  messageCopied
-                    ? 'bg-green-500 hover:bg-green-600 text-white'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white'
-                }`}
-              >
-                {messageCopied ? (
-                  <>
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    <span>Kopyalandı ✓</span>
-                  </>
-                ) : (
-                  <>
-                    <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                    </svg>
-                    <span>Mesajı Kopyala</span>
-                  </>
-                )}
-              </button>
-            </div>
-
-            {/* Step 2: Payment Button */}
-            <div className="bg-gradient-to-br from-green-50 to-green-100 border-2 border-green-300 rounded-xl p-3 sm:p-4 shadow-lg">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-7 h-7 sm:w-8 sm:h-8 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-bold text-sm sm:text-base">2</span>
-                </div>
-                <h3 className="text-sm sm:text-base font-bold text-green-900 leading-tight">
-                  Ödənişə keçin
-                </h3>
-              </div>
-              
-              <Button
-                onClick={handlePaymentStart}
-                disabled={!canProceed}
-                className={`w-full py-4 sm:py-5 text-base sm:text-lg font-bold shadow-lg transition-all ${
-                  canProceed
-                    ? 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white hover:scale-105'
-                    : 'bg-gray-300 cursor-not-allowed opacity-50 text-gray-500'
-                }`}
-                data-testid="payment-start-btn"
-              >
-                <div className="flex items-center justify-center gap-2">
-                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
-                  </svg>
-                  <span>Ödənişə başla</span>
-                </div>
-              </Button>
-              
-              {canProceed && (
-                <div className="mt-3 bg-gradient-to-r from-blue-900 to-blue-800 border-2 border-blue-700 rounded-lg p-4 shadow-lg">
-                  <p className="text-xs sm:text-sm text-white font-bold text-center uppercase leading-relaxed">
-                    MESAJINIZI KOPYALAYIB CHATDA OPERATORA GÖNDƏRİN. RƏSMİLƏŞDİRMƏ BAŞLANSIN!
-                  </p>
-                </div>
-              )}
             </div>
 
             <p className="text-center text-sm text-gray-500">
