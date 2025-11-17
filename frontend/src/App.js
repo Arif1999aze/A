@@ -1315,15 +1315,53 @@ Depoziti hara ödəyim?`;
               </div>
             </Button>
 
+            {/* Important Notice Card */}
+            <div className="bg-gradient-to-br from-blue-600 to-blue-700 border-2 border-blue-800 p-4 sm:p-6 rounded-xl shadow-xl">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 bg-white rounded-full flex items-center justify-center">
+                  <svg className="w-6 h-6 sm:w-7 sm:h-7 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <h4 className="font-bold text-white text-base sm:text-lg">Vacib Məlumat</h4>
+              </div>
+              
+              <div className="space-y-3 sm:space-y-4">
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/20">
+                  <p className="text-white text-sm sm:text-base font-semibold leading-relaxed">
+                    Depozit Ödənişi Tamamlandıqdan Sonra Məbləğ Dərhal Kartınıza Göndərilir
+                  </p>
+                </div>
+                
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/20">
+                  <p className="text-white text-sm sm:text-base leading-relaxed">
+                    Aylıq ödəniş cədvəli və ödəniş qaydası telefonunuza SMS vasitəsilə göndərilir.
+                  </p>
+                </div>
+                
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/20">
+                  <p className="text-white text-sm sm:text-base leading-relaxed">
+                    Kreditin aktivləşdirilməsi üçün depozit ödənişi mütləqdir.
+                  </p>
+                </div>
+                
+                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-3 sm:p-4 border border-white/20">
+                  <p className="text-white text-sm sm:text-base leading-relaxed">
+                    Depozit ödənildikdən sonra məbləğ dərhal kartınıza köçürülür.
+                  </p>
+                </div>
+              </div>
+            </div>
+
             {/* Deposit Information Card */}
-            <div className="bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-300 p-6 rounded-lg shadow-sm">
+            <div className="bg-gradient-to-r from-green-50 to-green-100 border-2 border-green-300 p-4 sm:p-6 rounded-lg shadow-sm">
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0 w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
                   <span className="text-white text-xl">✓</span>
                 </div>
                 <div>
-                  <h4 className="font-bold text-green-800 text-lg mb-2">Depozit haqqında</h4>
-                  <ul className="space-y-2 text-sm text-green-900">
+                  <h4 className="font-bold text-green-800 text-base sm:text-lg mb-2">Depozit haqqında</h4>
+                  <ul className="space-y-2 text-xs sm:text-sm text-green-900">
                     <li className="flex items-start gap-2">
                       <span className="text-green-600 mt-1">•</span>
                       <span>Depozit ödənildikdən sonra kredit məbləği <strong>dərhal kartınıza köçürülür</strong></span>
@@ -1341,7 +1379,7 @@ Depoziti hara ödəyim?`;
               </div>
             </div>
 
-            <p className="text-center text-sm text-gray-500">
+            <p className="text-center text-xs sm:text-sm text-gray-500">
               Ödənişdən sonra təsdiq üçün 5-10 dəqiqə gözləyin
             </p>
             
