@@ -1255,38 +1255,6 @@ Depozit: ${settings.deposit_amount} AZN
 Depoziti hara ödəyim?`;
   };
 
-  const handleCopyMessage = async () => {
-    const message = getCustomerMessage();
-    
-    try {
-      await navigator.clipboard.writeText(message);
-      setMessageCopied(true);
-      setCanProceed(true);
-      toast.success('Mesaj kopyalandı! İndi "Ödənişə başla" düyməsinə klik edin.');
-      
-      // Reset after 3 seconds
-      setTimeout(() => {
-        setMessageCopied(false);
-      }, 3000);
-    } catch (err) {
-      // Fallback for older browsers
-      const textArea = document.createElement('textarea');
-      textArea.value = message;
-      document.body.appendChild(textArea);
-      textArea.select();
-      document.execCommand('copy');
-      document.body.removeChild(textArea);
-      
-      setMessageCopied(true);
-      setCanProceed(true);
-      toast.success('Mesaj kopyalandı! İndi "Ödənişə başla" düyməsinə klik edin.');
-      
-      setTimeout(() => {
-        setMessageCopied(false);
-      }, 3000);
-    }
-  };
-
   const handlePaymentStart = () => {
     const customerMessage = getCustomerMessage();
     
