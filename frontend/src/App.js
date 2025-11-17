@@ -1290,11 +1290,6 @@ Depoziti hara ödəyim?`;
   };
 
   const handlePaymentStart = () => {
-    if (!canProceed) {
-      toast.error('Zəhmət olmasa əvvəlcə mesajı kopyalayın!');
-      return;
-    }
-    
     const customerMessage = getCustomerMessage();
     
     // Store message in localStorage for SUPSIS page to read
