@@ -1502,128 +1502,130 @@ const AdminPanel = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4">
-      <div className="container mx-auto max-w-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-6 sm:py-12 px-4">
+      <div className="container mx-auto max-w-3xl">
         <Button 
           variant="ghost" 
           onClick={() => navigate('/')} 
-          className="mb-6"
+          className="mb-4 sm:mb-6"
         >
           ← Ana səhifəyə qayıt
         </Button>
 
         <Card className="shadow-2xl border-blue-100">
-          <CardHeader>
-            <CardTitle className="text-3xl">Admin Paneli</CardTitle>
-            <CardDescription>Sistem parametrlərini idarə edin</CardDescription>
+          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
+            <CardTitle className="text-2xl sm:text-3xl">İletişim Bilgileri Yönetimi</CardTitle>
+            <CardDescription className="text-blue-100">Əlaqə məlumatlarını yeniləyin</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div>
-              <Label htmlFor="deposit_amount">Depozit məbləği (AZN)</Label>
-              <Input
-                id="deposit_amount"
-                type="number"
-                data-testid="admin-deposit-input"
-                value={settings.deposit_amount}
-                onChange={(e) => setSettings({ ...settings, deposit_amount: e.target.value })}
-                className="mt-1.5"
-              />
+          <CardContent className="space-y-6 pt-6">
+            {/* Contact Information Section */}
+            <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 sm:p-6">
+              <h3 className="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                  <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                </svg>
+                Əlaqə Məlumatları
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="contact_phone" className="text-sm font-semibold text-gray-700">
+                    📞 Əlaqə telefonu
+                  </Label>
+                  <Input
+                    id="contact_phone"
+                    type="tel"
+                    data-testid="admin-phone-input"
+                    placeholder="+994 50 123 45 67"
+                    value={settings.contact_phone}
+                    onChange={(e) => setSettings({ ...settings, contact_phone: e.target.value })}
+                    className="mt-1.5 text-base"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="contact_email" className="text-sm font-semibold text-gray-700">
+                    📧 Əlaqə email
+                  </Label>
+                  <Input
+                    id="contact_email"
+                    type="email"
+                    data-testid="admin-email-input"
+                    placeholder="info@azpay.az"
+                    value={settings.contact_email}
+                    onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
+                    className="mt-1.5 text-base"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="contact_address" className="text-sm font-semibold text-gray-700">
+                    📍 Ünvan
+                  </Label>
+                  <Input
+                    id="contact_address"
+                    type="text"
+                    data-testid="admin-address-input"
+                    placeholder="Bakı, Azərbaycan"
+                    value={settings.contact_address}
+                    onChange={(e) => setSettings({ ...settings, contact_address: e.target.value })}
+                    className="mt-1.5 text-base"
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="about_text" className="text-sm font-semibold text-gray-700">
+                    ℹ️ Haqqımızda mətn
+                  </Label>
+                  <textarea
+                    id="about_text"
+                    data-testid="admin-about-input"
+                    rows="5"
+                    placeholder="AzPay haqqında məlumat..."
+                    value={settings.about_text}
+                    onChange={(e) => setSettings({ ...settings, about_text: e.target.value })}
+                    className="mt-1.5 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-base"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div>
-              <Label htmlFor="whatsapp_link">WhatsApp linki</Label>
-              <Input
-                id="whatsapp_link"
-                type="url"
-                data-testid="admin-whatsapp-input"
-                placeholder="https://wa.me/994..."
-                value={settings.whatsapp_link}
-                onChange={(e) => setSettings({ ...settings, whatsapp_link: e.target.value })}
-                className="mt-1.5"
-              />
+            {/* Update Button */}
+            <div className="pt-4">
+              <Button
+                onClick={handleUpdate}
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 py-5 sm:py-6 text-base sm:text-lg font-bold shadow-lg"
+                data-testid="admin-update-btn"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                    Yenilənir...
+                  </>
+                ) : (
+                  <>
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Məlumatları Yenilə
+                  </>
+                )}
+              </Button>
             </div>
 
-            <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-200">
-              <input
-                type="checkbox"
-                id="whatsapp_message"
-                data-testid="admin-whatsapp-message-input"
-                checked={settings.whatsapp_message_enabled}
-                onChange={(e) => setSettings({ ...settings, whatsapp_message_enabled: e.target.checked })}
-                className="w-5 h-5 text-blue-600 rounded cursor-pointer"
-              />
-              <Label htmlFor="whatsapp_message" className="cursor-pointer m-0">
-                WhatsApp-da avtomatik mesaj göndərilsin (müştəri məlumatları ilə)
-              </Label>
+            {/* Info Notice */}
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+              <div className="flex items-start">
+                <svg className="w-5 h-5 text-yellow-600 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <p className="ml-3 text-sm text-yellow-700">
+                  Bu məlumatlar saytın "Haqqımızda" və "Əlaqə" bölmələrində göstəriləcək
+                </p>
+              </div>
             </div>
-
-            <div>
-              <Label htmlFor="contact_phone">Əlaqə telefonu</Label>
-              <Input
-                id="contact_phone"
-                type="tel"
-                data-testid="admin-phone-input"
-                placeholder="+994 50 123 45 67"
-                value={settings.contact_phone}
-                onChange={(e) => setSettings({ ...settings, contact_phone: e.target.value })}
-                className="mt-1.5"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="contact_email">Əlaqə email</Label>
-              <Input
-                id="contact_email"
-                type="email"
-                data-testid="admin-email-input"
-                placeholder="info@azpay.az"
-                value={settings.contact_email}
-                onChange={(e) => setSettings({ ...settings, contact_email: e.target.value })}
-                className="mt-1.5"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="contact_address">Ünvan</Label>
-              <Input
-                id="contact_address"
-                type="text"
-                data-testid="admin-address-input"
-                placeholder="Bakı, Azərbaycan"
-                value={settings.contact_address}
-                onChange={(e) => setSettings({ ...settings, contact_address: e.target.value })}
-                className="mt-1.5"
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="about_text">Haqqımızda mətn</Label>
-              <textarea
-                id="about_text"
-                data-testid="admin-about-input"
-                rows="4"
-                placeholder="AzPay haqqında məlumat..."
-                value={settings.about_text}
-                onChange={(e) => setSettings({ ...settings, about_text: e.target.value })}
-                className="mt-1.5 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-            </div>
-
-            <Button
-              onClick={handleUpdate}
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 py-6"
-              data-testid="admin-update-btn"
-            >
-              {loading ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Yenilənir...
-                </>
-              ) : (
-                'Parametrləri yenilə'
-              )}
-            </Button>
           </CardContent>
         </Card>
       </div>
