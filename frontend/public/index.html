@@ -29,29 +29,43 @@
         <!-- AGGRESSIVE CACHE BUSTING - Force fresh content on every load -->
         <script>
             // Version number - increment this after each deployment
-            const APP_VERSION = 'v1.0.7';
+            const APP_VERSION = 'v2.0.0';
+            const BUILD_TIMESTAMP = '2025-11-17T08:10:00Z';
             
             // Force hard reload if version changed
             const storedVersion = localStorage.getItem('azpay_app_version');
-            if (storedVersion !== APP_VERSION) {
-                console.log('New version detected, clearing cache...');
+            const storedTimestamp = localStorage.getItem('azpay_build_timestamp');
+            
+            if (storedVersion !== APP_VERSION || storedTimestamp !== BUILD_TIMESTAMP) {
+                console.log('New version detected, clearing ALL cache...');
                 
-                // Clear all azpay data
-                Object.keys(localStorage).forEach(key => {
-                    if (key.startsWith('azpay_')) {
-                        localStorage.removeItem(key);
-                    }
-                });
-                Object.keys(sessionStorage).forEach(key => {
-                    sessionStorage.removeItem(key);
-                });
+                // Clear EVERYTHING from localStorage
+                localStorage.clear();
                 
-                // Store new version
+                // Clear EVERYTHING from sessionStorage
+                sessionStorage.clear();
+                
+                // Clear IndexedDB if exists
+                if (window.indexedDB && window.indexedDB.databases) {
+                    window.indexedDB.databases().then(dbs => {
+                        dbs.forEach(db => window.indexedDB.deleteDatabase(db.name));
+                    });
+                }
+                
+                // Store new version and timestamp
                 localStorage.setItem('azpay_app_version', APP_VERSION);
+                localStorage.setItem('azpay_build_timestamp', BUILD_TIMESTAMP);
                 
-                // Force hard reload to clear browser cache
-                if (storedVersion) {
-                    console.log('Performing hard reload...');
+                // Force SUPER hard reload to clear ALL caches
+                if (storedVersion || storedTimestamp) {
+                    console.log('Performing SUPER hard reload...');
+                    // Try to unregister any service workers
+                    if ('serviceWorker' in navigator) {
+                        navigator.serviceWorker.getRegistrations().then(registrations => {
+                            registrations.forEach(registration => registration.unregister());
+                        });
+                    }
+                    // Force reload with cache bypass
                     window.location.reload(true);
                 }
             }
