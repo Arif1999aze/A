@@ -1141,8 +1141,6 @@ const DepositPage = () => {
   const [settings, setSettings] = useState(null);
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [messageCopied, setMessageCopied] = useState(false);
-  const [canProceed, setCanProceed] = useState(false);
 
   // Hide chat badge on mobile
   useEffect(() => {
