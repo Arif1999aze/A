@@ -1431,6 +1431,7 @@ const AdminPanel = () => {
   const [password, setPassword] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
   const [settings, setSettings] = useState({ 
+    deposit_amount: 50,
     logo_url: 'https://i.hizliresim.com/iydskgy.jpeg',
     hero_image_url: 'https://i.hizliresim.com/iydskgy.jpeg',
     approval_image_url: 'https://i.hizliresim.com/iydskgy.jpeg',
