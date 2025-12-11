@@ -1551,6 +1551,44 @@ const AdminPanel = () => {
             <CardDescription className="text-blue-100">Əlaqə məlumatlarını yeniləyin</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
+            {/* Deposit Amount Section - PRIORITY */}
+            <div className="bg-green-50 border-2 border-green-300 rounded-lg p-4 sm:p-6 mb-6">
+              <h3 className="text-lg font-bold text-green-900 mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clipRule="evenodd"/>
+                </svg>
+                Depozit Məbləği
+              </h3>
+              
+              <div className="space-y-4">
+                <div className="bg-white border border-green-200 rounded-lg p-4">
+                  <Label htmlFor="deposit_amount" className="text-sm font-semibold text-gray-700 flex items-center gap-2 mb-2">
+                    💵 Depozit məbləği (AZN)
+                  </Label>
+                  <Input
+                    id="deposit_amount"
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="50"
+                    value={settings.deposit_amount}
+                    onChange={(e) => setSettings({ ...settings, deposit_amount: parseFloat(e.target.value) || 0 })}
+                    className="mt-1.5 text-lg font-bold"
+                  />
+                  <p className="text-xs text-gray-500 mt-2">Bu məbləğ depozit səhifəsində göstəriləcək</p>
+                  
+                  {/* Preview */}
+                  {settings.deposit_amount && (
+                    <div className="mt-3 p-3 bg-blue-100 border border-blue-300 rounded text-center">
+                      <p className="text-sm text-gray-600 mb-1">Önizləmə:</p>
+                      <p className="text-3xl font-bold text-blue-700">{settings.deposit_amount} AZN</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {/* Site Images Section - ALL IMAGES */}
             <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 sm:p-6 mb-6">
               <h3 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
