@@ -464,6 +464,20 @@ const ApprovalPage = () => {
   const appId = window.location.pathname.split('/').pop();
   const [progress, setProgress] = useState(0);
   const [checking, setChecking] = useState(true);
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    // Fetch settings for image
+    const fetchSettings = async () => {
+      try {
+        const response = await axios.get(`${API}/settings`);
+        setSettings(response.data);
+      } catch (error) {
+        console.error('Settings yüklənə bilmədi');
+      }
+    };
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     // Progress animation
