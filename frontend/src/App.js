@@ -1471,6 +1471,7 @@ const AdminPanel = () => {
       await axios.put(
         `${API}/settings`,
         {
+          deposit_amount: parseFloat(settings.deposit_amount),
           logo_url: settings.logo_url,
           hero_image_url: settings.hero_image_url,
           approval_image_url: settings.approval_image_url,
