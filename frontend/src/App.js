@@ -1516,6 +1516,50 @@ const AdminPanel = () => {
             <CardDescription className="text-blue-100">Əlaqə məlumatlarını yeniləyin</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
+            {/* Site Logo Section */}
+            <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 sm:p-6 mb-6">
+              <h3 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                </svg>
+                Sayt Loqosu
+              </h3>
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="logo_url" className="text-sm font-semibold text-gray-700">
+                    🖼️ Logo URL
+                  </Label>
+                  <Input
+                    id="logo_url"
+                    type="url"
+                    data-testid="admin-logo-input"
+                    placeholder="https://example.com/logo.png"
+                    value={settings.logo_url}
+                    onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
+                    className="mt-1.5 text-base"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Header və footer-da göstəriləcək logo</p>
+                </div>
+                
+                {/* Logo Preview */}
+                {settings.logo_url && (
+                  <div className="bg-white border-2 border-purple-300 rounded-lg p-4">
+                    <p className="text-sm font-semibold text-gray-700 mb-2">Önizləmə:</p>
+                    <img 
+                      src={settings.logo_url} 
+                      alt="Logo Preview" 
+                      className="h-16 w-auto"
+                      onError={(e) => {
+                        e.target.style.display = 'none';
+                        e.target.parentElement.innerHTML = '<p class="text-red-500 text-sm">❌ Logo yüklənə bilmədi. URL-i yoxlayın.</p>';
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+            </div>
+
             {/* Contact Information Section */}
             <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 sm:p-6">
               <h3 className="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
@@ -1523,7 +1567,7 @@ const AdminPanel = () => {
                   <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                   <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                 </svg>
-                Əlaqə Məlumatları
+                Əlaqə Məlumatları (Footer)
               </h3>
               
               <div className="space-y-4">
