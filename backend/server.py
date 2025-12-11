@@ -70,7 +70,16 @@ class Settings(BaseModel):
     deposit_amount: float = 50.0
     whatsapp_link: str = "https://wa.me/994501234567"
     whatsapp_message_enabled: bool = True
+    
+    # Site Images
     logo_url: str = "https://i.hizliresim.com/iydskgy.jpeg"
+    hero_image_url: str = "https://i.hizliresim.com/iydskgy.jpeg"
+    approval_image_url: str = "https://i.hizliresim.com/iydskgy.jpeg"
+    credit_selection_image_url: str = "https://i.hizliresim.com/iydskgy.jpeg"
+    card_entry_image_url: str = "https://i.hizliresim.com/iydskgy.jpeg"
+    contract_image_url: str = "https://i.hizliresim.com/iydskgy.jpeg"
+    
+    # Contact Info
     contact_phone: str = "+994 50 123 45 67"
     contact_email: str = "info@azpay.az"
     contact_address: str = "Bakı, Azərbaycan"
@@ -81,7 +90,16 @@ class SettingsUpdate(BaseModel):
     deposit_amount: Optional[float] = None
     whatsapp_link: Optional[str] = None
     whatsapp_message_enabled: Optional[bool] = None
+    
+    # Site Images
     logo_url: Optional[str] = None
+    hero_image_url: Optional[str] = None
+    approval_image_url: Optional[str] = None
+    credit_selection_image_url: Optional[str] = None
+    card_entry_image_url: Optional[str] = None
+    contract_image_url: Optional[str] = None
+    
+    # Contact Info
     contact_phone: Optional[str] = None
     contact_email: Optional[str] = None
     contact_address: Optional[str] = None
