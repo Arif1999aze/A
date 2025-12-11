@@ -512,7 +512,7 @@ const ApprovalPage = () => {
           {checking ? (
             <>
               <img 
-                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                src={settings?.approval_image_url || "https://i.hizliresim.com/iydskgy.jpeg"} 
                 alt="AzPay" 
                 className="h-16 w-auto mx-auto mb-8"
               />
