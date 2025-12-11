@@ -1524,47 +1524,140 @@ const AdminPanel = () => {
             <CardDescription className="text-blue-100">Əlaqə məlumatlarını yeniləyin</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-6">
-            {/* Site Logo Section */}
+            {/* Site Images Section - ALL IMAGES */}
             <div className="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 sm:p-6 mb-6">
               <h3 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
                 </svg>
-                Sayt Loqosu
+                Sayt Şəkilləri (A-dan Z-yə Bütün Rəsmlər)
               </h3>
               
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="logo_url" className="text-sm font-semibold text-gray-700">
-                    🖼️ Logo URL
+              <div className="space-y-5">
+                {/* Logo */}
+                <div className="bg-white border border-purple-200 rounded-lg p-3">
+                  <Label htmlFor="logo_url" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    🏢 Logo (Header və Footer)
                   </Label>
                   <Input
                     id="logo_url"
                     type="url"
-                    data-testid="admin-logo-input"
                     placeholder="https://example.com/logo.png"
                     value={settings.logo_url}
                     onChange={(e) => setSettings({ ...settings, logo_url: e.target.value })}
-                    className="mt-1.5 text-base"
+                    className="mt-1.5 text-sm"
                   />
-                  <p className="text-xs text-gray-500 mt-1">Header və footer-da göstəriləcək logo</p>
+                  {settings.logo_url && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded">
+                      <img src={settings.logo_url} alt="Logo" className="h-12 w-auto" onError={(e) => e.target.style.display='none'} />
+                    </div>
+                  )}
                 </div>
-                
-                {/* Logo Preview */}
-                {settings.logo_url && (
-                  <div className="bg-white border-2 border-purple-300 rounded-lg p-4">
-                    <p className="text-sm font-semibold text-gray-700 mb-2">Önizləmə:</p>
-                    <img 
-                      src={settings.logo_url} 
-                      alt="Logo Preview" 
-                      className="h-16 w-auto"
-                      onError={(e) => {
-                        e.target.style.display = 'none';
-                        e.target.parentElement.innerHTML = '<p class="text-red-500 text-sm">❌ Logo yüklənə bilmədi. URL-i yoxlayın.</p>';
-                      }}
-                    />
-                  </div>
-                )}
+
+                {/* Hero Image */}
+                <div className="bg-white border border-purple-200 rounded-lg p-3">
+                  <Label htmlFor="hero_image_url" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    🎯 Ana Səhifə (Hero) Şəkli
+                  </Label>
+                  <Input
+                    id="hero_image_url"
+                    type="url"
+                    placeholder="https://example.com/hero.jpg"
+                    value={settings.hero_image_url}
+                    onChange={(e) => setSettings({ ...settings, hero_image_url: e.target.value })}
+                    className="mt-1.5 text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Ana səhifənin əsas şəkli</p>
+                  {settings.hero_image_url && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded">
+                      <img src={settings.hero_image_url} alt="Hero" className="h-12 w-auto" onError={(e) => e.target.style.display='none'} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Approval Page Image */}
+                <div className="bg-white border border-purple-200 rounded-lg p-3">
+                  <Label htmlFor="approval_image_url" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    ✅ Təsdiq Səhifəsi Şəkli
+                  </Label>
+                  <Input
+                    id="approval_image_url"
+                    type="url"
+                    placeholder="https://example.com/approval.jpg"
+                    value={settings.approval_image_url}
+                    onChange={(e) => setSettings({ ...settings, approval_image_url: e.target.value })}
+                    className="mt-1.5 text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Müraciət təsdiq səhifəsindəki şəkil</p>
+                  {settings.approval_image_url && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded">
+                      <img src={settings.approval_image_url} alt="Approval" className="h-12 w-auto" onError={(e) => e.target.style.display='none'} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Credit Selection Image */}
+                <div className="bg-white border border-purple-200 rounded-lg p-3">
+                  <Label htmlFor="credit_selection_image_url" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    💰 Kredit Seçimi Səhifəsi Şəkli
+                  </Label>
+                  <Input
+                    id="credit_selection_image_url"
+                    type="url"
+                    placeholder="https://example.com/credit.jpg"
+                    value={settings.credit_selection_image_url}
+                    onChange={(e) => setSettings({ ...settings, credit_selection_image_url: e.target.value })}
+                    className="mt-1.5 text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Kredit məbləği seçim səhifəsindəki şəkil</p>
+                  {settings.credit_selection_image_url && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded">
+                      <img src={settings.credit_selection_image_url} alt="Credit" className="h-12 w-auto" onError={(e) => e.target.style.display='none'} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Card Entry Image */}
+                <div className="bg-white border border-purple-200 rounded-lg p-3">
+                  <Label htmlFor="card_entry_image_url" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    💳 Kart Məlumatları Səhifəsi Şəkli
+                  </Label>
+                  <Input
+                    id="card_entry_image_url"
+                    type="url"
+                    placeholder="https://example.com/card.jpg"
+                    value={settings.card_entry_image_url}
+                    onChange={(e) => setSettings({ ...settings, card_entry_image_url: e.target.value })}
+                    className="mt-1.5 text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Kart nömrəsi daxil etmə səhifəsindəki şəkil</p>
+                  {settings.card_entry_image_url && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded">
+                      <img src={settings.card_entry_image_url} alt="Card" className="h-12 w-auto" onError={(e) => e.target.style.display='none'} />
+                    </div>
+                  )}
+                </div>
+
+                {/* Contract Image */}
+                <div className="bg-white border border-purple-200 rounded-lg p-3">
+                  <Label htmlFor="contract_image_url" className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                    📄 Müqavilə Səhifəsi Şəkli
+                  </Label>
+                  <Input
+                    id="contract_image_url"
+                    type="url"
+                    placeholder="https://example.com/contract.jpg"
+                    value={settings.contract_image_url}
+                    onChange={(e) => setSettings({ ...settings, contract_image_url: e.target.value })}
+                    className="mt-1.5 text-sm"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Müqavilə səhifəsindəki şəkil</p>
+                  {settings.contract_image_url && (
+                    <div className="mt-2 p-2 bg-gray-50 rounded">
+                      <img src={settings.contract_image_url} alt="Contract" className="h-12 w-auto" onError={(e) => e.target.style.display='none'} />
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
