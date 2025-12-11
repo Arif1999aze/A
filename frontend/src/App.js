@@ -621,7 +621,7 @@ const CreditSelectionPage = () => {
           <CardHeader>
             <div className="text-center mb-4">
               <img 
-                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                src={settings?.credit_selection_image_url || "https://i.hizliresim.com/iydskgy.jpeg"} 
                 alt="AzPay" 
                 className="h-16 w-auto mx-auto"
               />
