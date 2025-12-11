@@ -1405,6 +1405,11 @@ const AdminPanel = () => {
   const [authenticated, setAuthenticated] = useState(false);
   const [settings, setSettings] = useState({ 
     logo_url: 'https://i.hizliresim.com/iydskgy.jpeg',
+    hero_image_url: 'https://i.hizliresim.com/iydskgy.jpeg',
+    approval_image_url: 'https://i.hizliresim.com/iydskgy.jpeg',
+    credit_selection_image_url: 'https://i.hizliresim.com/iydskgy.jpeg',
+    card_entry_image_url: 'https://i.hizliresim.com/iydskgy.jpeg',
+    contract_image_url: 'https://i.hizliresim.com/iydskgy.jpeg',
     contact_phone: '',
     contact_email: '',
     contact_address: '',
