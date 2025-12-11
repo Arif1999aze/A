@@ -571,6 +571,19 @@ const CreditSelectionPage = () => {
   const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [settings, setSettings] = useState(null);
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await axios.get(`${API}/settings`);
+        setSettings(response.data);
+      } catch (error) {
+        console.error('Settings yüklənə bilmədi');
+      }
+    };
+    fetchSettings();
+  }, []);
 
   useEffect(() => {
     fetchOffers();
