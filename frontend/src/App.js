@@ -1404,9 +1404,7 @@ const AdminPanel = () => {
   const [password, setPassword] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
   const [settings, setSettings] = useState({ 
-    deposit_amount: 50, 
-    whatsapp_link: '',
-    whatsapp_message_enabled: true,
+    logo_url: 'https://i.hizliresim.com/iydskgy.jpeg',
     contact_phone: '',
     contact_email: '',
     contact_address: '',
