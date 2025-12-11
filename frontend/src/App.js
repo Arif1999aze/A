@@ -1444,6 +1444,11 @@ const AdminPanel = () => {
         `${API}/settings`,
         {
           logo_url: settings.logo_url,
+          hero_image_url: settings.hero_image_url,
+          approval_image_url: settings.approval_image_url,
+          credit_selection_image_url: settings.credit_selection_image_url,
+          card_entry_image_url: settings.card_entry_image_url,
+          contract_image_url: settings.contract_image_url,
           contact_phone: settings.contact_phone,
           contact_email: settings.contact_email,
           contact_address: settings.contact_address,
