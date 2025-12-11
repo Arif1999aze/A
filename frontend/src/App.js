@@ -1440,9 +1440,7 @@ const AdminPanel = () => {
       await axios.put(
         `${API}/settings`,
         {
-          deposit_amount: parseFloat(settings.deposit_amount),
-          whatsapp_link: settings.whatsapp_link,
-          whatsapp_message_enabled: settings.whatsapp_message_enabled,
+          logo_url: settings.logo_url,
           contact_phone: settings.contact_phone,
           contact_email: settings.contact_email,
           contact_address: settings.contact_address,
