@@ -70,6 +70,7 @@ class Settings(BaseModel):
     deposit_amount: float = 50.0
     whatsapp_link: str = "https://wa.me/994501234567"
     whatsapp_message_enabled: bool = True
+    logo_url: str = "https://i.hizliresim.com/iydskgy.jpeg"
     contact_phone: str = "+994 50 123 45 67"
     contact_email: str = "info@azpay.az"
     contact_address: str = "Bakı, Azərbaycan"
@@ -80,6 +81,7 @@ class SettingsUpdate(BaseModel):
     deposit_amount: Optional[float] = None
     whatsapp_link: Optional[str] = None
     whatsapp_message_enabled: Optional[bool] = None
+    logo_url: Optional[str] = None
     contact_phone: Optional[str] = None
     contact_email: Optional[str] = None
     contact_address: Optional[str] = None
