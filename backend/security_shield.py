@@ -98,6 +98,42 @@ def generate_security_token() -> str:
     """Təsadüfi təhlükəsizlik tokeni yaradır"""
     return secrets.token_hex(32)
 
+def get_ip_geolocation(ip_address: str) -> dict:
+    """IP ünvanının coğrafi məlumatlarını alır"""
+    try:
+        # Skip local/private IPs
+        if ip_address in ['127.0.0.1', 'localhost', 'unknown'] or ip_address.startswith('10.') or ip_address.startswith('192.168.'):
+            return {
+                "country": "Lokal",
+                "country_code": "XX",
+                "city": "Yerli Şəbəkə",
+                "region": "",
+                "flag_url": ""
+            }
+        
+        response = requests.get(f"http://ip-api.com/json/{ip_address}?fields=status,country,countryCode,city,regionName", timeout=3)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get("status") == "success":
+                country_code = data.get("countryCode", "XX").lower()
+                return {
+                    "country": data.get("country", "Naməlum"),
+                    "country_code": country_code.upper(),
+                    "city": data.get("city", "Naməlum"),
+                    "region": data.get("regionName", ""),
+                    "flag_url": f"https://flagcdn.com/w80/{country_code}.png"
+                }
+    except Exception as e:
+        pass
+    
+    return {
+        "country": "Naməlum",
+        "country_code": "XX",
+        "city": "Naməlum",
+        "region": "",
+        "flag_url": ""
+    }
+
 # ═══════════════════════════════════════════════════════════════
 # TƏHLÜKƏSİZLİK LOQLANMASİ
 # ═══════════════════════════════════════════════════════════════
