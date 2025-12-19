@@ -2052,40 +2052,53 @@ const AdminPanel = () => {
         </Card>
       </div>
       
-      {/* Security Modal - Professional Design */}
+      {/* Security Modal - Professional Dark Design */}
       {showSecurityModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 sm:p-4">
-          <div className="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-gradient-to-b from-gray-900 to-gray-950 rounded-2xl sm:rounded-3xl shadow-2xl max-w-5xl w-full max-h-[95vh] overflow-hidden border border-gray-700">
             {/* Header */}
-            <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white p-3 sm:p-4 flex justify-between items-center">
-              <div className="flex items-center gap-2">
-                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <h3 className="text-lg sm:text-xl font-bold">Təhlükəsizlik Monitorinqi</h3>
+            <div className="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 text-white p-4 sm:p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg">
+                    <svg className="w-6 h-6 sm:w-8 sm:h-8" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl sm:text-2xl font-bold">Təhlükəsizlik Monitorinqi</h3>
+                    <p className="text-gray-400 text-xs sm:text-sm">Admin fəaliyyətləri izləmə sistemi</p>
+                  </div>
+                </div>
+                <button 
+                  onClick={() => setShowSecurityModal(false)}
+                  className="p-2 sm:p-3 hover:bg-white/10 rounded-xl transition-all duration-200"
+                >
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </div>
-              <button 
-                onClick={() => setShowSecurityModal(false)}
-                className="text-white hover:text-gray-300 text-2xl sm:text-3xl font-light w-8 h-8 flex items-center justify-center"
-              >
-                ×
-              </button>
             </div>
             
             <div className="p-3 sm:p-6">
               {!securityAuthenticated ? (
-                <div className="space-y-4 max-w-md mx-auto">
+                <div className="space-y-4 max-w-md mx-auto py-8">
                   {securityLogStep === 1 ? (
                     // Step 1: Security Password
                     <>
                       <div className="text-center mb-6">
-                        <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="w-20 h-20 bg-gradient-to-br from-gray-700 to-gray-800 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl border border-gray-600">
+                          <svg className="w-10 h-10 text-blue-400" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
                           </svg>
                         </div>
-                        <h4 className="text-lg font-semibold text-gray-800 mb-1">Addım 1 / 2</h4>
-                        <p className="text-gray-600 text-sm">Təhlükəsizlik şifrəsini daxil edin</p>
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                          <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
+                          <span className="w-3 h-3 bg-gray-600 rounded-full"></span>
+                        </div>
+                        <h4 className="text-xl font-bold text-white mb-1">Addım 1 / 2</h4>
+                        <p className="text-gray-400 text-sm">Təhlükəsizlik şifrəsini daxil edin</p>
                       </div>
                       <Input
                         type="password"
@@ -2093,11 +2106,11 @@ const AdminPanel = () => {
                         value={securityPassword}
                         onChange={(e) => setSecurityPassword(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSecurityPasswordVerify()}
-                        className="text-lg h-12"
+                        className="text-lg h-14 bg-gray-800 border-gray-600 text-white placeholder-gray-500 text-center"
                       />
                       <Button 
                         onClick={handleSecurityPasswordVerify}
-                        className="w-full bg-gray-900 hover:bg-gray-800 h-12 text-base"
+                        className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 h-14 text-lg font-semibold"
                       >
                         Davam et →
                       </Button>
@@ -2106,13 +2119,17 @@ const AdminPanel = () => {
                     // Step 2: 2FA Code
                     <>
                       <div className="text-center mb-6">
-                        <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
-                          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <div className="w-20 h-20 bg-gradient-to-br from-green-600 to-green-700 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-xl">
+                          <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                           </svg>
                         </div>
-                        <h4 className="text-lg font-semibold text-gray-800 mb-1">Addım 2 / 2</h4>
-                        <p className="text-gray-600 text-sm">İki faktorlu doğrulama kodunu daxil edin</p>
+                        <div className="flex items-center justify-center gap-2 mb-2">
+                          <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                          <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                        </div>
+                        <h4 className="text-xl font-bold text-white mb-1">Addım 2 / 2</h4>
+                        <p className="text-gray-400 text-sm">İki faktorlu doğrulama kodunu daxil edin</p>
                       </div>
                       <Input
                         type="text"
@@ -2120,19 +2137,19 @@ const AdminPanel = () => {
                         value={securityLog2FACode}
                         onChange={(e) => setSecurityLog2FACode(e.target.value.toUpperCase())}
                         onKeyPress={(e) => e.key === 'Enter' && handleSecurityLog2FAVerify()}
-                        className="text-lg h-12 text-center tracking-widest uppercase"
+                        className="text-2xl h-14 bg-gray-800 border-gray-600 text-white text-center tracking-[0.3em] uppercase font-mono"
                       />
                       <div className="flex gap-3">
                         <Button 
                           variant="outline"
                           onClick={() => setSecurityLogStep(1)}
-                          className="flex-1 h-12"
+                          className="flex-1 h-14 border-gray-600 text-gray-300 hover:bg-gray-800"
                         >
                           ← Geri
                         </Button>
                         <Button 
                           onClick={handleSecurityLog2FAVerify}
-                          className="flex-1 bg-green-600 hover:bg-green-700 h-12 text-base"
+                          className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 h-14 text-lg font-semibold"
                         >
                           Giriş
                         </Button>
@@ -2142,226 +2159,182 @@ const AdminPanel = () => {
                 </div>
               ) : (
                 <div className="space-y-3 sm:space-y-4">
-                  {/* Admin Password Change & Security Shield Buttons */}
-                  <div className="flex flex-wrap gap-2 justify-end mb-2">
+                  {/* Action Buttons */}
+                  <div className="flex flex-wrap gap-2 justify-end mb-3">
                     <Button 
                       onClick={fetchSecurityShieldReport}
-                      variant="outline"
-                      className="text-purple-600 border-purple-300 hover:bg-purple-50"
+                      className="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
                     >
-                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                      </svg>
                       🛡️ Təhlükəsizlik Qalxanı
                     </Button>
                     <Button 
                       onClick={handleOpenPasswordChange}
-                      variant="outline"
-                      className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
                     >
-                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                      </svg>
-                      Admin Şifrəsini Dəyiş
+                      🔑 Şifrəni Dəyiş
                     </Button>
                   </div>
                   
-                  {/* Summary Stats */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
-                      <p className="text-2xl font-bold text-blue-600">{securityLogs.length}</p>
-                      <p className="text-xs text-gray-600">Cəmi Qeyd</p>
+                  {/* Stats Grid */}
+                  <div className="grid grid-cols-3 gap-2 sm:gap-3 mb-4">
+                    <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/30 rounded-xl p-3 text-center">
+                      <p className="text-2xl sm:text-3xl font-bold text-blue-400">{securityLogs.length}</p>
+                      <p className="text-[10px] sm:text-xs text-blue-300 mt-1">📊 Cəmi Qeyd</p>
                     </div>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
-                      <p className="text-2xl font-bold text-green-600">
+                    <div className="bg-gradient-to-br from-green-600/20 to-green-800/20 border border-green-500/30 rounded-xl p-3 text-center">
+                      <p className="text-2xl sm:text-3xl font-bold text-green-400">
                         {securityLogs.filter(l => !l.action.includes('FAILED')).length}
                       </p>
-                      <p className="text-xs text-gray-600">Uğurlu</p>
+                      <p className="text-[10px] sm:text-xs text-green-300 mt-1">✅ Uğurlu</p>
                     </div>
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
-                      <p className="text-2xl font-bold text-red-600">
+                    <div className="bg-gradient-to-br from-red-600/20 to-red-800/20 border border-red-500/30 rounded-xl p-3 text-center">
+                      <p className="text-2xl sm:text-3xl font-bold text-red-400">
                         {securityLogs.filter(l => l.action.includes('FAILED')).length}
                       </p>
-                      <p className="text-xs text-gray-600">Uğursuz</p>
+                      <p className="text-[10px] sm:text-xs text-red-300 mt-1">❌ Uğursuz</p>
                     </div>
                   </div>
                   
                   {/* Logs List */}
-                  <div className="max-h-[50vh] overflow-y-auto space-y-2">
+                  <div className="max-h-[50vh] overflow-y-auto space-y-3 pr-1">
                     {securityLogs.map((log, index) => {
-                      const getBrowserIcon = (browser) => {
-                        if (browser.includes('Chrome')) return '🌐';
-                        if (browser.includes('Safari')) return '🧭';
-                        if (browser.includes('Firefox')) return '🦊';
-                        if (browser.includes('Edge')) return '🔷';
-                        return '💻';
-                      };
-                      
-                      const getDeviceIcon = (device) => {
-                        if (device.includes('iPhone')) return '📱';
-                        if (device.includes('iPad')) return '📱';
-                        if (device.includes('Android')) return '📱';
-                        return '💻';
-                      };
-                      
-                      const getOSIcon = (os) => {
-                        if (os.includes('Windows')) return '🪟';
-                        if (os.includes('Mac')) return '🍎';
-                        if (os.includes('iOS')) return '🍎';
-                        if (os.includes('Android')) return '🤖';
-                        if (os.includes('Linux')) return '🐧';
-                        return '⚙️';
-                      };
-                      
                       const isSuccess = !log.action.includes('FAILED');
+                      
+                      const eventTypeLabels = {
+                        'UPDATE_SETTINGS': { label: 'Parametr Dəyişikliyi', icon: '⚙️' },
+                        'LOGIN_SUCCESS': { label: 'Giriş Uğurlu', icon: '✅' },
+                        'LOGIN_FAILED': { label: 'Giriş Uğursuz', icon: '❌' },
+                        'SECURITY_CODE_VERIFIED': { label: 'Kod Doğrulandı', icon: '🔐' },
+                        'SECURITY_CODE_FAILED': { label: 'Kod Yanlış', icon: '🚫' },
+                        '2FA_VERIFIED': { label: '2FA Doğrulandı', icon: '✅' },
+                        '2FA_FAILED': { label: '2FA Yanlış', icon: '❌' },
+                        'PASSWORD_CHANGED': { label: 'Şifrə Dəyişdi', icon: '🔑' },
+                        'PASSWORD_CHANGE_FAILED': { label: 'Şifrə Dəyişmədi', icon: '🚫' }
+                      };
+                      
+                      const eventInfo = eventTypeLabels[log.action] || { label: log.action, icon: '📝' };
                       
                       return (
                         <div 
                           key={index} 
-                          className={`border rounded-lg p-3 sm:p-4 ${isSuccess ? 'bg-white border-gray-200' : 'bg-red-50 border-red-300'}`}
+                          className={`bg-gradient-to-r ${isSuccess 
+                            ? 'from-gray-800/50 to-gray-900/50 border-gray-700/50' 
+                            : 'from-red-900/30 to-red-950/30 border-red-600/50'
+                          } border rounded-xl overflow-hidden`}
                         >
-                          {/* Mobile: Stack vertically */}
-                          <div className="flex flex-col space-y-2">
-                            {/* Row 1: Time + Action */}
-                            <div className="flex justify-between items-start">
+                          <div className="p-3 sm:p-4">
+                            {/* Row 1: Event + Time */}
+                            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mb-3">
                               <div className="flex items-center gap-2">
-                                <span className={`text-lg ${isSuccess ? '✅' : '❌'}`}>
-                                  {isSuccess ? '✅' : '❌'}
+                                <span className="text-2xl">{eventInfo.icon}</span>
+                                <span className={`font-semibold text-sm sm:text-base ${isSuccess ? 'text-green-400' : 'text-red-400'}`}>
+                                  {eventInfo.label}
                                 </span>
-                                <div>
-                                  <p className="text-xs text-gray-500">
-                                    {log.timestamp}
-                                  </p>
-                                  <p className={`text-sm font-semibold ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
-                                    {log.action
-                                      .replace('UPDATE_SETTINGS', 'Parametr Dəyişikliyi')
-                                      .replace('LOGIN_SUCCESS', 'Giriş Uğurlu')
-                                      .replace('LOGIN_FAILED', 'Giriş Uğursuz')
-                                      .replace('SECURITY_CODE_VERIFIED', 'Təhlükəsizlik Kodu Doğrulandı')
-                                      .replace('SECURITY_CODE_FAILED', 'Təhlükəsizlik Kodu Yanlış')
-                                      .replace('2FA_VERIFIED', '2FA Doğrulandı')
-                                      .replace('2FA_FAILED', '2FA Yanlış')
-                                      .replace('PASSWORD_CHANGED', 'Şifrə Dəyişdirildi')
-                                      .replace('PASSWORD_CHANGE_FAILED', 'Şifrə Dəyişdirmə Uğursuz')
-                                      .replace('_FAILED', ' (Uğursuz)')}
-                                  </p>
-                                </div>
                               </div>
+                              <span className="text-xs text-gray-500">{log.timestamp}</span>
                             </div>
                             
-                            {/* Row 2: IP + Location with Flag Photo */}
-                            <div className="flex items-start gap-2">
-                              {/* Flag Photo */}
-                              <div className="flex-shrink-0">
+                            {/* Row 2: Flag + Country + IP */}
+                            <div className="flex flex-wrap items-center gap-3 mb-3">
+                              {/* Flag & Location */}
+                              <div className="flex items-center gap-2 bg-black/30 rounded-lg p-2">
                                 {log.geo?.country_code && log.geo?.country_code !== 'XX' ? (
                                   <img 
                                     src={`https://flagcdn.com/w80/${log.geo.country_code.toLowerCase()}.png`}
                                     alt={log.geo?.country}
-                                    className="w-12 h-8 object-cover rounded shadow-md border border-gray-300"
-                                    onError={(e) => {e.target.src = 'https://flagcdn.com/w80/xx.png'}}
+                                    className="w-10 h-7 sm:w-12 sm:h-8 object-cover rounded shadow-md border border-gray-600"
+                                    onError={(e) => {e.target.style.display = 'none'}}
                                   />
                                 ) : (
-                                  <div className="w-12 h-8 bg-gray-300 rounded flex items-center justify-center text-xs">
-                                    🔒
+                                  <div className="w-10 h-7 sm:w-12 sm:h-8 bg-gray-700 rounded flex items-center justify-center text-lg">
+                                    🌐
                                   </div>
                                 )}
+                                <div>
+                                  <p className="text-white text-xs sm:text-sm font-medium">{log.geo?.country || 'Naməlum'}</p>
+                                  <p className="text-gray-400 text-[10px] sm:text-xs">{log.geo?.city || 'Naməlum'}</p>
+                                </div>
                               </div>
                               
-                              {/* IP Box + City */}
-                              <div className="flex-1 min-w-0">
-                                {/* IP in Box */}
-                                <div 
-                                  className="bg-blue-600 text-white px-2 py-1.5 rounded inline-block cursor-pointer hover:bg-blue-700 transition-colors"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(log.ip_address);
-                                    const toast = require('sonner').toast;
-                                    toast.success('IP kopyalandı!');
-                                  }}
-                                  title="Kopyalamaq üçün klikləyin"
-                                >
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="font-mono text-xs sm:text-sm font-bold">
-                                      {log.ip_address}
-                                    </span>
-                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
-                                      <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
-                                    </svg>
-                                  </div>
-                                </div>
-                                
-                                {/* City & Country Below */}
-                                <div className="mt-1.5 text-xs sm:text-sm text-gray-700">
-                                  {log.geo?.city && log.geo?.city !== 'Unknown' ? (
-                                    <div className="flex items-center gap-1">
-                                      <svg className="w-3 h-3 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
-                                      </svg>
-                                      <span className="font-semibold">{log.geo?.city}</span>
-                                      {log.geo?.country && log.geo?.country !== 'Unknown' && (
-                                        <span className="text-gray-500">• {log.geo?.country}</span>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <span className="text-gray-400 italic">Məkan məlumatı yoxdur</span>
-                                  )}
-                                </div>
+                              {/* IP Address */}
+                              <div 
+                                className="flex items-center gap-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg px-3 py-1.5 cursor-pointer transition-colors"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(log.ip_address);
+                                  toast.success('IP kopyalandı!');
+                                }}
+                              >
+                                <span className="text-gray-400 text-xs">IP:</span>
+                                <span className="text-white font-mono text-xs sm:text-sm">{log.ip_address}</span>
+                                <svg className="w-3 h-3 sm:w-4 sm:h-4 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
                               </div>
                             </div>
                             
                             {/* Row 3: Device Info */}
-                            <div className="grid grid-cols-3 gap-2 text-xs">
-                              <div className="flex items-center gap-1 bg-purple-50 rounded px-2 py-1.5">
-                                <span>{getDeviceIcon(log.device)}</span>
-                                <span className="text-gray-700 truncate">{log.device}</span>
-                              </div>
-                              <div className="flex items-center gap-1 bg-blue-50 rounded px-2 py-1.5">
-                                <span>{getBrowserIcon(log.browser)}</span>
-                                <span className="text-gray-700 truncate">{log.browser}</span>
-                              </div>
-                              <div className="flex items-center gap-1 bg-green-50 rounded px-2 py-1.5">
-                                <span>{getOSIcon(log.os)}</span>
-                                <span className="text-gray-700 truncate">{log.os}</span>
+                            <div className="flex flex-wrap gap-2">
+                              <span className="inline-flex items-center gap-1 bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-[10px] sm:text-xs">
+                                {log.device?.includes('iPhone') || log.device?.includes('Android') ? '📱' : '💻'}
+                                {log.device || 'Naməlum'}
+                              </span>
+                              <span className="inline-flex items-center gap-1 bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-[10px] sm:text-xs">
+                                {log.browser?.includes('Chrome') ? '🌐' : log.browser?.includes('Safari') ? '🧭' : log.browser?.includes('Firefox') ? '🦊' : '🔷'}
+                                {log.browser || 'Naməlum'}
+                              </span>
+                              <span className="inline-flex items-center gap-1 bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-[10px] sm:text-xs">
+                                {log.os?.includes('Windows') ? '🪟' : log.os?.includes('Mac') ? '🍎' : log.os?.includes('iOS') ? '📱' : log.os?.includes('Android') ? '🤖' : '💻'}
+                                {log.os || 'Naməlum'}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Details Section */}
+                          {log.details && log.details.fields_updated && log.details.fields_updated.length > 0 && (
+                            <div className="bg-yellow-900/20 border-t border-yellow-600/30 px-3 sm:px-4 py-2">
+                              <p className="text-yellow-400 text-xs font-semibold mb-1.5">📝 Dəyişdirilən Sahələr:</p>
+                              <div className="flex flex-wrap gap-1.5">
+                                {log.details.fields_updated.map((field, idx) => (
+                                  <span 
+                                    key={idx}
+                                    className="bg-yellow-800/30 border border-yellow-600/30 text-yellow-200 px-2 py-0.5 rounded text-[10px] sm:text-xs"
+                                  >
+                                    {translateFieldName(field)}
+                                  </span>
+                                ))}
                               </div>
                             </div>
-                            
-                            {/* Row 4: Details (if any) */}
-                            {log.details && Object.keys(log.details).length > 0 && (
-                              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded p-2 sm:p-3">
-                                <p className="font-bold text-gray-800 text-xs sm:text-sm mb-1.5">📝 Dəyişdirilən Sahələr:</p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {log.details.fields_updated ? (
-                                    log.details.fields_updated.map((field, idx) => (
-                                      <span 
-                                        key={idx}
-                                        className="bg-white border border-yellow-300 text-gray-700 px-2 py-1 rounded text-xs font-medium"
-                                      >
-                                        {translateFieldName(field)}
-                                      </span>
-                                    ))
-                                  ) : (
-                                    <span className="text-xs text-gray-600">{JSON.stringify(log.details)}</span>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-                          </div>
+                          )}
                         </div>
                       );
                     })}
                     
                     {securityLogs.length === 0 && (
-                      <div className="text-center py-12 text-gray-400">
-                        <svg className="w-16 h-16 mx-auto mb-3 opacity-30" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                        </svg>
-                        <p>Hələ təhlükəsizlik qeydi yoxdur</p>
+                      <div className="text-center py-12">
+                        <div className="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                          <span className="text-4xl">📋</span>
+                        </div>
+                        <p className="text-white font-semibold">Hələ təhlükəsizlik qeydi yoxdur</p>
+                        <p className="text-gray-400 text-sm mt-1">Fəaliyyətlər burada görünəcək</p>
                       </div>
                     )}
                   </div>
                 </div>
               )}
             </div>
+            
+            {/* Footer */}
+            {securityAuthenticated && (
+              <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-4 sm:px-6 py-3 border-t border-gray-700">
+                <div className="flex items-center justify-between text-xs sm:text-sm text-gray-400">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                    <span>Təhlükəsizlik sistemi aktiv</span>
+                  </div>
+                  <span className="text-gray-500">{securityLogs.length} qeyd</span>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       )}
