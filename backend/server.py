@@ -1,6 +1,8 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Header, Request
+from fastapi import FastAPI, APIRouter, HTTPException, Header, Request, Response
+from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -9,6 +11,17 @@ from pydantic import BaseModel, Field, ConfigDict
 from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
+
+# Təhlükəsizlik modulu
+from security_shield import (
+    check_login_attempt, 
+    check_rate_limit, 
+    check_suspicious_patterns,
+    is_ip_blocked,
+    get_security_headers,
+    get_security_report,
+    log_security_event
+)
 
 
 ROOT_DIR = Path(__file__).parent
@@ -20,7 +33,70 @@ client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
 # Create the main app without a prefix
-app = FastAPI()
+app = FastAPI(
+    title="AzPay API",
+    docs_url=None,  # Swagger UI-nı gizlə
+    redoc_url=None,  # ReDoc-u gizlə
+    openapi_url=None  # OpenAPI schema-nı gizlə
+)
+
+# ═══════════════════════════════════════════════════════════════
+# TƏHLÜKƏSİZLİK MIDDLEWARE
+# ═══════════════════════════════════════════════════════════════
+
+class SecurityMiddleware(BaseHTTPMiddleware):
+    """Bütün sorğular üçün təhlükəsizlik yoxlamaları"""
+    
+    async def dispatch(self, request: Request, call_next):
+        # Real IP ünvanını al
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            ip = forwarded.split(',')[0].strip()
+        else:
+            ip = request.headers.get("x-real-ip") or (request.client.host if request.client else "unknown")
+        
+        user_agent = request.headers.get("user-agent", "")
+        
+        # 1. IP blok yoxlaması
+        is_blocked, block_msg = is_ip_blocked(ip)
+        if is_blocked:
+            return JSONResponse(
+                status_code=403,
+                content={"detail": f"🛡️ Təhlükəsizlik: {block_msg}"}
+            )
+        
+        # 2. Rate limit yoxlaması (admin endpointləri üçün)
+        if "/api/" in str(request.url.path):
+            allowed, msg = check_rate_limit(ip, user_agent)
+            if not allowed:
+                return JSONResponse(
+                    status_code=429,
+                    content={"detail": f"🛡️ Təhlükəsizlik: {msg}"}
+                )
+        
+        # 3. Şübhəli pattern yoxlaması (query params)
+        query_string = str(request.url.query)
+        if query_string:
+            allowed, msg = check_suspicious_patterns(query_string, ip, user_agent)
+            if not allowed:
+                return JSONResponse(
+                    status_code=400,
+                    content={"detail": f"🛡️ Təhlükəsizlik: {msg}"}
+                )
+        
+        # Sorğunu işlə
+        response = await call_next(request)
+        
+        # Təhlükəsizlik başlıqlarını əlavə et
+        security_headers = get_security_headers()
+        for header, value in security_headers.items():
+            if value:  # Boş dəyərləri əlavə etmə
+                response.headers[header] = value
+        
+        return response
+
+# Middleware əlavə et
+app.add_middleware(SecurityMiddleware)
 
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
