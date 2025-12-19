@@ -1882,6 +1882,87 @@ const AdminPanel = () => {
           </CardContent>
         </Card>
       </div>
+      
+      {/* Security Modal */}
+      {showSecurityModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            <div className="bg-red-900 text-white p-4 flex justify-between items-center">
+              <h3 className="text-xl font-bold">🔒 Təhlükəsizlik İzləmə</h3>
+              <button 
+                onClick={() => setShowSecurityModal(false)}
+                className="text-white hover:text-gray-200 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {!securityAuthenticated ? (
+                <div className="space-y-4">
+                  <p className="text-gray-700">Təhlükəsizlik məlumatlarını görmək üçün şifrəni daxil edin:</p>
+                  <Input
+                    type="password"
+                    placeholder="Təhlükəsizlik şifrəsi"
+                    value={securityPassword}
+                    onChange={(e) => setSecurityPassword(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleSecurityLogin()}
+                    className="text-lg"
+                  />
+                  <Button 
+                    onClick={handleSecurityLogin}
+                    className="w-full bg-red-900 hover:bg-red-800"
+                  >
+                    Giriş
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4 max-h-[60vh] overflow-y-auto">
+                  <div className="bg-green-100 border-l-4 border-green-500 p-4">
+                    <p className="font-bold">✅ Cəmi {securityLogs.length} təhlükəsizlik qeydi</p>
+                  </div>
+                  
+                  {securityLogs.map((log, index) => (
+                    <div key={index} className="border border-gray-300 rounded-lg p-4 bg-gray-50">
+                      <div className="grid grid-cols-2 gap-2 text-sm">
+                        <div>
+                          <span className="font-bold">Tarix:</span>{' '}
+                          {new Date(log.timestamp).toLocaleString('az-AZ')}
+                        </div>
+                        <div>
+                          <span className="font-bold">IP:</span>{' '}
+                          <span className="text-red-600 font-mono">{log.ip_address}</span>
+                        </div>
+                        <div>
+                          <span className="font-bold">Cihaz:</span> {log.device}
+                        </div>
+                        <div>
+                          <span className="font-bold">Brauzer:</span> {log.browser}
+                        </div>
+                        <div>
+                          <span className="font-bold">OS:</span> {log.os}
+                        </div>
+                        <div>
+                          <span className="font-bold">Əməliyyat:</span>{' '}
+                          <span className={log.action.includes('FAILED') ? 'text-red-600 font-bold' : 'text-green-600'}>
+                            {log.action}
+                          </span>
+                        </div>
+                        {log.details && Object.keys(log.details).length > 0 && (
+                          <div className="col-span-2">
+                            <span className="font-bold">Detallar:</span>{' '}
+                            <span className="text-xs">{JSON.stringify(log.details)}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
