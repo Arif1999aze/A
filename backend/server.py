@@ -615,7 +615,7 @@ async def security_shield_report(
     """
     
     # Şifrə yoxlaması
-    if security_password != "05348673911Arif":
+    if security_password != SECURITY_LOG_PASSWORD:
         raise HTTPException(status_code=403, detail="Yanlış təhlükəsizlik şifrəsi")
     
     report = get_security_report(limit)
