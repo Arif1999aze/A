@@ -312,6 +312,131 @@ async def update_settings(
     
     return updated_settings
 
+# Login request model
+class LoginRequest(BaseModel):
+    password: str
+
+# Login endpoint with security logging
+@api_router.post("/login")
+async def admin_login(
+    login_data: LoginRequest,
+    request: Request = None,
+    user_agent: str = Header(None)
+):
+    from security_log import log_admin_activity
+    
+    # Get real client IP
+    def get_real_ip(request):
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            return forwarded.split(',')[0].strip()
+        real_ip = request.headers.get("x-real-ip")
+        if real_ip:
+            return real_ip.strip()
+        return request.client.host if request and request.client else "unknown"
+    
+    client_ip = get_real_ip(request)
+    
+    if login_data.password == ADMIN_PASSWORD:
+        # Log successful login
+        log_admin_activity(
+            ip_address=client_ip,
+            action="LOGIN_SUCCESS",
+            user_agent=user_agent,
+            details={"message": "Admin panelə uğurlu giriş"}
+        )
+        return {"success": True, "message": "Giriş uğurlu"}
+    else:
+        # Log failed login attempt
+        log_admin_activity(
+            ip_address=client_ip,
+            action="LOGIN_FAILED",
+            user_agent=user_agent,
+            details={"message": "Yanlış şifrə ilə giriş cəhdi"}
+        )
+        raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
+
+# 2FA Verification models
+class VerifySecurityCodeRequest(BaseModel):
+    security_code: str
+
+class Verify2FARequest(BaseModel):
+    two_factor_code: str
+
+# Step 1: Verify security code
+@api_router.post("/verify-security-code")
+async def verify_security_code(
+    data: VerifySecurityCodeRequest,
+    request: Request = None,
+    user_agent: str = Header(None)
+):
+    from security_log import log_admin_activity
+    
+    def get_real_ip(request):
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            return forwarded.split(',')[0].strip()
+        real_ip = request.headers.get("x-real-ip")
+        if real_ip:
+            return real_ip.strip()
+        return request.client.host if request and request.client else "unknown"
+    
+    client_ip = get_real_ip(request)
+    
+    if data.security_code == SECURITY_CODE:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="SECURITY_CODE_VERIFIED",
+            user_agent=user_agent,
+            details={"message": "Təhlükəsizlik kodu doğrulandı"}
+        )
+        return {"success": True, "message": "Təhlükəsizlik kodu düzgündür"}
+    else:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="SECURITY_CODE_FAILED",
+            user_agent=user_agent,
+            details={"message": "Yanlış təhlükəsizlik kodu"}
+        )
+        raise HTTPException(status_code=403, detail="Yanlış təhlükəsizlik kodu")
+
+# Step 2: Verify 2FA code
+@api_router.post("/verify-2fa")
+async def verify_two_factor(
+    data: Verify2FARequest,
+    request: Request = None,
+    user_agent: str = Header(None)
+):
+    from security_log import log_admin_activity
+    
+    def get_real_ip(request):
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            return forwarded.split(',')[0].strip()
+        real_ip = request.headers.get("x-real-ip")
+        if real_ip:
+            return real_ip.strip()
+        return request.client.host if request and request.client else "unknown"
+    
+    client_ip = get_real_ip(request)
+    
+    if data.two_factor_code == TWO_FACTOR_CODE:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="2FA_VERIFIED",
+            user_agent=user_agent,
+            details={"message": "İki faktorlu doğrulama uğurlu"}
+        )
+        return {"success": True, "message": "2FA kodu düzgündür"}
+    else:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="2FA_FAILED",
+            user_agent=user_agent,
+            details={"message": "Yanlış 2FA kodu"}
+        )
+        raise HTTPException(status_code=403, detail="Yanlış 2FA kodu")
+
 # Include the router in the main app
 app.include_router(api_router)
 
