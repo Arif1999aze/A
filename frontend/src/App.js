@@ -1473,7 +1473,7 @@ const AdminPanel = () => {
   const handleUpdate = async () => {
     setLoading(true);
     try {
-      const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'Batuhan6565';
+      const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin05348673911Arif';
       await axios.put(
         `${API}/settings`,
         {
@@ -1490,7 +1490,10 @@ const AdminPanel = () => {
           about_text: settings.about_text
         },
         {
-          headers: { 'admin-password': adminPassword }
+          headers: { 
+            'admin-password': adminPassword,
+            'user-agent': navigator.userAgent
+          }
         }
       );
       toast.success('Parametrlər yeniləndi');
@@ -1498,6 +1501,32 @@ const AdminPanel = () => {
       toast.error('Xəta baş verdi');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSecurityCheck = () => {
+    setShowSecurityModal(true);
+    setSecurityPassword('');
+    setSecurityAuthenticated(false);
+    setSecurityLogs([]);
+  };
+
+  const handleSecurityLogin = async () => {
+    if (securityPassword !== '05348673911Arif') {
+      toast.error('Yanlış təhlükəsizlik şifrəsi');
+      return;
+    }
+
+    try {
+      const response = await axios.get(`${API}/admin/security-logs?limit=100`, {
+        headers: { 'security-password': securityPassword }
+      });
+      
+      setSecurityLogs(response.data.logs);
+      setSecurityAuthenticated(true);
+      toast.success(`${response.data.total} təhlükəsizlik qeydi yükləndi`);
+    } catch (error) {
+      toast.error('Təhlükəsizlik məlumatlarını yükləyərkən xəta');
     }
   };
 
