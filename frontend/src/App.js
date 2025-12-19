@@ -1450,13 +1450,29 @@ const AdminPanel = () => {
   const [securityPassword, setSecurityPassword] = useState('');
   const [securityLogs, setSecurityLogs] = useState([]);
   const [securityAuthenticated, setSecurityAuthenticated] = useState(false);
+  
+  // 2FA states for update
+  const [show2FAModal, setShow2FAModal] = useState(false);
+  const [twoFAStep, setTwoFAStep] = useState(1); // 1 = security code, 2 = 2FA code
+  const [securityCode, setSecurityCode] = useState('');
+  const [twoFactorCode, setTwoFactorCode] = useState('');
+  const [verifying, setVerifying] = useState(false);
 
-  const handleLogin = () => {
-    const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'Batuhan6565';
-    if (password === adminPassword) {
-      setAuthenticated(true);
-      fetchSettings();
-    } else {
+  const handleLogin = async () => {
+    const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin05348673911Arif';
+    
+    try {
+      // Call login API to log the attempt
+      await axios.post(`${API}/login`, { password }, {
+        headers: { 'user-agent': navigator.userAgent }
+      });
+      
+      if (password === adminPassword) {
+        setAuthenticated(true);
+        fetchSettings();
+        toast.success('Giriş uğurlu!');
+      }
+    } catch (error) {
       toast.error('Yanlış şifrə');
     }
   };
