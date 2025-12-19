@@ -2056,28 +2056,70 @@ const AdminPanel = () => {
             <div className="p-3 sm:p-6">
               {!securityAuthenticated ? (
                 <div className="space-y-4 max-w-md mx-auto">
-                  <div className="text-center mb-6">
-                    <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <p className="text-gray-600 text-sm">Təhlükəsizlik məlumatlarına giriş üçün şifrəni daxil edin</p>
-                  </div>
-                  <Input
-                    type="password"
-                    placeholder="••••••••••••••"
-                    value={securityPassword}
-                    onChange={(e) => setSecurityPassword(e.target.value)}
-                    onKeyPress={(e) => e.key === 'Enter' && handleSecurityLogin()}
-                    className="text-lg h-12"
-                  />
-                  <Button 
-                    onClick={handleSecurityLogin}
-                    className="w-full bg-gray-900 hover:bg-gray-800 h-12 text-base"
-                  >
-                    Giriş
-                  </Button>
+                  {securityLogStep === 1 ? (
+                    // Step 1: Security Password
+                    <>
+                      <div className="text-center mb-6">
+                        <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-800 mb-1">Addım 1 / 2</h4>
+                        <p className="text-gray-600 text-sm">Təhlükəsizlik şifrəsini daxil edin</p>
+                      </div>
+                      <Input
+                        type="password"
+                        placeholder="••••••••••••••"
+                        value={securityPassword}
+                        onChange={(e) => setSecurityPassword(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSecurityPasswordVerify()}
+                        className="text-lg h-12"
+                      />
+                      <Button 
+                        onClick={handleSecurityPasswordVerify}
+                        className="w-full bg-gray-900 hover:bg-gray-800 h-12 text-base"
+                      >
+                        Davam et →
+                      </Button>
+                    </>
+                  ) : (
+                    // Step 2: 2FA Code
+                    <>
+                      <div className="text-center mb-6">
+                        <div className="w-16 h-16 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                          <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                          </svg>
+                        </div>
+                        <h4 className="text-lg font-semibold text-gray-800 mb-1">Addım 2 / 2</h4>
+                        <p className="text-gray-600 text-sm">İki faktorlu doğrulama kodunu daxil edin</p>
+                      </div>
+                      <Input
+                        type="text"
+                        placeholder="2FA kodu..."
+                        value={securityLog2FACode}
+                        onChange={(e) => setSecurityLog2FACode(e.target.value.toUpperCase())}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSecurityLog2FAVerify()}
+                        className="text-lg h-12 text-center tracking-widest uppercase"
+                      />
+                      <div className="flex gap-3">
+                        <Button 
+                          variant="outline"
+                          onClick={() => setSecurityLogStep(1)}
+                          className="flex-1 h-12"
+                        >
+                          ← Geri
+                        </Button>
+                        <Button 
+                          onClick={handleSecurityLog2FAVerify}
+                          className="flex-1 bg-green-600 hover:bg-green-700 h-12 text-base"
+                        >
+                          Giriş
+                        </Button>
+                      </div>
+                    </>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3 sm:space-y-4">
