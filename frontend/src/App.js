@@ -1667,6 +1667,19 @@ const AdminPanel = () => {
     }
   };
 
+  // Security Shield Report
+  const fetchSecurityShieldReport = async () => {
+    try {
+      const response = await axios.get(`${API}/security-shield-report?limit=50`, {
+        headers: { 'security-password': '05348673911Arif' }
+      });
+      setSecurityShieldReport(response.data);
+      setShowSecurityShield(true);
+    } catch (error) {
+      toast.error('Təhlükəsizlik hesabatı yüklənə bilmədi');
+    }
+  };
+
   // Field name translator (EN -> AZ)
   const translateFieldName = (fieldName) => {
     const translations = {
