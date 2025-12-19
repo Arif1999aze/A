@@ -2123,6 +2123,20 @@ const AdminPanel = () => {
                 </div>
               ) : (
                 <div className="space-y-3 sm:space-y-4">
+                  {/* Admin Password Change Button */}
+                  <div className="flex justify-end mb-2">
+                    <Button 
+                      onClick={handleOpenPasswordChange}
+                      variant="outline"
+                      className="text-orange-600 border-orange-300 hover:bg-orange-50"
+                    >
+                      <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                      </svg>
+                      Admin Şifrəsini Dəyiş
+                    </Button>
+                  </div>
+                  
                   {/* Summary Stats */}
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
