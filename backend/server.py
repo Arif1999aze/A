@@ -26,7 +26,11 @@ app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
 # Admin password from env
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'Batuhan6565')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin05348673911Arif')
+
+# 2FA codes for settings update
+SECURITY_CODE = "Arif05348673911"
+TWO_FACTOR_CODE = "YESS"
 
 # Define Models
 class CreditApplication(BaseModel):
