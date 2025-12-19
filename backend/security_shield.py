@@ -156,12 +156,22 @@ def log_security_event(
     - CRITICAL: Kritik (hücum aşkarlandı, blok edildi)
     """
     
+    # Get IP geolocation
+    geo = get_ip_geolocation(ip_address)
+    
+    # Parse user agent for device info
+    device_info = parse_user_agent(user_agent) if user_agent else {}
+    
     event = {
         "timestamp": format_turkey_time(),
         "event_type": event_type,
         "severity": severity,
         "ip_address": ip_address,
         "ip_masked": mask_ip(ip_address),
+        "geo": geo,
+        "device": device_info.get("device", "Naməlum"),
+        "browser": device_info.get("browser", "Naməlum"),
+        "os": device_info.get("os", "Naməlum"),
         "description": description,
         "details": details or {},
         "user_agent": user_agent,
