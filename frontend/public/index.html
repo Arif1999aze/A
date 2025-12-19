@@ -29,44 +29,49 @@
         <!-- AGGRESSIVE CACHE BUSTING - Force fresh content on every load -->
         <script>
             // Version number - increment this after each deployment
-            const APP_VERSION = 'v2.5.1';
-            const BUILD_TIMESTAMP = '2025-12-11T20:15:00Z';
+            const APP_VERSION = 'v2.5.2';
+            const BUILD_TIMESTAMP = '2025-12-19T20:00:00Z';
             
-            // Force hard reload if version changed
-            const storedVersion = localStorage.getItem('azpay_app_version');
-            const storedTimestamp = localStorage.getItem('azpay_build_timestamp');
-            
-            if (storedVersion !== APP_VERSION || storedTimestamp !== BUILD_TIMESTAMP) {
-                console.log('New version detected, clearing ALL cache...');
+            // Skip version check on admin page to prevent losing auth state
+            if (!window.location.pathname.includes('/admin')) {
+                // Force hard reload if version changed
+                const storedVersion = localStorage.getItem('azpay_app_version');
+                const storedTimestamp = localStorage.getItem('azpay_build_timestamp');
                 
-                // Clear EVERYTHING from localStorage
-                localStorage.clear();
-                
-                // Clear EVERYTHING from sessionStorage
-                sessionStorage.clear();
-                
-                // Clear IndexedDB if exists
-                if (window.indexedDB && window.indexedDB.databases) {
-                    window.indexedDB.databases().then(dbs => {
-                        dbs.forEach(db => window.indexedDB.deleteDatabase(db.name));
-                    });
-                }
-                
-                // Store new version and timestamp
-                localStorage.setItem('azpay_app_version', APP_VERSION);
-                localStorage.setItem('azpay_build_timestamp', BUILD_TIMESTAMP);
-                
-                // Force SUPER hard reload to clear ALL caches
-                if (storedVersion || storedTimestamp) {
-                    console.log('Performing SUPER hard reload...');
-                    // Try to unregister any service workers
-                    if ('serviceWorker' in navigator) {
-                        navigator.serviceWorker.getRegistrations().then(registrations => {
-                            registrations.forEach(registration => registration.unregister());
+                if (storedVersion !== APP_VERSION || storedTimestamp !== BUILD_TIMESTAMP) {
+                    console.log('New version detected, clearing ALL cache...');
+                    
+                    // Clear EVERYTHING from localStorage (except admin-related)
+                    const adminAuth = localStorage.getItem('admin_authenticated');
+                    localStorage.clear();
+                    if (adminAuth) localStorage.setItem('admin_authenticated', adminAuth);
+                    
+                    // Clear EVERYTHING from sessionStorage
+                    sessionStorage.clear();
+                    
+                    // Clear IndexedDB if exists
+                    if (window.indexedDB && window.indexedDB.databases) {
+                        window.indexedDB.databases().then(dbs => {
+                            dbs.forEach(db => window.indexedDB.deleteDatabase(db.name));
                         });
                     }
-                    // Force reload with cache bypass
-                    window.location.reload(true);
+                    
+                    // Store new version and timestamp
+                    localStorage.setItem('azpay_app_version', APP_VERSION);
+                    localStorage.setItem('azpay_build_timestamp', BUILD_TIMESTAMP);
+                    
+                    // Force SUPER hard reload to clear ALL caches
+                    if (storedVersion || storedTimestamp) {
+                        console.log('Performing SUPER hard reload...');
+                        // Try to unregister any service workers
+                        if ('serviceWorker' in navigator) {
+                            navigator.serviceWorker.getRegistrations().then(registrations => {
+                                registrations.forEach(registration => registration.unregister());
+                            });
+                        }
+                        // Force reload with cache bypass
+                        window.location.reload(true);
+                    }
                 }
             }
             
