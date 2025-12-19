@@ -430,14 +430,14 @@ async def admin_login(
         )
         return {"success": True, "message": "Giriş uğurlu"}
     else:
-        # Log failed login attempt
+        # Log failed login attempt (artıq security_shield-də loqlanır)
         log_admin_activity(
             ip_address=client_ip,
             action="LOGIN_FAILED",
             user_agent=user_agent,
             details={"message": "Yanlış şifrə ilə giriş cəhdi"}
         )
-        raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
+        raise HTTPException(status_code=403, detail=security_msg if security_msg != "OK" else "Yanlış admin şifrəsi")
 
 # 2FA Verification models
 class VerifySecurityCodeRequest(BaseModel):
