@@ -203,9 +203,7 @@ async def get_security_logs(
     Get security logs - requires special security password
     Hidden endpoint for security monitoring
     """
-    SECURITY_PASSWORD = "05348673911Arif"
-    
-    if security_password != SECURITY_PASSWORD:
+    if security_password != SECURITY_LOG_PASSWORD:
         raise HTTPException(status_code=403, detail="Yanlış təhlükəsizlik şifrəsi")
     
     from security_log import get_security_logs, get_unique_ips
