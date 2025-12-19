@@ -199,10 +199,31 @@ async def get_settings():
     return settings
 
 @api_router.put("/settings", response_model=Settings)
-async def update_settings(update: SettingsUpdate, admin_password: str = Header(...)):
+async def update_settings(update: SettingsUpdate, admin_password: str = Header(...), request: Request = None):
+    # Get client IP
+    client_ip = request.client.host if request else "unknown"
+    
+    # Log access attempt
+    from admin_access_log import log_admin_access
+    
     if admin_password != ADMIN_PASSWORD:
+        log_admin_access(
+            ip_address=client_ip,
+            action="UPDATE_SETTINGS",
+            success=False,
+            details={"error": "Wrong password"}
+        )
         raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
-    print(f"Received password: {admin_password}, Expected: {ADMIN_PASSWORD}")
+    
+    # Log successful access
+    log_admin_access(
+        ip_address=client_ip,
+        action="UPDATE_SETTINGS",
+        success=True,
+        details={
+            "fields_updated": [k for k, v in update.model_dump(exclude_unset=True).items() if v is not None]
+        }
+    )
     
     settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
     
