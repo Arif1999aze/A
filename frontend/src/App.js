@@ -2077,11 +2077,22 @@ const AdminPanel = () => {
                             
                             {/* Row 4: Details (if any) */}
                             {log.details && Object.keys(log.details).length > 0 && (
-                              <div className="text-xs bg-yellow-50 border border-yellow-200 rounded p-2">
-                                <span className="font-semibold text-gray-700">Dəyişikliklər: </span>
-                                <span className="text-gray-600">
-                                  {log.details.fields_updated ? log.details.fields_updated.join(', ') : JSON.stringify(log.details)}
-                                </span>
+                              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded p-2 sm:p-3">
+                                <p className="font-bold text-gray-800 text-xs sm:text-sm mb-1.5">📝 Dəyişdirilən Sahələr:</p>
+                                <div className="flex flex-wrap gap-1.5">
+                                  {log.details.fields_updated ? (
+                                    log.details.fields_updated.map((field, idx) => (
+                                      <span 
+                                        key={idx}
+                                        className="bg-white border border-yellow-300 text-gray-700 px-2 py-1 rounded text-xs font-medium"
+                                      >
+                                        {translateFieldName(field)}
+                                      </span>
+                                    ))
+                                  ) : (
+                                    <span className="text-xs text-gray-600">{JSON.stringify(log.details)}</span>
+                                  )}
+                                </div>
                               </div>
                             )}
                           </div>
