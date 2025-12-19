@@ -1673,7 +1673,7 @@ const AdminPanel = () => {
   const fetchSecurityShieldReport = async () => {
     try {
       const response = await axios.get(`${API}/security-shield-report?limit=50`, {
-        headers: { 'security-password': '05348673911Arif' }
+        headers: { 'security-password': process.env.REACT_APP_SECURITY_LOG_PASSWORD }
       });
       setSecurityShieldReport(response.data);
       setShowSecurityShield(true);
