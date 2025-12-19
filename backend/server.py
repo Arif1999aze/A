@@ -260,16 +260,32 @@ async def update_settings(
         )
         raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
     
-    # Log successful update with details
-    changed_fields = [k for k, v in update.model_dump(exclude_unset=True).items() if v is not None]
-    log_admin_activity(
-        ip_address=client_ip,
-        action="UPDATE_SETTINGS",
-        user_agent=user_agent,
-        details={"fields_updated": changed_fields}
-    )
+    # Get current settings to compare
+    current_settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
     
-    settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
+    if not current_settings:
+        current_settings = Settings().model_dump()
+    
+    # Find actually changed fields (compare with current values)
+    changed_fields = []
+    update_dict = update.model_dump(exclude_unset=True)
+    for field_name, new_value in update_dict.items():
+        if new_value is not None:
+            current_value = current_settings.get(field_name)
+            # Compare values (handle type differences)
+            if str(current_value) != str(new_value):
+                changed_fields.append(field_name)
+    
+    # Only log if something actually changed
+    if changed_fields:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="UPDATE_SETTINGS",
+            user_agent=user_agent,
+            details={"fields_updated": changed_fields}
+        )
+    
+    settings = current_settings
     
     if not settings:
         settings = Settings().model_dump()
