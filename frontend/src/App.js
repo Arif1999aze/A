@@ -2337,7 +2337,7 @@ const AdminPanel = () => {
                     </Button>
                     <Button
                       onClick={handleVerify2FACode}
-                      disabled={twoFactorCode.length !== 4 || verifying}
+                      disabled={!twoFactorCode || verifying}
                       className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 py-5 text-lg"
                       data-testid="verify-2fa-code-btn"
                     >
