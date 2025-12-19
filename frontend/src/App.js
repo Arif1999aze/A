@@ -1579,13 +1579,26 @@ const AdminPanel = () => {
   const handleSecurityCheck = () => {
     setShowSecurityModal(true);
     setSecurityPassword('');
+    setSecurityLog2FACode('');
+    setSecurityLogStep(1);
     setSecurityAuthenticated(false);
     setSecurityLogs([]);
   };
 
-  const handleSecurityLogin = async () => {
+  // Step 1: Verify security password
+  const handleSecurityPasswordVerify = () => {
     if (securityPassword !== '05348673911Arif') {
       toast.error('Yanlış təhlükəsizlik şifrəsi');
+      return;
+    }
+    toast.success('Şifrə düzgündür!');
+    setSecurityLogStep(2);
+  };
+
+  // Step 2: Verify 2FA code for security logs
+  const handleSecurityLog2FAVerify = async () => {
+    if (securityLog2FACode !== 'BATUHAN') {
+      toast.error('Yanlış 2FA kodu!');
       return;
     }
 
@@ -1599,6 +1612,54 @@ const AdminPanel = () => {
       toast.success(`${response.data.total} təhlükəsizlik qeydi yükləndi`);
     } catch (error) {
       toast.error('Təhlükəsizlik məlumatlarını yükləyərkən xəta');
+    }
+  };
+
+  // Open password change modal
+  const handleOpenPasswordChange = () => {
+    setShowPasswordChangeModal(true);
+    setCurrentPasswordForChange('');
+    setNewPassword('');
+    setConfirmNewPassword('');
+  };
+
+  // Change admin password
+  const handleChangePassword = async () => {
+    const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin05348673911Arif';
+    
+    if (currentPasswordForChange !== adminPassword) {
+      toast.error('Cari şifrə yanlışdır!');
+      return;
+    }
+    
+    if (newPassword.length < 6) {
+      toast.error('Yeni şifrə ən azı 6 simvol olmalıdır!');
+      return;
+    }
+    
+    if (newPassword !== confirmNewPassword) {
+      toast.error('Yeni şifrələr uyğun gəlmir!');
+      return;
+    }
+    
+    setChangingPassword(true);
+    try {
+      await axios.post(`${API}/change-admin-password`, {
+        current_password: currentPasswordForChange,
+        new_password: newPassword
+      }, {
+        headers: { 'user-agent': navigator.userAgent }
+      });
+      
+      toast.success('Şifrə uğurla dəyişdirildi! Yeni şifrə ilə giriş edin.');
+      setShowPasswordChangeModal(false);
+      setShowSecurityModal(false);
+      setAuthenticated(false);
+      setPassword('');
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Şifrə dəyişdirilərkən xəta baş verdi');
+    } finally {
+      setChangingPassword(false);
     }
   };
 
