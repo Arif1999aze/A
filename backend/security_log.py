@@ -7,8 +7,48 @@ from datetime import datetime, timezone
 import json
 import os
 from typing import Optional
+import requests
 
 LOG_FILE = "/app/backend/security_access.log"
+
+def get_ip_geolocation(ip_address: str) -> dict:
+    """Get geolocation info for IP address"""
+    # Skip for internal IPs
+    if ip_address.startswith('10.') or ip_address.startswith('192.168.') or ip_address.startswith('172.'):
+        return {
+            "country": "Internal",
+            "country_code": "XX",
+            "city": "Private Network",
+            "region": "",
+            "flag": "🔒"
+        }
+    
+    try:
+        # Use ip-api.com (free, no key needed)
+        response = requests.get(f"http://ip-api.com/json/{ip_address}?fields=status,country,countryCode,city,regionName", timeout=3)
+        if response.status_code == 200:
+            data = response.json()
+            if data.get('status') == 'success':
+                country_code = data.get('countryCode', 'XX')
+                # Convert country code to flag emoji
+                flag = ''.join(chr(127397 + ord(char)) for char in country_code.upper())
+                return {
+                    "country": data.get('country', 'Unknown'),
+                    "country_code": country_code,
+                    "city": data.get('city', 'Unknown'),
+                    "region": data.get('regionName', ''),
+                    "flag": flag
+                }
+    except Exception as e:
+        print(f"Geolocation error: {e}")
+    
+    return {
+        "country": "Unknown",
+        "country_code": "XX",
+        "city": "Unknown",
+        "region": "",
+        "flag": "🌍"
+    }
 
 def log_admin_activity(
     ip_address: str,
@@ -28,9 +68,13 @@ def log_admin_activity(
     # Parse device info from user agent
     device_info = parse_device_info(user_agent) if user_agent else {}
     
+    # Get IP geolocation
+    geo_info = get_ip_geolocation(ip_address)
+    
     log_entry = {
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "ip_address": ip_address,
+        "geo": geo_info,
         "action": action,
         "device": device_info.get("device", "Unknown"),
         "browser": device_info.get("browser", "Unknown"),
