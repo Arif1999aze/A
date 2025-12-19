@@ -291,6 +291,7 @@ async def update_settings(
         settings = Settings().model_dump()
         settings['updated_at'] = settings['updated_at'].isoformat()
         await db.settings.insert_one(settings)
+        settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
     
     update_data = {k: v for k, v in update.model_dump().items() if v is not None}
     update_data['updated_at'] = datetime.now(timezone.utc).isoformat()
