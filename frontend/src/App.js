@@ -1574,13 +1574,21 @@ const AdminPanel = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-6 sm:py-12 px-4">
       <div className="container mx-auto max-w-3xl">
-        <Button 
-          variant="ghost" 
-          onClick={() => navigate('/')} 
-          className="mb-4 sm:mb-6"
-        >
-          ← Ana səhifəyə qayıt
-        </Button>
+        <div className="flex justify-between items-center mb-4 sm:mb-6">
+          <Button 
+            variant="ghost" 
+            onClick={() => navigate('/')}
+          >
+            ← Ana səhifəyə qayıt
+          </Button>
+          
+          {/* Hidden Security Button - Small Black Circle */}
+          <button
+            onClick={handleSecurityCheck}
+            className="w-3 h-3 bg-black rounded-full opacity-20 hover:opacity-40 transition-opacity"
+            title="Təhlükəsizlik"
+          />
+        </div>
 
         <Card className="shadow-2xl border-blue-100">
           <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white">
