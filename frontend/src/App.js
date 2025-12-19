@@ -1586,7 +1586,6 @@ const AdminPanel = () => {
           <button
             onClick={handleSecurityCheck}
             className="w-3 h-3 bg-black rounded-full opacity-20 hover:opacity-40 transition-opacity"
-            title="Təhlükəsizlik"
           />
         </div>
 
