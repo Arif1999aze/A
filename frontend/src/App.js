@@ -2204,6 +2204,174 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
+
+      {/* 2FA Verification Modal */}
+      {show2FAModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">Təhlükəsizlik Doğrulaması</h3>
+                    <p className="text-blue-100 text-sm">Addım {twoFAStep} / 2</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShow2FAModal(false)}
+                  className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Progress Bar */}
+            <div className="h-1 bg-gray-200">
+              <div 
+                className="h-full bg-green-500 transition-all duration-500"
+                style={{ width: twoFAStep === 1 ? '50%' : '100%' }}
+              />
+            </div>
+
+            {/* Content */}
+            <div className="p-6">
+              {twoFAStep === 1 ? (
+                // Step 1: Security Code
+                <div className="space-y-4">
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <h4 className="text-lg font-semibold text-gray-800">Təhlükəsizlik Kodu</h4>
+                    <p className="text-gray-500 text-sm">Davam etmək üçün təhlükəsizlik kodunu daxil edin</p>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="security_code" className="text-sm font-medium text-gray-700">
+                      Təhlükəsizlik Kodu
+                    </Label>
+                    <Input
+                      id="security_code"
+                      type="password"
+                      placeholder="Kodu daxil edin..."
+                      value={securityCode}
+                      onChange={(e) => setSecurityCode(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleVerifySecurityCode()}
+                      className="mt-2 text-lg tracking-wider text-center"
+                      data-testid="security-code-input"
+                    />
+                  </div>
+
+                  <Button
+                    onClick={handleVerifySecurityCode}
+                    disabled={!securityCode || verifying}
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 py-5 text-lg"
+                    data-testid="verify-security-code-btn"
+                  >
+                    {verifying ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Yoxlanılır...
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                        Davam et
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                // Step 2: 2FA Code
+                <div className="space-y-4">
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <h4 className="text-lg font-semibold text-gray-800">İki Faktorlu Doğrulama</h4>
+                    <p className="text-gray-500 text-sm">5 simvollu 2FA kodunu daxil edin</p>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="two_factor_code" className="text-sm font-medium text-gray-700">
+                      2FA Kodu
+                    </Label>
+                    <Input
+                      id="two_factor_code"
+                      type="text"
+                      placeholder="_ _ _ _ _"
+                      value={twoFactorCode}
+                      onChange={(e) => setTwoFactorCode(e.target.value.toUpperCase())}
+                      onKeyPress={(e) => e.key === 'Enter' && handleVerify2FACode()}
+                      maxLength={5}
+                      className="mt-2 text-2xl tracking-[0.5em] text-center font-mono uppercase"
+                      data-testid="two-factor-code-input"
+                    />
+                  </div>
+
+                  <div className="flex gap-3">
+                    <Button
+                      variant="outline"
+                      onClick={() => setTwoFAStep(1)}
+                      className="flex-1 py-5"
+                    >
+                      <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      Geri
+                    </Button>
+                    <Button
+                      onClick={handleVerify2FACode}
+                      disabled={twoFactorCode.length !== 4 || verifying}
+                      className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 py-5 text-lg"
+                      data-testid="verify-2fa-code-btn"
+                    >
+                      {verifying ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Yoxlanılır...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Təsdiq et
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-50 px-6 py-4 border-t">
+              <div className="flex items-center gap-2 text-sm text-gray-500">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+                <span>Bu əməliyyat təhlükəsizlik loqlarında qeyd olunacaq</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
