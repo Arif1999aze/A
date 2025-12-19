@@ -1451,6 +1451,17 @@ const AdminPanel = () => {
   const [securityLogs, setSecurityLogs] = useState([]);
   const [securityAuthenticated, setSecurityAuthenticated] = useState(false);
   
+  // Security Log 2FA states
+  const [securityLogStep, setSecurityLogStep] = useState(1); // 1 = password, 2 = 2FA code
+  const [securityLog2FACode, setSecurityLog2FACode] = useState('');
+  
+  // Password change states
+  const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
+  const [currentPasswordForChange, setCurrentPasswordForChange] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
+  
   // 2FA states for update
   const [show2FAModal, setShow2FAModal] = useState(false);
   const [twoFAStep, setTwoFAStep] = useState(1); // 1 = security code, 2 = 2FA code
