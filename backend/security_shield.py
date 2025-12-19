@@ -134,6 +134,56 @@ def get_ip_geolocation(ip_address: str) -> dict:
         "flag_url": ""
     }
 
+def parse_user_agent(user_agent: str) -> dict:
+    """User agent stringindən cihaz, brauzer və OS məlumatlarını çıxarır"""
+    if not user_agent:
+        return {"device": "Naməlum", "browser": "Naməlum", "os": "Naməlum"}
+    
+    ua = user_agent.lower()
+    
+    # Device detection
+    device = "Kompüter"
+    if "iphone" in ua:
+        device = "iPhone"
+    elif "ipad" in ua:
+        device = "iPad"
+    elif "android" in ua and "mobile" in ua:
+        device = "Android Telefon"
+    elif "android" in ua:
+        device = "Android Tablet"
+    elif "mobile" in ua:
+        device = "Mobil Cihaz"
+    
+    # Browser detection
+    browser = "Naməlum"
+    if "edg/" in ua or "edge" in ua:
+        browser = "Microsoft Edge"
+    elif "chrome" in ua and "safari" in ua:
+        browser = "Google Chrome"
+    elif "firefox" in ua:
+        browser = "Mozilla Firefox"
+    elif "safari" in ua:
+        browser = "Apple Safari"
+    elif "opera" in ua or "opr" in ua:
+        browser = "Opera"
+    
+    # OS detection
+    os_name = "Naməlum"
+    if "windows nt 10" in ua:
+        os_name = "Windows 10/11"
+    elif "windows" in ua:
+        os_name = "Windows"
+    elif "mac os" in ua or "macos" in ua:
+        os_name = "macOS"
+    elif "iphone" in ua or "ipad" in ua:
+        os_name = "iOS"
+    elif "android" in ua:
+        os_name = "Android"
+    elif "linux" in ua:
+        os_name = "Linux"
+    
+    return {"device": device, "browser": browser, "os": os_name}
+
 # ═══════════════════════════════════════════════════════════════
 # TƏHLÜKƏSİZLİK LOQLANMASİ
 # ═══════════════════════════════════════════════════════════════
