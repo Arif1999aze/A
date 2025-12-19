@@ -593,6 +593,32 @@ async def change_admin_password(
     
     return {"success": True, "message": "Şifrə uğurla dəyişdirildi"}
 
+# ═══════════════════════════════════════════════════════════════
+# TƏHLÜKƏSİZLİK QALXANI HESABATI
+# ═══════════════════════════════════════════════════════════════
+
+@api_router.get("/security-shield-report")
+async def security_shield_report(
+    limit: int = 100,
+    security_password: str = Header(None, alias="security-password")
+):
+    """
+    🛡️ Təhlükəsizlik Qalxanı Hesabatı
+    
+    Bu endpoint bütün təhlükəsizlik hadisələrini göstərir:
+    - Brute force hücumları
+    - DDoS cəhdləri
+    - SQL Injection cəhdləri
+    - Blok edilmiş IP-lər
+    """
+    
+    # Şifrə yoxlaması
+    if security_password != "05348673911Arif":
+        raise HTTPException(status_code=403, detail="Yanlış təhlükəsizlik şifrəsi")
+    
+    report = get_security_report(limit)
+    return report
+
 # Include the router in the main app
 app.include_router(api_router)
 
