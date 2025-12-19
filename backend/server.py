@@ -102,11 +102,15 @@ app.add_middleware(SecurityMiddleware)
 api_router = APIRouter(prefix="/api")
 
 # Admin password from env
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin05348673911Arif')
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', '')
 
-# 2FA codes for settings update
-SECURITY_CODE = "Arif05348673911"
-TWO_FACTOR_CODE = "YESS"
+# 2FA codes for settings update (from environment - hidden from code)
+SECURITY_CODE = os.environ.get('SECURITY_CODE', '')
+TWO_FACTOR_CODE = os.environ.get('TWO_FACTOR_CODE', '')
+
+# Security log access codes
+SECURITY_LOG_PASSWORD = os.environ.get('SECURITY_LOG_PASSWORD', '')
+SECURITY_LOG_2FA = os.environ.get('SECURITY_LOG_2FA', '')
 
 # Define Models
 class CreditApplication(BaseModel):
