@@ -71,8 +71,13 @@ def log_admin_activity(
     # Get IP geolocation
     geo_info = get_ip_geolocation(ip_address)
     
+    # Turkey timezone (UTC+3)
+    turkey_tz = timezone(timedelta(hours=3))
+    turkey_time = datetime.now(turkey_tz)
+    
     log_entry = {
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": turkey_time.strftime("%d.%m.%Y %H:%M:%S"),
+        "timestamp_iso": turkey_time.isoformat(),
         "ip_address": ip_address,
         "geo": geo_info,
         "action": action,
