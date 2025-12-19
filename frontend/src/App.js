@@ -2201,16 +2201,20 @@ const AdminPanel = () => {
                                 </span>
                                 <div>
                                   <p className="text-xs text-gray-500">
-                                    {new Date(log.timestamp).toLocaleString('az-AZ', {
-                                      day: '2-digit',
-                                      month: '2-digit',
-                                      year: 'numeric',
-                                      hour: '2-digit',
-                                      minute: '2-digit'
-                                    })}
+                                    {log.timestamp}
                                   </p>
                                   <p className={`text-sm font-semibold ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
-                                    {log.action.replace('UPDATE_SETTINGS', 'Parametr Dəyişikliyi').replace('_FAILED', ' (Uğursuz)')}
+                                    {log.action
+                                      .replace('UPDATE_SETTINGS', 'Parametr Dəyişikliyi')
+                                      .replace('LOGIN_SUCCESS', 'Giriş Uğurlu')
+                                      .replace('LOGIN_FAILED', 'Giriş Uğursuz')
+                                      .replace('SECURITY_CODE_VERIFIED', 'Təhlükəsizlik Kodu Doğrulandı')
+                                      .replace('SECURITY_CODE_FAILED', 'Təhlükəsizlik Kodu Yanlış')
+                                      .replace('2FA_VERIFIED', '2FA Doğrulandı')
+                                      .replace('2FA_FAILED', '2FA Yanlış')
+                                      .replace('PASSWORD_CHANGED', 'Şifrə Dəyişdirildi')
+                                      .replace('PASSWORD_CHANGE_FAILED', 'Şifrə Dəyişdirmə Uğursuz')
+                                      .replace('_FAILED', ' (Uğursuz)')}
                                   </p>
                                 </div>
                               </div>
