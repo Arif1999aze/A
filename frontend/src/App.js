@@ -2646,60 +2646,62 @@ const AdminPanel = () => {
         </div>
       )}
 
-      {/* 🛡️ Security Shield Modal */}
+      {/* 🛡️ Security Shield Modal - Professional Design */}
       {showSecurityShield && securityShieldReport && (
-        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[70] p-4">
-          <div className="bg-gray-900 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[70] p-2 sm:p-4">
+          <div className="bg-gradient-to-b from-gray-900 to-gray-950 rounded-2xl sm:rounded-3xl shadow-2xl max-w-4xl w-full max-h-[95vh] overflow-hidden border border-gray-700">
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6">
+            <div className="bg-gradient-to-r from-purple-600 via-indigo-600 to-blue-600 text-white p-4 sm:p-6">
               <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-3xl">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-2xl flex items-center justify-center text-2xl sm:text-4xl shadow-lg">
                     🛡️
                   </div>
                   <div>
-                    <h3 className="text-2xl font-bold">Təhlükəsizlik Qalxanı</h3>
-                    <p className="text-purple-200 text-sm">Hücumlardan qorunma hesabatı</p>
+                    <h3 className="text-xl sm:text-2xl font-bold">Təhlükəsizlik Qalxanı</h3>
+                    <p className="text-purple-200 text-xs sm:text-sm">Hücumlardan qorunma sistemi</p>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowSecurityShield(false)}
-                  className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                  className="p-2 sm:p-3 hover:bg-white/20 rounded-xl transition-all duration-200"
                 >
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </button>
               </div>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-gray-800">
-              <div className="bg-gray-700 rounded-lg p-3 text-center">
-                <p className="text-2xl font-bold text-white">{securityShieldReport.stats?.total_events || 0}</p>
-                <p className="text-xs text-gray-400">Cəmi Hadisə</p>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 p-3 sm:p-4 bg-gray-800/50">
+              <div className="bg-gradient-to-br from-blue-600/20 to-blue-800/20 border border-blue-500/30 rounded-xl p-3 text-center">
+                <p className="text-2xl sm:text-3xl font-bold text-blue-400">{securityShieldReport.stats?.total_events || 0}</p>
+                <p className="text-[10px] sm:text-xs text-blue-300 mt-1">📊 Cəmi Hadisə</p>
               </div>
-              <div className="bg-red-900/50 border border-red-500 rounded-lg p-3 text-center">
-                <p className="text-2xl font-bold text-red-400">{securityShieldReport.stats?.critical_events || 0}</p>
-                <p className="text-xs text-red-300">🔴 Kritik</p>
+              <div className="bg-gradient-to-br from-red-600/20 to-red-800/20 border border-red-500/30 rounded-xl p-3 text-center">
+                <p className="text-2xl sm:text-3xl font-bold text-red-400">{securityShieldReport.stats?.critical_events || 0}</p>
+                <p className="text-[10px] sm:text-xs text-red-300 mt-1">🔴 Kritik</p>
               </div>
-              <div className="bg-orange-900/50 border border-orange-500 rounded-lg p-3 text-center">
-                <p className="text-2xl font-bold text-orange-400">{securityShieldReport.stats?.high_events || 0}</p>
-                <p className="text-xs text-orange-300">🟠 Yüksək Risk</p>
+              <div className="bg-gradient-to-br from-orange-600/20 to-orange-800/20 border border-orange-500/30 rounded-xl p-3 text-center">
+                <p className="text-2xl sm:text-3xl font-bold text-orange-400">{securityShieldReport.stats?.high_events || 0}</p>
+                <p className="text-[10px] sm:text-xs text-orange-300 mt-1">🟠 Yüksək Risk</p>
               </div>
-              <div className="bg-purple-900/50 border border-purple-500 rounded-lg p-3 text-center">
-                <p className="text-2xl font-bold text-purple-400">{securityShieldReport.stats?.blocked_ips_count || 0}</p>
-                <p className="text-xs text-purple-300">🚫 Blok IP</p>
+              <div className="bg-gradient-to-br from-purple-600/20 to-purple-800/20 border border-purple-500/30 rounded-xl p-3 text-center">
+                <p className="text-2xl sm:text-3xl font-bold text-purple-400">{securityShieldReport.stats?.blocked_ips_count || 0}</p>
+                <p className="text-[10px] sm:text-xs text-purple-300 mt-1">🚫 Blok IP</p>
               </div>
             </div>
 
             {/* Blocked IPs */}
             {securityShieldReport.stats?.blocked_ips?.length > 0 && (
-              <div className="p-4 bg-red-900/20 border-b border-red-800">
-                <h4 className="text-red-400 font-semibold mb-2">🚫 Blok Edilmiş IP-lər:</h4>
+              <div className="mx-3 sm:mx-4 mt-2 p-3 bg-red-900/30 border border-red-600/50 rounded-xl">
+                <h4 className="text-red-400 font-semibold text-sm mb-2 flex items-center gap-2">
+                  <span>🚫</span> Blok Edilmiş IP-lər
+                </h4>
                 <div className="flex flex-wrap gap-2">
                   {securityShieldReport.stats.blocked_ips.map((ip, i) => (
-                    <span key={i} className="bg-red-800 text-red-200 px-3 py-1 rounded-full text-sm">
+                    <span key={i} className="bg-red-800/50 text-red-200 px-3 py-1 rounded-full text-xs font-mono">
                       {ip}
                     </span>
                   ))}
@@ -2707,65 +2709,146 @@ const AdminPanel = () => {
               </div>
             )}
 
-            {/* Logs */}
-            <div className="p-4 max-h-[50vh] overflow-y-auto">
-              <h4 className="text-white font-semibold mb-3">📋 Son Təhlükəsizlik Hadisələri:</h4>
-              <div className="space-y-2">
-                {securityShieldReport.logs?.map((log, index) => (
-                  <div 
-                    key={index} 
-                    className={`rounded-lg p-3 border ${
-                      log.severity === 'CRITICAL' ? 'bg-red-900/30 border-red-600' :
-                      log.severity === 'HIGH' ? 'bg-orange-900/30 border-orange-600' :
-                      log.severity === 'MEDIUM' ? 'bg-yellow-900/30 border-yellow-600' :
-                      'bg-gray-800 border-gray-600'
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="text-xl">{log.severity_icon}</span>
-                          <span className="font-semibold text-white">{log.event_type}</span>
-                          <span className="text-xs text-gray-400">{log.timestamp}</span>
+            {/* Logs List */}
+            <div className="p-3 sm:p-4 max-h-[50vh] overflow-y-auto">
+              <h4 className="text-white font-semibold text-sm sm:text-base mb-3 flex items-center gap-2">
+                <span>📋</span> Son Təhlükəsizlik Hadisələri
+              </h4>
+              <div className="space-y-3">
+                {securityShieldReport.logs?.map((log, index) => {
+                  const severityColors = {
+                    'CRITICAL': 'from-red-900/40 to-red-950/40 border-red-500/50',
+                    'HIGH': 'from-orange-900/40 to-orange-950/40 border-orange-500/50',
+                    'MEDIUM': 'from-yellow-900/40 to-yellow-950/40 border-yellow-500/50',
+                    'LOW': 'from-gray-800/40 to-gray-900/40 border-gray-600/50'
+                  };
+                  
+                  const eventTypeLabels = {
+                    'LOGIN_SUCCESS': { label: 'Giriş Uğurlu', color: 'text-green-400', icon: '✅' },
+                    'LOGIN_FAILED': { label: 'Giriş Uğursuz', color: 'text-red-400', icon: '❌' },
+                    'BRUTE_FORCE_DETECTED': { label: 'Brute Force', color: 'text-red-500', icon: '⚠️' },
+                    'IP_BLOCKED': { label: 'IP Blok Edildi', color: 'text-red-500', icon: '🚫' },
+                    'RATE_LIMIT_EXCEEDED': { label: 'Limit Aşıldı', color: 'text-orange-400', icon: '⏱️' },
+                    'SUSPICIOUS_PATTERN_DETECTED': { label: 'Şübhəli Kod', color: 'text-red-400', icon: '🔍' }
+                  };
+                  
+                  const eventInfo = eventTypeLabels[log.event_type] || { label: log.event_type, color: 'text-gray-400', icon: '📝' };
+                  
+                  return (
+                    <div 
+                      key={index} 
+                      className={`bg-gradient-to-r ${severityColors[log.severity] || severityColors['LOW']} border rounded-xl overflow-hidden`}
+                    >
+                      {/* Main Info Row */}
+                      <div className="p-3 sm:p-4">
+                        <div className="flex flex-col sm:flex-row sm:items-start gap-3">
+                          {/* Severity & Event */}
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <span className="text-2xl">{log.severity_icon}</span>
+                            <div>
+                              <div className="flex items-center gap-1">
+                                <span>{eventInfo.icon}</span>
+                                <span className={`font-semibold text-sm ${eventInfo.color}`}>{eventInfo.label}</span>
+                              </div>
+                              <p className="text-[10px] sm:text-xs text-gray-400">{log.timestamp}</p>
+                            </div>
+                          </div>
+                          
+                          {/* Flag, Country, City - Mobile Optimized */}
+                          <div className="flex items-center gap-2 bg-black/30 rounded-lg p-2 flex-shrink-0">
+                            {log.geo?.country_code && log.geo.country_code !== 'XX' ? (
+                              <img 
+                                src={log.geo.flag_url || `https://flagcdn.com/w80/${log.geo.country_code.toLowerCase()}.png`}
+                                alt={log.geo?.country}
+                                className="w-10 h-7 sm:w-12 sm:h-8 object-cover rounded shadow-md border border-gray-600"
+                                onError={(e) => {e.target.style.display = 'none'}}
+                              />
+                            ) : (
+                              <div className="w-10 h-7 sm:w-12 sm:h-8 bg-gray-700 rounded flex items-center justify-center text-lg">
+                                🌐
+                              </div>
+                            )}
+                            <div>
+                              <p className="text-white text-xs sm:text-sm font-medium">{log.geo?.country || 'Naməlum'}</p>
+                              <p className="text-gray-400 text-[10px] sm:text-xs">{log.geo?.city || 'Naməlum'}</p>
+                            </div>
+                          </div>
+                          
+                          {/* IP Address - Copyable */}
+                          <div className="flex-1">
+                            <div 
+                              className="inline-flex items-center gap-2 bg-black/40 rounded-lg px-3 py-1.5 cursor-pointer hover:bg-black/60 transition-colors"
+                              onClick={() => {
+                                navigator.clipboard.writeText(log.ip_address);
+                                toast.success('IP kopyalandı!');
+                              }}
+                            >
+                              <span className="text-gray-400 text-xs">IP:</span>
+                              <span className="text-white font-mono text-xs sm:text-sm">{log.ip_address}</span>
+                              <svg className="w-3 h-3 sm:w-4 sm:h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                              </svg>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-gray-300 text-sm">{log.description}</p>
-                        <p className="text-gray-500 text-xs mt-1">IP: {log.ip_masked}</p>
+                        
+                        {/* Device Info */}
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          <span className="inline-flex items-center gap-1 bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-[10px] sm:text-xs">
+                            {log.device?.includes('iPhone') || log.device?.includes('Android') ? '📱' : '💻'}
+                            {log.device || 'Naməlum'}
+                          </span>
+                          <span className="inline-flex items-center gap-1 bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-[10px] sm:text-xs">
+                            {log.browser?.includes('Chrome') ? '🌐' : log.browser?.includes('Safari') ? '🧭' : log.browser?.includes('Firefox') ? '🦊' : '🔷'}
+                            {log.browser || 'Naməlum'}
+                          </span>
+                          <span className="inline-flex items-center gap-1 bg-gray-700/50 text-gray-300 px-2 py-1 rounded text-[10px] sm:text-xs">
+                            {log.os?.includes('Windows') ? '🪟' : log.os?.includes('mac') ? '🍎' : log.os?.includes('iOS') ? '📱' : log.os?.includes('Android') ? '🤖' : '💻'}
+                            {log.os || 'Naməlum'}
+                          </span>
+                        </div>
                       </div>
+                      
+                      {/* Threat Analysis */}
+                      {log.threat_analysis?.explanation_az && (
+                        <div className="bg-black/40 px-3 sm:px-4 py-2 border-t border-gray-700/50">
+                          <div className="flex items-start gap-2">
+                            <span className="text-sm">📊</span>
+                            <div className="flex-1">
+                              <p className="text-gray-300 text-[10px] sm:text-xs leading-relaxed">{log.threat_analysis.explanation_az}</p>
+                              {log.threat_analysis.recommendation && (
+                                <p className="text-green-400 text-[10px] sm:text-xs mt-1 font-medium">
+                                  ✅ {log.threat_analysis.recommendation}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      )}
                     </div>
-                    
-                    {/* Threat Analysis */}
-                    {log.threat_analysis && (
-                      <div className="mt-2 bg-black/30 rounded p-2">
-                        <p className="text-xs text-gray-400 font-semibold mb-1">📊 Analiz:</p>
-                        <p className="text-xs text-gray-300">{log.threat_analysis.explanation_az}</p>
-                        {log.threat_analysis.recommendation && (
-                          <p className="text-xs text-green-400 mt-1">
-                            ✅ {log.threat_analysis.recommendation}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
                 
                 {(!securityShieldReport.logs || securityShieldReport.logs.length === 0) && (
-                  <div className="text-center py-8 text-gray-500">
-                    <p className="text-4xl mb-2">✅</p>
-                    <p>Heç bir təhlükəsizlik hadisəsi yoxdur</p>
-                    <p className="text-sm">Sistem təhlükəsizdir</p>
+                  <div className="text-center py-12">
+                    <div className="w-20 h-20 bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <span className="text-4xl">✅</span>
+                    </div>
+                    <p className="text-white font-semibold">Heç bir təhlükəsizlik hadisəsi yoxdur</p>
+                    <p className="text-gray-400 text-sm mt-1">Sistem tam təhlükəsizdir</p>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Footer */}
-            <div className="bg-gray-800 px-6 py-4 border-t border-gray-700">
-              <div className="flex items-center justify-between text-sm text-gray-400">
+            <div className="bg-gradient-to-r from-gray-800 to-gray-900 px-4 sm:px-6 py-3 sm:py-4 border-t border-gray-700">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm text-gray-400">
                 <div className="flex items-center gap-2">
-                  <span>🛡️</span>
-                  <span>AzPay Təhlükəsizlik Qalxanı aktiv</span>
+                  <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+                  <span>🛡️ AzPay Təhlükəsizlik Qalxanı aktiv</span>
                 </div>
-                <span>Hesabat: {securityShieldReport.generated_at}</span>
+                <span className="text-gray-500">{securityShieldReport.generated_at}</span>
               </div>
             </div>
           </div>
