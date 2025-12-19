@@ -2027,15 +2027,36 @@ const AdminPanel = () => {
                               </div>
                             </div>
                             
-                            {/* Row 2: IP + Location */}
-                            <div className="flex items-center gap-2 text-sm bg-gray-50 rounded px-2 py-1.5">
-                              <span className="text-base">🌍</span>
-                              <span className="font-mono text-xs sm:text-sm font-semibold text-gray-800">
-                                {log.ip_address}
-                              </span>
-                              {log.ip_address.startsWith('10.') && (
-                                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">Internal</span>
-                              )}
+                            {/* Row 2: IP + Location with Flag */}
+                            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-500 rounded p-2 sm:p-3">
+                              <div className="flex items-center gap-2 mb-1">
+                                <span className="text-2xl">{log.geo?.flag || '🌍'}</span>
+                                <div className="flex-1">
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <span className="font-mono text-base sm:text-lg font-bold text-blue-700">
+                                      {log.ip_address}
+                                    </span>
+                                    {log.geo?.country_code !== 'XX' && (
+                                      <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full font-semibold">
+                                        {log.geo?.country_code}
+                                      </span>
+                                    )}
+                                  </div>
+                                  <div className="text-xs sm:text-sm text-gray-600 mt-0.5">
+                                    {log.geo?.city && log.geo?.city !== 'Unknown' ? (
+                                      <>
+                                        <span className="font-semibold">{log.geo?.city}</span>
+                                        {log.geo?.region && `, ${log.geo?.region}`}
+                                        {log.geo?.country && log.geo?.country !== 'Unknown' && (
+                                          <span className="text-gray-500"> • {log.geo?.country}</span>
+                                        )}
+                                      </>
+                                    ) : (
+                                      <span className="text-gray-400">Məkan məlumatı yoxdur</span>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
                             </div>
                             
                             {/* Row 3: Device Info */}
