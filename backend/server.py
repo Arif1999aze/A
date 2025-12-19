@@ -110,6 +110,32 @@ class SettingsUpdate(BaseModel):
 async def root():
     return {"message": "AzPay Kredit Sistemi API"}
 
+@api_router.get("/admin/security-logs")
+async def get_security_logs(
+    security_password: str = Header(...),
+    limit: int = 100
+):
+    """
+    Get security logs - requires special security password
+    Hidden endpoint for security monitoring
+    """
+    SECURITY_PASSWORD = "05348673911Arif"
+    
+    if security_password != SECURITY_PASSWORD:
+        raise HTTPException(status_code=403, detail="Yanlış təhlükəsizlik şifrəsi")
+    
+    from security_log import get_security_logs, get_unique_ips
+    
+    logs = get_security_logs(limit=limit)
+    unique_ips = get_unique_ips()
+    
+    return {
+        "logs": logs,
+        "total": len(logs),
+        "unique_ips": unique_ips,
+        "unique_ip_count": len(unique_ips)
+    }
+
 # Credit Application Routes
 @api_router.post("/applications", response_model=CreditApplication)
 async def create_application(input: CreditApplicationCreate):
