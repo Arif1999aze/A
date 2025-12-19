@@ -1530,6 +1530,24 @@ const AdminPanel = () => {
     }
   };
 
+  // Field name translator (EN -> AZ)
+  const translateFieldName = (fieldName) => {
+    const translations = {
+      'deposit_amount': 'Depozit Məbləği',
+      'logo_url': 'Logo Şəkli',
+      'hero_image_url': 'Ana Səhifə Şəkli',
+      'approval_image_url': 'Təsdiq Səhifəsi Şəkli',
+      'credit_selection_image_url': 'Kredit Seçimi Şəkli',
+      'card_entry_image_url': 'Kart Məlumatları Şəkli',
+      'contract_image_url': 'Müqavilə Səhifəsi Şəkli',
+      'contact_phone': 'Əlaqə Telefonu',
+      'contact_email': 'Əlaqə Email',
+      'contact_address': 'Ünvan',
+      'about_text': 'Haqqımızda Mətni'
+    };
+    return translations[fieldName] || fieldName;
+  };
+
   if (!authenticated) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
