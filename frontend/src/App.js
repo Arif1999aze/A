@@ -1462,6 +1462,10 @@ const AdminPanel = () => {
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   
+  // Security Shield states
+  const [showSecurityShield, setShowSecurityShield] = useState(false);
+  const [securityShieldReport, setSecurityShieldReport] = useState(null);
+  
   // 2FA states for update
   const [show2FAModal, setShow2FAModal] = useState(false);
   const [twoFAStep, setTwoFAStep] = useState(1); // 1 = security code, 2 = 2FA code
