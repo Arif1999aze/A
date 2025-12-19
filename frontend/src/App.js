@@ -1925,7 +1925,7 @@ const AdminPanel = () => {
             {/* Update Button */}
             <div className="pt-4">
               <Button
-                onClick={handleUpdate}
+                onClick={handleUpdateClick}
                 disabled={loading}
                 className="w-full bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 py-5 sm:py-6 text-base sm:text-lg font-bold shadow-lg"
                 data-testid="admin-update-btn"
