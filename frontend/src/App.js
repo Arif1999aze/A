@@ -2027,34 +2027,62 @@ const AdminPanel = () => {
                               </div>
                             </div>
                             
-                            {/* Row 2: IP + Location with Flag */}
-                            <div className="bg-gradient-to-r from-blue-50 to-purple-50 border-l-4 border-blue-500 rounded p-2 sm:p-3">
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="text-2xl">{log.geo?.flag || '🌍'}</span>
-                                <div className="flex-1">
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <span className="font-mono text-base sm:text-lg font-bold text-blue-700">
+                            {/* Row 2: IP + Location with Flag Photo */}
+                            <div className="flex items-start gap-2">
+                              {/* Flag Photo */}
+                              <div className="flex-shrink-0">
+                                {log.geo?.country_code && log.geo?.country_code !== 'XX' ? (
+                                  <img 
+                                    src={`https://flagcdn.com/w80/${log.geo.country_code.toLowerCase()}.png`}
+                                    alt={log.geo?.country}
+                                    className="w-12 h-8 object-cover rounded shadow-md border border-gray-300"
+                                    onError={(e) => {e.target.src = 'https://flagcdn.com/w80/xx.png'}}
+                                  />
+                                ) : (
+                                  <div className="w-12 h-8 bg-gray-300 rounded flex items-center justify-center text-xs">
+                                    🔒
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* IP Box + City */}
+                              <div className="flex-1 min-w-0">
+                                {/* IP in Box */}
+                                <div 
+                                  className="bg-blue-600 text-white px-2 py-1.5 rounded inline-block cursor-pointer hover:bg-blue-700 transition-colors"
+                                  onClick={() => {
+                                    navigator.clipboard.writeText(log.ip_address);
+                                    const toast = require('sonner').toast;
+                                    toast.success('IP kopyalandı!');
+                                  }}
+                                  title="Kopyalamaq üçün klikləyin"
+                                >
+                                  <div className="flex items-center gap-1.5">
+                                    <span className="font-mono text-xs sm:text-sm font-bold">
                                       {log.ip_address}
                                     </span>
-                                    {log.geo?.country_code !== 'XX' && (
-                                      <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full font-semibold">
-                                        {log.geo?.country_code}
-                                      </span>
-                                    )}
+                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+                                      <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
+                                    </svg>
                                   </div>
-                                  <div className="text-xs sm:text-sm text-gray-600 mt-0.5">
-                                    {log.geo?.city && log.geo?.city !== 'Unknown' ? (
-                                      <>
-                                        <span className="font-semibold">{log.geo?.city}</span>
-                                        {log.geo?.region && `, ${log.geo?.region}`}
-                                        {log.geo?.country && log.geo?.country !== 'Unknown' && (
-                                          <span className="text-gray-500"> • {log.geo?.country}</span>
-                                        )}
-                                      </>
-                                    ) : (
-                                      <span className="text-gray-400">Məkan məlumatı yoxdur</span>
-                                    )}
-                                  </div>
+                                </div>
+                                
+                                {/* City & Country Below */}
+                                <div className="mt-1.5 text-xs sm:text-sm text-gray-700">
+                                  {log.geo?.city && log.geo?.city !== 'Unknown' ? (
+                                    <div className="flex items-center gap-1">
+                                      <svg className="w-3 h-3 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+                                      </svg>
+                                      <span className="font-semibold">{log.geo?.city}</span>
+                                      {log.geo?.country && log.geo?.country !== 'Unknown' && (
+                                        <span className="text-gray-500">• {log.geo?.country}</span>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <span className="text-gray-400 italic">Məkan məlumatı yoxdur</span>
+                                  )}
                                 </div>
                               </div>
                             </div>
