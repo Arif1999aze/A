@@ -1882,80 +1882,183 @@ const AdminPanel = () => {
         </Card>
       </div>
       
-      {/* Security Modal */}
+      {/* Security Modal - Professional Design */}
       {showSecurityModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
-            <div className="bg-red-900 text-white p-4 flex justify-between items-center">
-              <h3 className="text-xl font-bold">🔒 Təhlükəsizlik İzləmə</h3>
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-6xl w-full max-h-[95vh] overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white p-3 sm:p-4 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <h3 className="text-lg sm:text-xl font-bold">Təhlükəsizlik Monitorinqi</h3>
+              </div>
               <button 
                 onClick={() => setShowSecurityModal(false)}
-                className="text-white hover:text-gray-200 text-2xl"
+                className="text-white hover:text-gray-300 text-2xl sm:text-3xl font-light w-8 h-8 flex items-center justify-center"
               >
                 ×
               </button>
             </div>
             
-            <div className="p-6">
+            <div className="p-3 sm:p-6">
               {!securityAuthenticated ? (
-                <div className="space-y-4">
-                  <p className="text-gray-700">Təhlükəsizlik məlumatlarını görmək üçün şifrəni daxil edin:</p>
+                <div className="space-y-4 max-w-md mx-auto">
+                  <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-gray-900 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-600 text-sm">Təhlükəsizlik məlumatlarına giriş üçün şifrəni daxil edin</p>
+                  </div>
                   <Input
                     type="password"
-                    placeholder="Təhlükəsizlik şifrəsi"
+                    placeholder="••••••••••••••"
                     value={securityPassword}
                     onChange={(e) => setSecurityPassword(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && handleSecurityLogin()}
-                    className="text-lg"
+                    className="text-lg h-12"
                   />
                   <Button 
                     onClick={handleSecurityLogin}
-                    className="w-full bg-red-900 hover:bg-red-800"
+                    className="w-full bg-gray-900 hover:bg-gray-800 h-12 text-base"
                   >
                     Giriş
                   </Button>
                 </div>
               ) : (
-                <div className="space-y-4 max-h-[60vh] overflow-y-auto">
-                  <div className="bg-green-100 border-l-4 border-green-500 p-4">
-                    <p className="font-bold">✅ Cəmi {securityLogs.length} təhlükəsizlik qeydi</p>
+                <div className="space-y-3 sm:space-y-4">
+                  {/* Summary Stats */}
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-blue-600">{securityLogs.length}</p>
+                      <p className="text-xs text-gray-600">Cəmi Qeyd</p>
+                    </div>
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-green-600">
+                        {securityLogs.filter(l => !l.action.includes('FAILED')).length}
+                      </p>
+                      <p className="text-xs text-gray-600">Uğurlu</p>
+                    </div>
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                      <p className="text-2xl font-bold text-red-600">
+                        {securityLogs.filter(l => l.action.includes('FAILED')).length}
+                      </p>
+                      <p className="text-xs text-gray-600">Uğursuz</p>
+                    </div>
                   </div>
                   
-                  {securityLogs.map((log, index) => (
-                    <div key={index} className="border border-gray-300 rounded-lg p-4 bg-gray-50">
-                      <div className="grid grid-cols-2 gap-2 text-sm">
-                        <div>
-                          <span className="font-bold">Tarix:</span>{' '}
-                          {new Date(log.timestamp).toLocaleString('az-AZ')}
-                        </div>
-                        <div>
-                          <span className="font-bold">IP:</span>{' '}
-                          <span className="text-red-600 font-mono">{log.ip_address}</span>
-                        </div>
-                        <div>
-                          <span className="font-bold">Cihaz:</span> {log.device}
-                        </div>
-                        <div>
-                          <span className="font-bold">Brauzer:</span> {log.browser}
-                        </div>
-                        <div>
-                          <span className="font-bold">OS:</span> {log.os}
-                        </div>
-                        <div>
-                          <span className="font-bold">Əməliyyat:</span>{' '}
-                          <span className={log.action.includes('FAILED') ? 'text-red-600 font-bold' : 'text-green-600'}>
-                            {log.action}
-                          </span>
-                        </div>
-                        {log.details && Object.keys(log.details).length > 0 && (
-                          <div className="col-span-2">
-                            <span className="font-bold">Detallar:</span>{' '}
-                            <span className="text-xs">{JSON.stringify(log.details)}</span>
+                  {/* Logs List */}
+                  <div className="max-h-[50vh] overflow-y-auto space-y-2">
+                    {securityLogs.map((log, index) => {
+                      const getBrowserIcon = (browser) => {
+                        if (browser.includes('Chrome')) return '🌐';
+                        if (browser.includes('Safari')) return '🧭';
+                        if (browser.includes('Firefox')) return '🦊';
+                        if (browser.includes('Edge')) return '🔷';
+                        return '💻';
+                      };
+                      
+                      const getDeviceIcon = (device) => {
+                        if (device.includes('iPhone')) return '📱';
+                        if (device.includes('iPad')) return '📱';
+                        if (device.includes('Android')) return '📱';
+                        return '💻';
+                      };
+                      
+                      const getOSIcon = (os) => {
+                        if (os.includes('Windows')) return '🪟';
+                        if (os.includes('Mac')) return '🍎';
+                        if (os.includes('iOS')) return '🍎';
+                        if (os.includes('Android')) return '🤖';
+                        if (os.includes('Linux')) return '🐧';
+                        return '⚙️';
+                      };
+                      
+                      const isSuccess = !log.action.includes('FAILED');
+                      
+                      return (
+                        <div 
+                          key={index} 
+                          className={`border rounded-lg p-3 sm:p-4 ${isSuccess ? 'bg-white border-gray-200' : 'bg-red-50 border-red-300'}`}
+                        >
+                          {/* Mobile: Stack vertically */}
+                          <div className="flex flex-col space-y-2">
+                            {/* Row 1: Time + Action */}
+                            <div className="flex justify-between items-start">
+                              <div className="flex items-center gap-2">
+                                <span className={`text-lg ${isSuccess ? '✅' : '❌'}`}>
+                                  {isSuccess ? '✅' : '❌'}
+                                </span>
+                                <div>
+                                  <p className="text-xs text-gray-500">
+                                    {new Date(log.timestamp).toLocaleString('az-AZ', {
+                                      day: '2-digit',
+                                      month: '2-digit',
+                                      year: 'numeric',
+                                      hour: '2-digit',
+                                      minute: '2-digit'
+                                    })}
+                                  </p>
+                                  <p className={`text-sm font-semibold ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
+                                    {log.action.replace('UPDATE_SETTINGS', 'Parametr Dəyişikliyi').replace('_FAILED', ' (Uğursuz)')}
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                            
+                            {/* Row 2: IP + Location */}
+                            <div className="flex items-center gap-2 text-sm bg-gray-50 rounded px-2 py-1.5">
+                              <span className="text-base">🌍</span>
+                              <span className="font-mono text-xs sm:text-sm font-semibold text-gray-800">
+                                {log.ip_address}
+                              </span>
+                              {log.ip_address.startsWith('10.') && (
+                                <span className="text-xs text-blue-600 bg-blue-100 px-2 py-0.5 rounded">Internal</span>
+                              )}
+                            </div>
+                            
+                            {/* Row 3: Device Info */}
+                            <div className="grid grid-cols-3 gap-2 text-xs">
+                              <div className="flex items-center gap-1 bg-purple-50 rounded px-2 py-1.5">
+                                <span>{getDeviceIcon(log.device)}</span>
+                                <span className="text-gray-700 truncate">{log.device}</span>
+                              </div>
+                              <div className="flex items-center gap-1 bg-blue-50 rounded px-2 py-1.5">
+                                <span>{getBrowserIcon(log.browser)}</span>
+                                <span className="text-gray-700 truncate">{log.browser}</span>
+                              </div>
+                              <div className="flex items-center gap-1 bg-green-50 rounded px-2 py-1.5">
+                                <span>{getOSIcon(log.os)}</span>
+                                <span className="text-gray-700 truncate">{log.os}</span>
+                              </div>
+                            </div>
+                            
+                            {/* Row 4: Details (if any) */}
+                            {log.details && Object.keys(log.details).length > 0 && (
+                              <div className="text-xs bg-yellow-50 border border-yellow-200 rounded p-2">
+                                <span className="font-semibold text-gray-700">Dəyişikliklər: </span>
+                                <span className="text-gray-600">
+                                  {log.details.fields_updated ? log.details.fields_updated.join(', ') : JSON.stringify(log.details)}
+                                </span>
+                              </div>
+                            )}
                           </div>
-                        )}
+                        </div>
+                      );
+                    })}
+                    
+                    {securityLogs.length === 0 && (
+                      <div className="text-center py-12 text-gray-400">
+                        <svg className="w-16 h-16 mx-auto mb-3 opacity-30" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                        </svg>
+                        <p>Hələ təhlükəsizlik qeydi yoxdur</p>
                       </div>
-                    </div>
-                  ))}
+                    )}
+                  </div>
                 </div>
               )}
             </div>
