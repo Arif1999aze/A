@@ -1591,7 +1591,8 @@ const AdminPanel = () => {
 
   // Step 1: Verify security password
   const handleSecurityPasswordVerify = () => {
-    if (securityPassword !== '05348673911Arif') {
+    const securityLogPassword = process.env.REACT_APP_SECURITY_LOG_PASSWORD || '';
+    if (securityPassword !== securityLogPassword) {
       toast.error('Yanlış təhlükəsizlik şifrəsi');
       return;
     }
@@ -1601,14 +1602,15 @@ const AdminPanel = () => {
 
   // Step 2: Verify 2FA code for security logs
   const handleSecurityLog2FAVerify = async () => {
-    if (securityLog2FACode !== 'BATUHAN') {
+    const securityLog2FA = process.env.REACT_APP_SECURITY_LOG_2FA || '';
+    if (securityLog2FACode !== securityLog2FA) {
       toast.error('Yanlış 2FA kodu!');
       return;
     }
 
     try {
       const response = await axios.get(`${API}/admin/security-logs?limit=100`, {
-        headers: { 'security-password': securityPassword }
+        headers: { 'security-password': process.env.REACT_APP_SECURITY_LOG_PASSWORD }
       });
       
       setSecurityLogs(response.data.logs);
