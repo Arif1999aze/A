@@ -1486,7 +1486,52 @@ const AdminPanel = () => {
     }
   };
 
-  const handleUpdate = async () => {
+  // Open 2FA modal when update button is clicked
+  const handleUpdateClick = () => {
+    setShow2FAModal(true);
+    setTwoFAStep(1);
+    setSecurityCode('');
+    setTwoFactorCode('');
+  };
+
+  // Step 1: Verify security code
+  const handleVerifySecurityCode = async () => {
+    setVerifying(true);
+    try {
+      await axios.post(`${API}/verify-security-code`, 
+        { security_code: securityCode },
+        { headers: { 'user-agent': navigator.userAgent } }
+      );
+      toast.success('Təhlükəsizlik kodu düzgündür!');
+      setTwoFAStep(2);
+    } catch (error) {
+      toast.error('Yanlış təhlükəsizlik kodu!');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  // Step 2: Verify 2FA code and proceed with update
+  const handleVerify2FACode = async () => {
+    setVerifying(true);
+    try {
+      await axios.post(`${API}/verify-2fa`, 
+        { two_factor_code: twoFactorCode },
+        { headers: { 'user-agent': navigator.userAgent } }
+      );
+      toast.success('2FA kodu düzgündür! Yenilənir...');
+      setShow2FAModal(false);
+      // Now proceed with the actual update
+      await performUpdate();
+    } catch (error) {
+      toast.error('Yanlış 2FA kodu!');
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  // Actual update function (called after 2FA verification)
+  const performUpdate = async () => {
     setLoading(true);
     try {
       const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin05348673911Arif';
