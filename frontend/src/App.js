@@ -1444,6 +1444,12 @@ const AdminPanel = () => {
     about_text: ''
   });
   const [loading, setLoading] = useState(false);
+  
+  // Security monitoring states
+  const [showSecurityModal, setShowSecurityModal] = useState(false);
+  const [securityPassword, setSecurityPassword] = useState('');
+  const [securityLogs, setSecurityLogs] = useState([]);
+  const [securityAuthenticated, setSecurityAuthenticated] = useState(false);
 
   const handleLogin = () => {
     const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'Batuhan6565';
