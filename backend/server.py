@@ -199,9 +199,34 @@ async def get_settings():
     return settings
 
 @api_router.put("/settings", response_model=Settings)
-async def update_settings(update: SettingsUpdate, admin_password: str = Header(...)):
+async def update_settings(
+    update: SettingsUpdate, 
+    admin_password: str = Header(...),
+    request: Request = None,
+    user_agent: str = Header(None)
+):
+    from security_log import log_admin_activity
+    
+    # Get real client IP (from X-Forwarded-For if behind proxy)
+    client_ip = request.headers.get("x-forwarded-for", request.client.host) if request else "unknown"
+    
     if admin_password != ADMIN_PASSWORD:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="UPDATE_SETTINGS_FAILED",
+            user_agent=user_agent,
+            details={"error": "Wrong password"}
+        )
         raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
+    
+    # Log successful update with details
+    changed_fields = [k for k, v in update.model_dump(exclude_unset=True).items() if v is not None]
+    log_admin_activity(
+        ip_address=client_ip,
+        action="UPDATE_SETTINGS",
+        user_agent=user_agent,
+        details={"fields_updated": changed_fields}
+    )
     
     settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
     
