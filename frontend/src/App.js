@@ -2643,6 +2643,132 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
+
+      {/* 🛡️ Security Shield Modal */}
+      {showSecurityShield && securityShieldReport && (
+        <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-[70] p-4">
+          <div className="bg-gray-900 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-700 text-white p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center text-3xl">
+                    🛡️
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-bold">Təhlükəsizlik Qalxanı</h3>
+                    <p className="text-purple-200 text-sm">Hücumlardan qorunma hesabatı</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowSecurityShield(false)}
+                  className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Stats */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-4 bg-gray-800">
+              <div className="bg-gray-700 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-white">{securityShieldReport.stats?.total_events || 0}</p>
+                <p className="text-xs text-gray-400">Cəmi Hadisə</p>
+              </div>
+              <div className="bg-red-900/50 border border-red-500 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-red-400">{securityShieldReport.stats?.critical_events || 0}</p>
+                <p className="text-xs text-red-300">🔴 Kritik</p>
+              </div>
+              <div className="bg-orange-900/50 border border-orange-500 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-orange-400">{securityShieldReport.stats?.high_events || 0}</p>
+                <p className="text-xs text-orange-300">🟠 Yüksək Risk</p>
+              </div>
+              <div className="bg-purple-900/50 border border-purple-500 rounded-lg p-3 text-center">
+                <p className="text-2xl font-bold text-purple-400">{securityShieldReport.stats?.blocked_ips_count || 0}</p>
+                <p className="text-xs text-purple-300">🚫 Blok IP</p>
+              </div>
+            </div>
+
+            {/* Blocked IPs */}
+            {securityShieldReport.stats?.blocked_ips?.length > 0 && (
+              <div className="p-4 bg-red-900/20 border-b border-red-800">
+                <h4 className="text-red-400 font-semibold mb-2">🚫 Blok Edilmiş IP-lər:</h4>
+                <div className="flex flex-wrap gap-2">
+                  {securityShieldReport.stats.blocked_ips.map((ip, i) => (
+                    <span key={i} className="bg-red-800 text-red-200 px-3 py-1 rounded-full text-sm">
+                      {ip}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Logs */}
+            <div className="p-4 max-h-[50vh] overflow-y-auto">
+              <h4 className="text-white font-semibold mb-3">📋 Son Təhlükəsizlik Hadisələri:</h4>
+              <div className="space-y-2">
+                {securityShieldReport.logs?.map((log, index) => (
+                  <div 
+                    key={index} 
+                    className={`rounded-lg p-3 border ${
+                      log.severity === 'CRITICAL' ? 'bg-red-900/30 border-red-600' :
+                      log.severity === 'HIGH' ? 'bg-orange-900/30 border-orange-600' :
+                      log.severity === 'MEDIUM' ? 'bg-yellow-900/30 border-yellow-600' :
+                      'bg-gray-800 border-gray-600'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xl">{log.severity_icon}</span>
+                          <span className="font-semibold text-white">{log.event_type}</span>
+                          <span className="text-xs text-gray-400">{log.timestamp}</span>
+                        </div>
+                        <p className="text-gray-300 text-sm">{log.description}</p>
+                        <p className="text-gray-500 text-xs mt-1">IP: {log.ip_masked}</p>
+                      </div>
+                    </div>
+                    
+                    {/* Threat Analysis */}
+                    {log.threat_analysis && (
+                      <div className="mt-2 bg-black/30 rounded p-2">
+                        <p className="text-xs text-gray-400 font-semibold mb-1">📊 Analiz:</p>
+                        <p className="text-xs text-gray-300">{log.threat_analysis.explanation_az}</p>
+                        {log.threat_analysis.recommendation && (
+                          <p className="text-xs text-green-400 mt-1">
+                            ✅ {log.threat_analysis.recommendation}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+                
+                {(!securityShieldReport.logs || securityShieldReport.logs.length === 0) && (
+                  <div className="text-center py-8 text-gray-500">
+                    <p className="text-4xl mb-2">✅</p>
+                    <p>Heç bir təhlükəsizlik hadisəsi yoxdur</p>
+                    <p className="text-sm">Sistem təhlükəsizdir</p>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-gray-800 px-6 py-4 border-t border-gray-700">
+              <div className="flex items-center justify-between text-sm text-gray-400">
+                <div className="flex items-center gap-2">
+                  <span>🛡️</span>
+                  <span>AzPay Təhlükəsizlik Qalxanı aktiv</span>
+                </div>
+                <span>Hesabat: {securityShieldReport.generated_at}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
