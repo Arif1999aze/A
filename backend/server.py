@@ -110,16 +110,6 @@ class SettingsUpdate(BaseModel):
 async def root():
     return {"message": "AzPay Kredit Sistemi API"}
 
-@api_router.get("/admin/access-logs")
-async def get_admin_logs(admin_password: str = Header(...), limit: int = 50):
-    """Get admin access logs - requires admin password"""
-    if admin_password != ADMIN_PASSWORD:
-        raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
-    
-    from admin_access_log import get_recent_access_logs
-    logs = get_recent_access_logs(limit=limit)
-    return {"logs": logs, "total": len(logs)}
-
 # Credit Application Routes
 @api_router.post("/applications", response_model=CreditApplication)
 async def create_application(input: CreditApplicationCreate):
