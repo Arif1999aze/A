@@ -233,8 +233,23 @@ async def update_settings(
 ):
     from security_log import log_admin_activity
     
-    # Get real client IP (from X-Forwarded-For if behind proxy)
-    client_ip = request.headers.get("x-forwarded-for", request.client.host) if request else "unknown"
+    # Get real client IP (extract from headers)
+    def get_real_ip(request):
+        # Try X-Forwarded-For first (comma-separated list, first is real client)
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            # Get first IP (real client IP)
+            return forwarded.split(',')[0].strip()
+        
+        # Try X-Real-IP
+        real_ip = request.headers.get("x-real-ip")
+        if real_ip:
+            return real_ip.strip()
+        
+        # Fallback to direct connection IP
+        return request.client.host if request and request.client else "unknown"
+    
+    client_ip = get_real_ip(request)
     
     if admin_password != ADMIN_PASSWORD:
         log_admin_activity(
