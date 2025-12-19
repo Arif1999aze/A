@@ -392,7 +392,7 @@ async def update_settings(
 class LoginRequest(BaseModel):
     password: str
 
-# Login endpoint with security logging
+# Login endpoint with security shield
 @api_router.post("/login")
 async def admin_login(
     login_data: LoginRequest,
@@ -413,7 +413,14 @@ async def admin_login(
     
     client_ip = get_real_ip(request)
     
-    if login_data.password == ADMIN_PASSWORD:
+    # 🛡️ Təhlükəsizlik yoxlaması
+    is_correct = login_data.password == ADMIN_PASSWORD
+    allowed, security_msg = check_login_attempt(client_ip, is_correct, user_agent)
+    
+    if not allowed:
+        raise HTTPException(status_code=403, detail=security_msg)
+    
+    if is_correct:
         # Log successful login
         log_admin_activity(
             ip_address=client_ip,
