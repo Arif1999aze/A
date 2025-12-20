@@ -281,7 +281,7 @@ const HomePage = () => {
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                   <span className="text-lg">✉️</span>
-                  <span className="text-sm">{settings?.contact_email || 'info@azpay.az'}</span>
+                  <span className="text-sm">{settings?.contact_email || ''}</span>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                   <span className="text-lg">📍</span>
