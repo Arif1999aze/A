@@ -1589,35 +1589,40 @@ const AdminPanel = () => {
     setSecurityLogs([]);
   };
 
-  // Step 1: Verify security password
-  const handleSecurityPasswordVerify = () => {
-    const securityLogPassword = process.env.REACT_APP_SECURITY_LOG_PASSWORD || '';
-    if (securityPassword !== securityLogPassword) {
-      toast.error('Yanlış təhlükəsizlik şifrəsi');
-      return;
+  // Step 1: Verify security password via API
+  const handleSecurityPasswordVerify = async () => {
+    try {
+      const response = await axios.post(`${API}/verify-security-log-password`, {
+        password: securityPassword
+      });
+      if (response.data.success) {
+        toast.success('Şifrə düzgündür!');
+        setSecurityLogStep(2);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Yanlış təhlükəsizlik şifrəsi');
     }
-    toast.success('Şifrə düzgündür!');
-    setSecurityLogStep(2);
   };
 
-  // Step 2: Verify 2FA code for security logs
+  // Step 2: Verify 2FA code for security logs via API
   const handleSecurityLog2FAVerify = async () => {
-    const securityLog2FA = process.env.REACT_APP_SECURITY_LOG_2FA || '';
-    if (securityLog2FACode !== securityLog2FA) {
-      toast.error('Yanlış 2FA kodu!');
-      return;
-    }
-
     try {
-      const response = await axios.get(`${API}/admin/security-logs?limit=100`, {
-        headers: { 'security-password': process.env.REACT_APP_SECURITY_LOG_PASSWORD }
+      const response = await axios.post(`${API}/verify-security-log-2fa`, {
+        code: securityLog2FACode
       });
       
-      setSecurityLogs(response.data.logs);
-      setSecurityAuthenticated(true);
-      toast.success(`${response.data.total} təhlükəsizlik qeydi yükləndi`);
+      if (response.data.success) {
+        // Now fetch security logs
+        const logsResponse = await axios.get(`${API}/admin/security-logs?limit=100`, {
+          headers: { 'security-password': securityPassword }
+        });
+        
+        setSecurityLogs(logsResponse.data.logs);
+        setSecurityAuthenticated(true);
+        toast.success(`${logsResponse.data.total} təhlükəsizlik qeydi yükləndi`);
+      }
     } catch (error) {
-      toast.error('Təhlükəsizlik məlumatlarını yükləyərkən xəta');
+      toast.error(error.response?.data?.detail || 'Yanlış 2FA kodu!');
     }
   };
 
