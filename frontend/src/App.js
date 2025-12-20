@@ -2634,25 +2634,7 @@ const AdminPanel = () => {
         </div>
       )}
 
-      {/* Password Change Modal */}
-      {showPasswordChangeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
-            {/* Header */}
-            <div className="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-6">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-xl font-bold">Admin Şifrəsini Dəyiş</h3>
-                    <p className="text-orange-100 text-sm">Yeni şifrə ilə davam edin</p>
-                  </div>
-                </div>
-                <button
+      {/* 🛡️ Security Shield Modal - Professional Design */}
                   onClick={() => setShowPasswordChangeModal(false)}
                   className="p-2 hover:bg-white/20 rounded-full transition-colors"
                 >
