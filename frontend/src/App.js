@@ -285,7 +285,7 @@ const HomePage = () => {
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                   <span className="text-lg">📍</span>
-                  <span className="text-sm">{settings?.contact_address || 'Bakı, Azərbaycan'}</span>
+                  <span className="text-sm">{settings?.contact_address || ''}</span>
                 </div>
               </div>
             </div>
