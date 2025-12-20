@@ -433,6 +433,47 @@ async def verify_security_code(
         )
         raise HTTPException(status_code=403, detail="Yanlış təhlükəsizlik kodu")
 
+# Admin Phone Verification
+@api_router.post("/verify-admin-phone")
+async def verify_admin_phone(
+    data: VerifyAdminPhoneRequest,
+    request: Request = None,
+    user_agent: str = Header(None)
+):
+    from security_log import log_admin_activity
+    
+    def get_real_ip(request):
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            return forwarded.split(',')[0].strip()
+        real_ip = request.headers.get("x-real-ip")
+        if real_ip:
+            return real_ip.strip()
+        return request.client.host if request and request.client else "unknown"
+    
+    client_ip = get_real_ip(request)
+    
+    # Telefon nömrəsini təmizlə (boşluqlar, tire və s. silmək)
+    clean_phone = data.phone.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+    clean_admin_phone = ADMIN_PHONE.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+    
+    if clean_phone == clean_admin_phone:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="ADMIN_PHONE_VERIFIED",
+            user_agent=user_agent,
+            details={"message": "Admin telefon nömrəsi doğrulandı"}
+        )
+        return {"success": True, "message": "Telefon nömrəsi düzgündür"}
+    else:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="ADMIN_PHONE_FAILED",
+            user_agent=user_agent,
+            details={"message": "Yanlış telefon nömrəsi ilə giriş cəhdi"}
+        )
+        raise HTTPException(status_code=403, detail="Yanlış telefon nömrəsi")
+
 # Admin Login 2FA Verification
 @api_router.post("/verify-admin-2fa")
 async def verify_admin_2fa(
