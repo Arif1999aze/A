@@ -2298,12 +2298,6 @@ const AdminPanel = () => {
                     >
                       🛡️ Təhlükəsizlik Qalxanı
                     </Button>
-                    <Button 
-                      onClick={handleOpenPasswordChange}
-                      className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white"
-                    >
-                      🔑 Şifrəni Dəyiş
-                    </Button>
                   </div>
                   
                   {/* Stats Grid */}
@@ -2339,8 +2333,10 @@ const AdminPanel = () => {
                         'SECURITY_CODE_FAILED': { label: 'Kod Yanlış', icon: '🚫' },
                         '2FA_VERIFIED': { label: '2FA Doğrulandı', icon: '✅' },
                         '2FA_FAILED': { label: '2FA Yanlış', icon: '❌' },
-                        'PASSWORD_CHANGED': { label: 'Şifrə Dəyişdi', icon: '🔑' },
-                        'PASSWORD_CHANGE_FAILED': { label: 'Şifrə Dəyişmədi', icon: '🚫' }
+                        'ADMIN_PHONE_VERIFIED': { label: 'Telefon Doğrulandı', icon: '📱' },
+                        'ADMIN_PHONE_FAILED': { label: 'Telefon Yanlış', icon: '📵' },
+                        'ADMIN_2FA_VERIFIED': { label: 'Admin 2FA Doğrulandı', icon: '✅' },
+                        'ADMIN_2FA_FAILED': { label: 'Admin 2FA Yanlış', icon: '❌' }
                       };
                       
                       const eventInfo = eventTypeLabels[log.action] || { label: log.action, icon: '📝' };
