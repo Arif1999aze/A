@@ -1549,7 +1549,6 @@ const AdminPanel = () => {
   const performUpdate = async () => {
     setLoading(true);
     try {
-      const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin05348673911Arif';
       await axios.put(
         `${API}/settings`,
         {
@@ -1567,7 +1566,6 @@ const AdminPanel = () => {
         },
         {
           headers: { 
-            'admin-password': adminPassword,
             'user-agent': navigator.userAgent
           }
         }
