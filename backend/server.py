@@ -501,6 +501,84 @@ async def verify_two_factor(
         raise HTTPException(status_code=403, detail="Yanlış 2FA kodu")
 
 # ═══════════════════════════════════════════════════════════════
+# TELEFON NÖMRƏSİ DƏYİŞDİRMƏ
+# ═══════════════════════════════════════════════════════════════
+
+class ChangePhoneRequest(BaseModel):
+    current_phone: str
+    new_phone: str
+
+@api_router.post("/change-admin-phone")
+async def change_admin_phone(
+    data: ChangePhoneRequest,
+    request: Request = None,
+    user_agent: str = Header(None)
+):
+    global ADMIN_PHONE
+    from security_log import log_admin_activity
+    
+    def get_real_ip(request):
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            return forwarded.split(',')[0].strip()
+        real_ip = request.headers.get("x-real-ip")
+        if real_ip:
+            return real_ip.strip()
+        return request.client.host if request and request.client else "unknown"
+    
+    client_ip = get_real_ip(request)
+    
+    # Telefon nömrələrini təmizlə
+    clean_current = data.current_phone.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+    clean_admin = ADMIN_PHONE.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+    clean_new = data.new_phone.replace(" ", "").replace("-", "").replace("(", "").replace(")", "")
+    
+    # Cari telefon nömrəsini yoxla
+    if clean_current != clean_admin:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="PHONE_CHANGE_FAILED",
+            user_agent=user_agent,
+            details={"message": "Yanlış cari telefon nömrəsi ilə dəyişdirmə cəhdi"}
+        )
+        raise HTTPException(status_code=403, detail="Cari telefon nömrəsi yanlışdır")
+    
+    # Yeni telefon nömrəsini yoxla
+    if len(clean_new) < 10:
+        raise HTTPException(status_code=400, detail="Yeni telefon nömrəsi ən azı 10 rəqəm olmalıdır")
+    
+    # Telefon nömrəsini yaddaşda yenilə
+    old_phone = ADMIN_PHONE
+    ADMIN_PHONE = clean_new
+    
+    # .env faylını yenilə
+    env_path = ROOT_DIR / '.env'
+    try:
+        with open(env_path, 'r') as f:
+            env_content = f.read()
+        
+        import re
+        if 'ADMIN_PHONE=' in env_content:
+            env_content = re.sub(r'ADMIN_PHONE=.*', f'ADMIN_PHONE={clean_new}', env_content)
+        else:
+            env_content += f'\nADMIN_PHONE={clean_new}'
+        
+        with open(env_path, 'w') as f:
+            f.write(env_content)
+    except Exception as e:
+        ADMIN_PHONE = old_phone
+        raise HTTPException(status_code=500, detail="Telefon nömrəsi faylda yenilənə bilmədi")
+    
+    log_admin_activity(
+        ip_address=client_ip,
+        action="PHONE_CHANGED",
+        user_agent=user_agent,
+        details={"message": "Admin telefon nömrəsi uğurla dəyişdirildi"}
+    )
+    
+    return {"success": True, "message": "Telefon nömrəsi uğurla dəyişdirildi"}
+
+# ═══════════════════════════════════════════════════════════════
 # TƏHLÜKƏSİZLİK QALXANI HESABATI
 # ═══════════════════════════════════════════════════════════════
 
