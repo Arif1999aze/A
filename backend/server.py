@@ -44,9 +44,6 @@ app = FastAPI(
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-# Admin password from env (with fallback)
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin05348673911Arif')
-
 # Admin Login Phone Number
 ADMIN_PHONE = os.environ.get('ADMIN_PHONE', '0502002020')
 
