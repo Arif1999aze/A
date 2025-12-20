@@ -1460,13 +1460,6 @@ const AdminPanel = () => {
   const [securityLogStep, setSecurityLogStep] = useState(1);
   const [securityLog2FACode, setSecurityLog2FACode] = useState('');
   
-  // Password change states
-  const [showPasswordChangeModal, setShowPasswordChangeModal] = useState(false);
-  const [currentPasswordForChange, setCurrentPasswordForChange] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [confirmNewPassword, setConfirmNewPassword] = useState('');
-  const [changingPassword, setChangingPassword] = useState(false);
-  
   // Security Shield states
   const [showSecurityShield, setShowSecurityShield] = useState(false);
   const [securityShieldReport, setSecurityShieldReport] = useState(null);
