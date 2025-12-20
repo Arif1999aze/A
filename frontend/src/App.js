@@ -1775,8 +1775,8 @@ const AdminPanel = () => {
                     1
                   </div>
                   <div className="hidden sm:block">
-                    <p className={`font-semibold ${loginStep >= 1 ? 'text-white' : 'text-white/50'}`}>Şifrə</p>
-                    <p className={`text-xs ${loginStep >= 1 ? 'text-blue-200' : 'text-white/30'}`}>Admin şifrəsi</p>
+                    <p className={`font-semibold ${loginStep >= 1 ? 'text-white' : 'text-white/50'}`}>Telefon</p>
+                    <p className={`text-xs ${loginStep >= 1 ? 'text-blue-200' : 'text-white/30'}`}>Nömrə doğrulama</p>
                   </div>
                 </div>
                 <div className={`w-16 h-1 rounded ${loginStep >= 2 ? 'bg-white' : 'bg-white/20'}`}></div>
