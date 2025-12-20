@@ -2383,7 +2383,9 @@ const AdminPanel = () => {
                         'ADMIN_PHONE_VERIFIED': { label: 'Telefon Doğrulandı', icon: '📱' },
                         'ADMIN_PHONE_FAILED': { label: 'Telefon Yanlış', icon: '📵' },
                         'ADMIN_2FA_VERIFIED': { label: 'Admin 2FA Doğrulandı', icon: '✅' },
-                        'ADMIN_2FA_FAILED': { label: 'Admin 2FA Yanlış', icon: '❌' }
+                        'ADMIN_2FA_FAILED': { label: 'Admin 2FA Yanlış', icon: '❌' },
+                        'PHONE_CHANGED': { label: 'Telefon Dəyişdi', icon: '📱' },
+                        'PHONE_CHANGE_FAILED': { label: 'Telefon Dəyişmədi', icon: '🚫' }
                       };
                       
                       const eventInfo = eventTypeLabels[log.action] || { label: log.action, icon: '📝' };
