@@ -277,7 +277,7 @@ const HomePage = () => {
               <div className="space-y-3 text-blue-100">
                 <div className="flex items-center justify-center md:justify-start gap-2">
                   <span className="text-lg">📞</span>
-                  <span className="text-sm">{settings?.contact_phone || '+994 50 123 45 67'}</span>
+                  <span className="text-sm">{settings?.contact_phone || ''}</span>
                 </div>
                 <div className="flex items-center justify-center md:justify-start gap-2">
                   <span className="text-lg">✉️</span>
