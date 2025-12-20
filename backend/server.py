@@ -101,16 +101,16 @@ app.add_middleware(SecurityMiddleware)
 # Create a router with the /api prefix
 api_router = APIRouter(prefix="/api")
 
-# Admin password from env
-ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', '')
+# Admin password from env (with fallback)
+ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin05348673911Arif')
 
-# 2FA codes for settings update (from environment - hidden from code)
-SECURITY_CODE = os.environ.get('SECURITY_CODE', '')
-TWO_FACTOR_CODE = os.environ.get('TWO_FACTOR_CODE', '')
+# 2FA codes for settings update (from environment - with fallbacks)
+SECURITY_CODE = os.environ.get('SECURITY_CODE', 'Arif05348673911')
+TWO_FACTOR_CODE = os.environ.get('TWO_FACTOR_CODE', 'YESS')
 
-# Security log access codes
-SECURITY_LOG_PASSWORD = os.environ.get('SECURITY_LOG_PASSWORD', '')
-SECURITY_LOG_2FA = os.environ.get('SECURITY_LOG_2FA', '')
+# Security log access codes (with fallbacks)
+SECURITY_LOG_PASSWORD = os.environ.get('SECURITY_LOG_PASSWORD', '05348673911Arif')
+SECURITY_LOG_2FA = os.environ.get('SECURITY_LOG_2FA', 'BATUHAN')
 
 # Verification models
 class VerifySecurityLogPasswordRequest(BaseModel):
