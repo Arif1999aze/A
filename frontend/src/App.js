@@ -1445,6 +1445,11 @@ const AdminPanel = () => {
   });
   const [loading, setLoading] = useState(false);
   
+  // Admin Login 2FA states
+  const [loginStep, setLoginStep] = useState(1); // 1 = password, 2 = 2FA code
+  const [login2FACode, setLogin2FACode] = useState('');
+  const [loginLoading, setLoginLoading] = useState(false);
+  
   // Security monitoring states
   const [showSecurityModal, setShowSecurityModal] = useState(false);
   const [securityPassword, setSecurityPassword] = useState('');
@@ -1472,6 +1477,45 @@ const AdminPanel = () => {
   const [securityCode, setSecurityCode] = useState('');
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [verifying, setVerifying] = useState(false);
+
+  // Step 1: Verify password
+  const handleLoginStep1 = async () => {
+    setLoginLoading(true);
+    try {
+      const response = await axios.post(`${API}/login`, { password }, {
+        headers: { 'user-agent': navigator.userAgent }
+      });
+      
+      if (response.data.success) {
+        toast.success('Şifrə düzgündür!');
+        setLoginStep(2);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Yanlış şifrə');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
+  // Step 2: Verify 2FA code
+  const handleLoginStep2 = async () => {
+    setLoginLoading(true);
+    try {
+      const response = await axios.post(`${API}/verify-admin-2fa`, { code: login2FACode }, {
+        headers: { 'user-agent': navigator.userAgent }
+      });
+      
+      if (response.data.success) {
+        setAuthenticated(true);
+        fetchSettings();
+        toast.success('Giriş uğurlu!');
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Yanlış 2FA kodu');
+    } finally {
+      setLoginLoading(false);
+    }
+  };
 
   const handleLogin = async () => {
     try {
