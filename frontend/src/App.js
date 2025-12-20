@@ -1748,7 +1748,7 @@ const AdminPanel = () => {
                       value={phoneNumber}
                       onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, ''))}
                       onKeyPress={(e) => e.key === 'Enter' && handleLoginStep1()}
-                      placeholder="050 XXX XX XX"
+                      placeholder=""
                       className="mt-2 h-14 bg-white/10 border-white/20 text-white placeholder-white/30 text-xl text-center tracking-wider"
                     />
                   </div>
