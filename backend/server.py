@@ -427,6 +427,43 @@ async def verify_security_code(
         )
         raise HTTPException(status_code=403, detail="Yanlış təhlükəsizlik kodu")
 
+# Admin Login 2FA Verification
+@api_router.post("/verify-admin-2fa")
+async def verify_admin_2fa(
+    data: VerifyAdmin2FARequest,
+    request: Request = None,
+    user_agent: str = Header(None)
+):
+    from security_log import log_admin_activity
+    
+    def get_real_ip(request):
+        forwarded = request.headers.get("x-forwarded-for")
+        if forwarded:
+            return forwarded.split(',')[0].strip()
+        real_ip = request.headers.get("x-real-ip")
+        if real_ip:
+            return real_ip.strip()
+        return request.client.host if request and request.client else "unknown"
+    
+    client_ip = get_real_ip(request)
+    
+    if data.code == ADMIN_LOGIN_2FA:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="ADMIN_2FA_VERIFIED",
+            user_agent=user_agent,
+            details={"message": "Admin 2FA doğrulandı - giriş uğurlu"}
+        )
+        return {"success": True, "message": "2FA kodu düzgündür"}
+    else:
+        log_admin_activity(
+            ip_address=client_ip,
+            action="ADMIN_2FA_FAILED",
+            user_agent=user_agent,
+            details={"message": "Yanlış admin 2FA kodu"}
+        )
+        raise HTTPException(status_code=403, detail="Yanlış 2FA kodu")
+
 # Step 2: Verify 2FA code
 @api_router.post("/verify-2fa")
 async def verify_two_factor(
