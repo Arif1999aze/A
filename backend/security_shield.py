@@ -33,8 +33,8 @@ TURKEY_TZ = timezone(timedelta(hours=3))
 # Rate limiting konfiqurasiyası
 MAX_LOGIN_ATTEMPTS = 5  # Maksimum giriş cəhdi
 LOGIN_BLOCK_DURATION = 30 * 60  # 30 dəqiqə blok (saniyə)
-MAX_REQUESTS_PER_MINUTE = 60  # Dəqiqədə maksimum sorğu
-SUSPICIOUS_PATTERNS_THRESHOLD = 3  # Şübhəli pattern sayı
+MAX_REQUESTS_PER_MINUTE = 200  # Dəqiqədə maksimum sorğu (artırıldı)
+SUSPICIOUS_PATTERNS_THRESHOLD = 5  # Şübhəli pattern sayı
 
 # Təhlükəsizlik log faylı
 SECURITY_SHIELD_LOG = "/app/backend/security_shield.log"
