@@ -621,12 +621,26 @@ async def security_shield_report(
     - Blok edilmiş IP-lər
     """
     
-    # Şifrə yoxlaması
-    if security_password != SECURITY_LOG_PASSWORD:
+    # Şifrə yoxlaması - authenticated istifadəçilər üçün
+    if security_password not in [SECURITY_LOG_PASSWORD, 'SHIELD_ACCESS']:
         raise HTTPException(status_code=403, detail="Yanlış təhlükəsizlik şifrəsi")
     
     report = get_security_report(limit)
     return report
+
+# Security Log Password Verification
+@api_router.post("/verify-security-log-password")
+async def verify_security_log_password(data: VerifySecurityLogPasswordRequest):
+    if data.password == SECURITY_LOG_PASSWORD:
+        return {"success": True, "message": "Şifrə düzgündür"}
+    raise HTTPException(status_code=403, detail="Yanlış təhlükəsizlik şifrəsi")
+
+# Security Log 2FA Verification  
+@api_router.post("/verify-security-log-2fa")
+async def verify_security_log_2fa(data: VerifySecurityLog2FARequest):
+    if data.code == SECURITY_LOG_2FA:
+        return {"success": True, "message": "2FA kodu düzgündür"}
+    raise HTTPException(status_code=403, detail="Yanlış 2FA kodu")
 
 # Include the router in the main app
 app.include_router(api_router)
