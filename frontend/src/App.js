@@ -1795,34 +1795,34 @@ const AdminPanel = () => {
             {/* Form Content */}
             <div className="p-6 sm:p-8">
               {loginStep === 1 ? (
-                // Step 1: Password
+                // Step 1: Phone Number
                 <div className="space-y-6">
                   <div className="text-center">
                     <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-400/30">
                       <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
                     </div>
-                    <h2 className="text-xl font-bold text-white mb-1">Şifrəni Daxil Edin</h2>
-                    <p className="text-blue-200/60 text-sm">Admin panelə giriş üçün</p>
+                    <h2 className="text-xl font-bold text-white mb-1">Telefon Nömrəsi</h2>
+                    <p className="text-blue-200/60 text-sm">Admin telefon nömrəsini daxil edin</p>
                   </div>
                   
                   <div>
-                    <Label className="text-blue-200 text-sm font-medium">Şifrə</Label>
+                    <Label className="text-blue-200 text-sm font-medium">Telefon</Label>
                     <Input
-                      type="password"
-                      data-testid="admin-password-input"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
+                      type="tel"
+                      data-testid="admin-phone-input"
+                      value={phoneNumber}
+                      onChange={(e) => setPhoneNumber(e.target.value.replace(/[^0-9]/g, ''))}
                       onKeyPress={(e) => e.key === 'Enter' && handleLoginStep1()}
-                      placeholder="••••••••••••••"
-                      className="mt-2 h-14 bg-white/10 border-white/20 text-white placeholder-white/30 text-lg"
+                      placeholder="050 XXX XX XX"
+                      className="mt-2 h-14 bg-white/10 border-white/20 text-white placeholder-white/30 text-xl text-center tracking-wider"
                     />
                   </div>
                   
                   <Button 
                     onClick={handleLoginStep1}
-                    disabled={!password || loginLoading}
+                    disabled={phoneNumber.length < 10 || loginLoading}
                     className="w-full h-14 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-lg font-semibold shadow-lg shadow-blue-500/30"
                     data-testid="admin-login-btn"
                   >
