@@ -1661,6 +1661,41 @@ const AdminPanel = () => {
     }
   };
 
+  // Phone change functions
+  const handleOpenPhoneChange = () => {
+    setShowPhoneChangeModal(true);
+    setCurrentPhoneForChange('');
+    setNewPhone('');
+  };
+
+  const handleChangePhone = async () => {
+    if (newPhone.length < 10) {
+      toast.error('Yeni telefon nömrəsi ən azı 10 rəqəm olmalıdır!');
+      return;
+    }
+    
+    setChangingPhone(true);
+    try {
+      await axios.post(`${API}/change-admin-phone`, {
+        current_phone: currentPhoneForChange,
+        new_phone: newPhone
+      }, {
+        headers: { 'user-agent': navigator.userAgent }
+      });
+      
+      toast.success('Telefon nömrəsi uğurla dəyişdirildi! Yeni nömrə ilə giriş edin.');
+      setShowPhoneChangeModal(false);
+      setShowSecurityModal(false);
+      setAuthenticated(false);
+      setPhoneNumber('');
+      setLoginStep(1);
+    } catch (error) {
+      toast.error(error.response?.data?.detail || 'Telefon nömrəsi dəyişdirilərkən xəta baş verdi');
+    } finally {
+      setChangingPhone(false);
+    }
+  };
+
   // Field name translator (EN -> AZ)
   const translateFieldName = (fieldName) => {
     const translations = {
