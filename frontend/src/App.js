@@ -1428,7 +1428,7 @@ Depoziti hara ödəyim?`;
 // Admin Panel
 const AdminPanel = () => {
   const navigate = useNavigate();
-  const [password, setPassword] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
   const [settings, setSettings] = useState({ 
     deposit_amount: 50,
@@ -1446,7 +1446,7 @@ const AdminPanel = () => {
   const [loading, setLoading] = useState(false);
   
   // Admin Login 2FA states
-  const [loginStep, setLoginStep] = useState(1); // 1 = password, 2 = 2FA code
+  const [loginStep, setLoginStep] = useState(1); // 1 = phone, 2 = 2FA code
   const [login2FACode, setLogin2FACode] = useState('');
   const [loginLoading, setLoginLoading] = useState(false);
   
@@ -1457,7 +1457,7 @@ const AdminPanel = () => {
   const [securityAuthenticated, setSecurityAuthenticated] = useState(false);
   
   // Security Log 2FA states
-  const [securityLogStep, setSecurityLogStep] = useState(1); // 1 = password, 2 = 2FA code
+  const [securityLogStep, setSecurityLogStep] = useState(1);
   const [securityLog2FACode, setSecurityLog2FACode] = useState('');
   
   // Password change states
@@ -1473,25 +1473,25 @@ const AdminPanel = () => {
   
   // 2FA states for update
   const [show2FAModal, setShow2FAModal] = useState(false);
-  const [twoFAStep, setTwoFAStep] = useState(1); // 1 = security code, 2 = 2FA code
+  const [twoFAStep, setTwoFAStep] = useState(1);
   const [securityCode, setSecurityCode] = useState('');
   const [twoFactorCode, setTwoFactorCode] = useState('');
   const [verifying, setVerifying] = useState(false);
 
-  // Step 1: Verify password
+  // Step 1: Verify phone number
   const handleLoginStep1 = async () => {
     setLoginLoading(true);
     try {
-      const response = await axios.post(`${API}/login`, { password }, {
+      const response = await axios.post(`${API}/verify-admin-phone`, { phone: phoneNumber }, {
         headers: { 'user-agent': navigator.userAgent }
       });
       
       if (response.data.success) {
-        toast.success('Şifrə düzgündür!');
+        toast.success('Telefon nömrəsi düzgündür!');
         setLoginStep(2);
       }
     } catch (error) {
-      toast.error(error.response?.data?.detail || 'Yanlış şifrə');
+      toast.error(error.response?.data?.detail || 'Yanlış telefon nömrəsi');
     } finally {
       setLoginLoading(false);
     }
