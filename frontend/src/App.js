@@ -1517,25 +1517,6 @@ const AdminPanel = () => {
     }
   };
 
-  const handleLogin = async () => {
-    try {
-      // Call login API - backend validates password
-      const response = await axios.post(`${API}/login`, { password }, {
-        headers: { 'user-agent': navigator.userAgent }
-      });
-      
-      // If API returns success, password is correct
-      if (response.data.success) {
-        setAuthenticated(true);
-        fetchSettings();
-        toast.success('Giriş uğurlu!');
-      }
-    } catch (error) {
-      // API returns error for wrong password
-      toast.error(error.response?.data?.detail || 'Yanlış şifrə');
-    }
-  };
-
   const fetchSettings = async () => {
     try {
       const response = await axios.get(`${API}/settings`);
