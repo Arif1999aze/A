@@ -1642,47 +1642,6 @@ const AdminPanel = () => {
     }
   };
 
-  // Open password change modal
-  const handleOpenPasswordChange = () => {
-    setShowPasswordChangeModal(true);
-    setCurrentPasswordForChange('');
-    setNewPassword('');
-    setConfirmNewPassword('');
-  };
-
-  // Change admin password - backend validates
-  const handleChangePassword = async () => {
-    if (newPassword.length < 6) {
-      toast.error('Yeni şifrə ən azı 6 simvol olmalıdır!');
-      return;
-    }
-    
-    if (newPassword !== confirmNewPassword) {
-      toast.error('Yeni şifrələr uyğun gəlmir!');
-      return;
-    }
-    
-    setChangingPassword(true);
-    try {
-      await axios.post(`${API}/change-admin-password`, {
-        current_password: currentPasswordForChange,
-        new_password: newPassword
-      }, {
-        headers: { 'user-agent': navigator.userAgent }
-      });
-      
-      toast.success('Şifrə uğurla dəyişdirildi! Yeni şifrə ilə giriş edin.');
-      setShowPasswordChangeModal(false);
-      setShowSecurityModal(false);
-      setAuthenticated(false);
-      setPassword('');
-    } catch (error) {
-      toast.error(error.response?.data?.detail || 'Şifrə dəyişdirilərkən xəta baş verdi');
-    } finally {
-      setChangingPassword(false);
-    }
-  };
-
   // Security Shield Report
   const fetchSecurityShieldReport = async () => {
     try {
