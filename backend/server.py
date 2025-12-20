@@ -353,7 +353,7 @@ async def update_settings(
 class LoginRequest(BaseModel):
     password: str
 
-# Login endpoint with security shield
+# Login endpoint - sadə və etibarlı
 @api_router.post("/login")
 async def admin_login(
     login_data: LoginRequest,
@@ -374,14 +374,8 @@ async def admin_login(
     
     client_ip = get_real_ip(request)
     
-    # 🛡️ Təhlükəsizlik yoxlaması
-    is_correct = login_data.password == ADMIN_PASSWORD
-    allowed, security_msg = check_login_attempt(client_ip, is_correct, user_agent)
-    
-    if not allowed:
-        raise HTTPException(status_code=403, detail=security_msg)
-    
-    if is_correct:
+    # Şifrə yoxlaması - sadə və birbaşa
+    if login_data.password == ADMIN_PASSWORD:
         # Log successful login
         log_admin_activity(
             ip_address=client_ip,
@@ -391,14 +385,14 @@ async def admin_login(
         )
         return {"success": True, "message": "Giriş uğurlu"}
     else:
-        # Log failed login attempt (artıq security_shield-də loqlanır)
+        # Log failed login attempt
         log_admin_activity(
             ip_address=client_ip,
             action="LOGIN_FAILED",
             user_agent=user_agent,
             details={"message": "Yanlış şifrə ilə giriş cəhdi"}
         )
-        raise HTTPException(status_code=403, detail=security_msg if security_msg != "OK" else "Yanlış admin şifrəsi")
+        raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
 
 # 2FA Verification models
 class VerifySecurityCodeRequest(BaseModel):
