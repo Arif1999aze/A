@@ -1464,6 +1464,12 @@ const AdminPanel = () => {
   const [showSecurityShield, setShowSecurityShield] = useState(false);
   const [securityShieldReport, setSecurityShieldReport] = useState(null);
   
+  // Phone change states
+  const [showPhoneChangeModal, setShowPhoneChangeModal] = useState(false);
+  const [currentPhoneForChange, setCurrentPhoneForChange] = useState('');
+  const [newPhone, setNewPhone] = useState('');
+  const [changingPhone, setChangingPhone] = useState(false);
+  
   // 2FA states for update
   const [show2FAModal, setShow2FAModal] = useState(false);
   const [twoFAStep, setTwoFAStep] = useState(1);
