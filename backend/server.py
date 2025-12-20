@@ -112,6 +112,13 @@ TWO_FACTOR_CODE = os.environ.get('TWO_FACTOR_CODE', '')
 SECURITY_LOG_PASSWORD = os.environ.get('SECURITY_LOG_PASSWORD', '')
 SECURITY_LOG_2FA = os.environ.get('SECURITY_LOG_2FA', '')
 
+# Verification models
+class VerifySecurityLogPasswordRequest(BaseModel):
+    password: str
+
+class VerifySecurityLog2FARequest(BaseModel):
+    code: str
+
 # Define Models
 class CreditApplication(BaseModel):
     model_config = ConfigDict(extra="ignore")
