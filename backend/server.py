@@ -344,51 +344,6 @@ async def update_settings(
     
     return updated_settings
 
-# Login request model
-class LoginRequest(BaseModel):
-    password: str
-
-# Login endpoint - sadə və etibarlı
-@api_router.post("/login")
-async def admin_login(
-    login_data: LoginRequest,
-    request: Request = None,
-    user_agent: str = Header(None)
-):
-    from security_log import log_admin_activity
-    
-    # Get real client IP
-    def get_real_ip(request):
-        forwarded = request.headers.get("x-forwarded-for")
-        if forwarded:
-            return forwarded.split(',')[0].strip()
-        real_ip = request.headers.get("x-real-ip")
-        if real_ip:
-            return real_ip.strip()
-        return request.client.host if request and request.client else "unknown"
-    
-    client_ip = get_real_ip(request)
-    
-    # Şifrə yoxlaması - sadə və birbaşa
-    if login_data.password == ADMIN_PASSWORD:
-        # Log successful login
-        log_admin_activity(
-            ip_address=client_ip,
-            action="LOGIN_SUCCESS",
-            user_agent=user_agent,
-            details={"message": "Admin panelə uğurlu giriş"}
-        )
-        return {"success": True, "message": "Giriş uğurlu"}
-    else:
-        # Log failed login attempt
-        log_admin_activity(
-            ip_address=client_ip,
-            action="LOGIN_FAILED",
-            user_agent=user_agent,
-            details={"message": "Yanlış şifrə ilə giriş cəhdi"}
-        )
-        raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
-
 # 2FA Verification models
 class VerifySecurityCodeRequest(BaseModel):
     security_code: str
