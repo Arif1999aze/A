@@ -1474,21 +1474,21 @@ const AdminPanel = () => {
   const [verifying, setVerifying] = useState(false);
 
   const handleLogin = async () => {
-    const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin05348673911Arif';
-    
     try {
-      // Call login API to log the attempt
-      await axios.post(`${API}/login`, { password }, {
+      // Call login API - backend validates password
+      const response = await axios.post(`${API}/login`, { password }, {
         headers: { 'user-agent': navigator.userAgent }
       });
       
-      if (password === adminPassword) {
+      // If API returns success, password is correct
+      if (response.data.success) {
         setAuthenticated(true);
         fetchSettings();
         toast.success('Giriş uğurlu!');
       }
     } catch (error) {
-      toast.error('Yanlış şifrə');
+      // API returns error for wrong password
+      toast.error(error.response?.data?.detail || 'Yanlış şifrə');
     }
   };
 
