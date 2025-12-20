@@ -2,7 +2,6 @@ from fastapi import FastAPI, APIRouter, HTTPException, Header, Request, Response
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
@@ -12,16 +11,8 @@ from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
-# Təhlükəsizlik modulu
-from security_shield import (
-    check_login_attempt, 
-    check_rate_limit, 
-    check_suspicious_patterns,
-    is_ip_blocked,
-    get_security_headers,
-    get_security_report,
-    log_security_event
-)
+# Təhlükəsizlik modulu - yalnız hesabat üçün
+from security_shield import get_security_report
 
 
 ROOT_DIR = Path(__file__).parent
