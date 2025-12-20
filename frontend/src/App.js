@@ -2339,6 +2339,12 @@ const AdminPanel = () => {
                     >
                       🛡️ Təhlükəsizlik Qalxanı
                     </Button>
+                    <Button 
+                      onClick={handleOpenPhoneChange}
+                      className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white"
+                    >
+                      📱 Telefonu Dəyiş
+                    </Button>
                   </div>
                   
                   {/* Stats Grid */}
