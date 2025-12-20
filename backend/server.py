@@ -47,6 +47,9 @@ api_router = APIRouter(prefix="/api")
 # Admin password from env (with fallback)
 ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin05348673911Arif')
 
+# Admin Login Phone Number
+ADMIN_PHONE = os.environ.get('ADMIN_PHONE', '0502002020')
+
 # 2FA codes for settings update (from environment - with fallbacks)
 SECURITY_CODE = os.environ.get('SECURITY_CODE', 'Arif05348673911')
 TWO_FACTOR_CODE = os.environ.get('TWO_FACTOR_CODE', 'YESS')
