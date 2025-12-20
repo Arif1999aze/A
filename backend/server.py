@@ -71,6 +71,9 @@ class VerifySecurityLog2FARequest(BaseModel):
 class VerifyAdmin2FARequest(BaseModel):
     code: str
 
+class VerifyAdminPhoneRequest(BaseModel):
+    phone: str
+
 # Define Models
 class CreditApplication(BaseModel):
     model_config = ConfigDict(extra="ignore")
