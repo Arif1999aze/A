@@ -259,7 +259,6 @@ async def get_settings():
 @api_router.put("/settings", response_model=Settings)
 async def update_settings(
     update: SettingsUpdate, 
-    admin_password: str = Header(...),
     request: Request = None,
     user_agent: str = Header(None)
 ):
@@ -283,14 +282,7 @@ async def update_settings(
     
     client_ip = get_real_ip(request)
     
-    if admin_password != ADMIN_PASSWORD:
-        log_admin_activity(
-            ip_address=client_ip,
-            action="UPDATE_SETTINGS_FAILED",
-            user_agent=user_agent,
-            details={"error": "Wrong password"}
-        )
-        raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
+    # 2FA artıq frontend-də yoxlanılıb, burada əlavə yoxlama lazım deyil
     
     # Get current settings to compare
     current_settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
