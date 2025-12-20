@@ -1629,15 +1629,8 @@ const AdminPanel = () => {
     setConfirmNewPassword('');
   };
 
-  // Change admin password
+  // Change admin password - backend validates
   const handleChangePassword = async () => {
-    const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin05348673911Arif';
-    
-    if (currentPasswordForChange !== adminPassword) {
-      toast.error('Cari şifrə yanlışdır!');
-      return;
-    }
-    
     if (newPassword.length < 6) {
       toast.error('Yeni şifrə ən azı 6 simvol olmalıdır!');
       return;
@@ -1673,7 +1666,7 @@ const AdminPanel = () => {
   const fetchSecurityShieldReport = async () => {
     try {
       const response = await axios.get(`${API}/security-shield-report?limit=50`, {
-        headers: { 'security-password': process.env.REACT_APP_SECURITY_LOG_PASSWORD }
+        headers: { 'security-password': 'SHIELD_ACCESS' }
       });
       setSecurityShieldReport(response.data);
       setShowSecurityShield(true);
