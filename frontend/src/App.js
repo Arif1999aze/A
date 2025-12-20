@@ -2683,6 +2683,104 @@ const AdminPanel = () => {
         </div>
       )}
 
+      {/* 📱 Phone Change Modal */}
+      {showPhoneChangeModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[60] p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-green-500 to-teal-500 text-white p-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">Telefon Nömrəsini Dəyiş</h3>
+                    <p className="text-green-100 text-sm">Yeni nömrə ilə davam edin</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setShowPhoneChangeModal(false)}
+                  className="p-2 hover:bg-white/20 rounded-full transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-4">
+              <div>
+                <Label htmlFor="current_phone_change" className="text-sm font-medium text-gray-700">
+                  Cari Telefon Nömrəsi
+                </Label>
+                <Input
+                  id="current_phone_change"
+                  type="tel"
+                  placeholder="Cari telefon nömrəsini daxil edin..."
+                  value={currentPhoneForChange}
+                  onChange={(e) => setCurrentPhoneForChange(e.target.value.replace(/[^0-9]/g, ''))}
+                  className="mt-2"
+                />
+              </div>
+              
+              <div>
+                <Label htmlFor="new_phone" className="text-sm font-medium text-gray-700">
+                  Yeni Telefon Nömrəsi
+                </Label>
+                <Input
+                  id="new_phone"
+                  type="tel"
+                  placeholder="Yeni telefon nömrəsini daxil edin..."
+                  value={newPhone}
+                  onChange={(e) => setNewPhone(e.target.value.replace(/[^0-9]/g, ''))}
+                  onKeyPress={(e) => e.key === 'Enter' && handleChangePhone()}
+                  className="mt-2"
+                />
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPhoneChangeModal(false)}
+                  className="flex-1"
+                >
+                  Ləğv et
+                </Button>
+                <Button
+                  onClick={handleChangePhone}
+                  disabled={changingPhone || !currentPhoneForChange || newPhone.length < 10}
+                  className="flex-1 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
+                >
+                  {changingPhone ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Dəyişdirilir...
+                    </>
+                  ) : (
+                    'Telefonu Dəyiş'
+                  )}
+                </Button>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="bg-green-50 px-6 py-4 border-t border-green-100">
+              <div className="flex items-center gap-2 text-sm text-green-700">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                <span>Telefon dəyişdirildikdən sonra yenidən giriş etməlisiniz</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 🛡️ Security Shield Modal - Professional Design */}
       {showSecurityShield && securityShieldReport && (
         <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[70] p-2 sm:p-4">
