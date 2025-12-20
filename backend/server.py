@@ -55,11 +55,17 @@ TWO_FACTOR_CODE = os.environ.get('TWO_FACTOR_CODE', 'YESS')
 SECURITY_LOG_PASSWORD = os.environ.get('SECURITY_LOG_PASSWORD', '05348673911Arif')
 SECURITY_LOG_2FA = os.environ.get('SECURITY_LOG_2FA', 'BATUHAN')
 
+# Admin Login 2FA code
+ADMIN_LOGIN_2FA = os.environ.get('ADMIN_LOGIN_2FA', '1806')
+
 # Verification models
 class VerifySecurityLogPasswordRequest(BaseModel):
     password: str
 
 class VerifySecurityLog2FARequest(BaseModel):
+    code: str
+
+class VerifyAdmin2FARequest(BaseModel):
     code: str
 
 # Define Models
