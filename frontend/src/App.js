@@ -1742,41 +1742,199 @@ const AdminPanel = () => {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
-        <Card className="max-w-md w-full shadow-2xl">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Admin Paneli</CardTitle>
-            <CardDescription className="text-center">Daxil olmaq üçün şifrəni daxil edin</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="password">Şifrə</Label>
-              <Input
-                id="password"
-                type="password"
-                data-testid="admin-password-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                className="mt-1.5"
-              />
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-4 py-8 relative overflow-hidden">
+        {/* Background Effects */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
+        </div>
+        
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAiIGhlaWdodD0iNDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI0MCIgaGVpZ2h0PSI0MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAwIDEwIEwgNDAgMTAgTSAxMCAwIEwgMTAgNDAgTSAwIDIwIEwgNDAgMjAgTSAyMCAwIEwgMjAgNDAgTSAwIDMwIEwgNDAgMzAgTSAzMCAwIEwgMzAgNDAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40"></div>
+
+        <div className="relative z-10 w-full max-w-md">
+          {/* Logo & Title */}
+          <div className="text-center mb-8">
+            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl shadow-2xl shadow-blue-500/30 mb-4">
+              <svg className="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
             </div>
-            <Button 
-              onClick={handleLogin} 
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700"
-              data-testid="admin-login-btn"
-            >
-              Daxil ol
-            </Button>
-            <Button 
-              variant="ghost" 
-              onClick={() => navigate('/')} 
-              className="w-full"
-            >
-              Ana səhifəyə qayıt
-            </Button>
-          </CardContent>
-        </Card>
+            <h1 className="text-3xl font-bold text-white mb-2">Admin Paneli</h1>
+            <p className="text-blue-200/70">Təhlükəsiz giriş sistemi</p>
+          </div>
+
+          {/* Login Card */}
+          <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
+            {/* Progress Steps */}
+            <div className="bg-gradient-to-r from-blue-600/50 to-purple-600/50 px-6 py-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${loginStep >= 1 ? 'bg-white text-blue-600' : 'bg-white/20 text-white/50'}`}>
+                    1
+                  </div>
+                  <div className="hidden sm:block">
+                    <p className={`font-semibold ${loginStep >= 1 ? 'text-white' : 'text-white/50'}`}>Şifrə</p>
+                    <p className={`text-xs ${loginStep >= 1 ? 'text-blue-200' : 'text-white/30'}`}>Admin şifrəsi</p>
+                  </div>
+                </div>
+                <div className={`w-16 h-1 rounded ${loginStep >= 2 ? 'bg-white' : 'bg-white/20'}`}></div>
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${loginStep >= 2 ? 'bg-white text-purple-600' : 'bg-white/20 text-white/50'}`}>
+                    2
+                  </div>
+                  <div className="hidden sm:block">
+                    <p className={`font-semibold ${loginStep >= 2 ? 'text-white' : 'text-white/50'}`}>2FA</p>
+                    <p className={`text-xs ${loginStep >= 2 ? 'text-purple-200' : 'text-white/30'}`}>Doğrulama</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Form Content */}
+            <div className="p-6 sm:p-8">
+              {loginStep === 1 ? (
+                // Step 1: Password
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-500/20 to-blue-600/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-blue-400/30">
+                      <svg className="w-8 h-8 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-bold text-white mb-1">Şifrəni Daxil Edin</h2>
+                    <p className="text-blue-200/60 text-sm">Admin panelə giriş üçün</p>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-blue-200 text-sm font-medium">Şifrə</Label>
+                    <Input
+                      type="password"
+                      data-testid="admin-password-input"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleLoginStep1()}
+                      placeholder="••••••••••••••"
+                      className="mt-2 h-14 bg-white/10 border-white/20 text-white placeholder-white/30 text-lg"
+                    />
+                  </div>
+                  
+                  <Button 
+                    onClick={handleLoginStep1}
+                    disabled={!password || loginLoading}
+                    className="w-full h-14 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-lg font-semibold shadow-lg shadow-blue-500/30"
+                    data-testid="admin-login-btn"
+                  >
+                    {loginLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                        Yoxlanılır...
+                      </>
+                    ) : (
+                      <>
+                        Davam et
+                        <svg className="ml-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                // Step 2: 2FA Code
+                <div className="space-y-6">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-purple-600/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-purple-400/30">
+                      <svg className="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                      </svg>
+                    </div>
+                    <h2 className="text-xl font-bold text-white mb-1">2FA Doğrulama</h2>
+                    <p className="text-purple-200/60 text-sm">4 rəqəmli kodu daxil edin</p>
+                  </div>
+                  
+                  <div>
+                    <Label className="text-purple-200 text-sm font-medium">Doğrulama Kodu</Label>
+                    <Input
+                      type="text"
+                      value={login2FACode}
+                      onChange={(e) => setLogin2FACode(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      onKeyPress={(e) => e.key === 'Enter' && login2FACode.length === 4 && handleLoginStep2()}
+                      placeholder="• • • •"
+                      maxLength={4}
+                      className="mt-2 h-16 bg-white/10 border-white/20 text-white placeholder-white/30 text-3xl text-center tracking-[0.5em] font-mono"
+                      data-testid="admin-2fa-input"
+                    />
+                  </div>
+                  
+                  <div className="flex gap-3">
+                    <Button 
+                      variant="outline"
+                      onClick={() => {
+                        setLoginStep(1);
+                        setLogin2FACode('');
+                      }}
+                      className="flex-1 h-14 border-white/20 text-white hover:bg-white/10"
+                    >
+                      <svg className="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                      Geri
+                    </Button>
+                    <Button 
+                      onClick={handleLoginStep2}
+                      disabled={login2FACode.length !== 4 || loginLoading}
+                      className="flex-1 h-14 bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 text-lg font-semibold shadow-lg shadow-purple-500/30"
+                      data-testid="admin-2fa-btn"
+                    >
+                      {loginLoading ? (
+                        <>
+                          <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                          Yoxlanılır...
+                        </>
+                      ) : (
+                        <>
+                          <svg className="mr-2 w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                          </svg>
+                          Giriş
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="bg-black/20 px-6 py-4 border-t border-white/10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-blue-200/50 text-sm">
+                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                  </svg>
+                  <span>Şifrəli bağlantı</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  onClick={() => navigate('/')} 
+                  className="text-blue-200/50 hover:text-white hover:bg-white/10 text-sm"
+                >
+                  Ana səhifə →
+                </Button>
+              </div>
+            </div>
+          </div>
+
+          {/* Security Badge */}
+          <div className="mt-6 text-center">
+            <div className="inline-flex items-center gap-2 bg-white/5 backdrop-blur border border-white/10 rounded-full px-4 py-2 text-sm text-blue-200/60">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              2 addımlı təhlükəsizlik sistemi aktiv
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
