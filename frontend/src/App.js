@@ -1451,6 +1451,12 @@ const AdminPanel = () => {
   const [securityLogs, setSecurityLogs] = useState([]);
   const [securityAuthenticated, setSecurityAuthenticated] = useState(false);
   
+  // 2FA States for Update
+  const [show2FAModal, setShow2FAModal] = useState(false);
+  const [twoFAStep, setTwoFAStep] = useState(1); // 1 = first code, 2 = second code
+  const [firstSecurityCode, setFirstSecurityCode] = useState('');
+  const [secondSecurityCode, setSecondSecurityCode] = useState('');
+  
   // Block search engine indexing for admin page
   useEffect(() => {
     // Add noindex meta tag
