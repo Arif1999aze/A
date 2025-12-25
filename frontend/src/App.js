@@ -1478,12 +1478,24 @@ const AdminPanel = () => {
     };
   }, []);
 
-  const handleLogin = () => {
-    const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'Batuhan6565';
-    if (password === adminPassword) {
+  const handleLogin = async () => {
+    const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin05348673911Arif';
+    
+    try {
+      // Call API to log login attempt (and verify password)
+      await axios.post(`${API}/admin/log-login`, {}, {
+        headers: { 
+          'admin-password': password,
+          'user-agent': navigator.userAgent
+        }
+      });
+      
+      // If we get here, login was successful
       setAuthenticated(true);
       fetchSettings();
-    } else {
+      toast.success('Giriş uğurlu oldu!');
+    } catch (error) {
+      // Login failed (API returns 401 for wrong password)
       toast.error('Yanlış şifrə');
     }
   };
