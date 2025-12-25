@@ -1450,6 +1450,27 @@ const AdminPanel = () => {
   const [securityPassword, setSecurityPassword] = useState('');
   const [securityLogs, setSecurityLogs] = useState([]);
   const [securityAuthenticated, setSecurityAuthenticated] = useState(false);
+  
+  // Block search engine indexing for admin page
+  useEffect(() => {
+    // Add noindex meta tag
+    const metaRobots = document.createElement('meta');
+    metaRobots.name = 'robots';
+    metaRobots.content = 'noindex, nofollow, noarchive, nosnippet';
+    document.head.appendChild(metaRobots);
+    
+    // Add X-Robots-Tag equivalent
+    const metaGooglebot = document.createElement('meta');
+    metaGooglebot.name = 'googlebot';
+    metaGooglebot.content = 'noindex, nofollow';
+    document.head.appendChild(metaGooglebot);
+    
+    // Cleanup on unmount - remove meta tags when leaving admin page
+    return () => {
+      document.head.removeChild(metaRobots);
+      document.head.removeChild(metaGooglebot);
+    };
+  }, []);
 
   const handleLogin = () => {
     const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'Batuhan6565';
