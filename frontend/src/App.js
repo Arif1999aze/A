@@ -267,7 +267,7 @@ const HomePage = () => {
                 className="h-14 w-auto mx-auto md:mx-0 mb-4"
               />
               <p className="text-blue-100 text-sm leading-relaxed">
-                {settings?.about_text || 'AzPay - Azərbaycanda rəqəmsal maliyyə xidmətləri sahəsində fəaliyyət göstərən innovativ şirkətdir.'}
+                {settings?.about_text || 'AzPay Kredit müasir maliyyə həlləri təqdim edən etibarlı ödəniş və kredit platformasıdır. Məqsədimiz istifadəçilərimizə sürətli, şəffaf və rahat kredit imkanları yaratmaq, maliyyə ehtiyaclarını minimum vaxtda qarşılamaqdır.'}
               </p>
             </div>
 
