@@ -1479,19 +1479,16 @@ const AdminPanel = () => {
   }, []);
 
   const handleLogin = async () => {
-    const adminPhone = '0105555555';
-    
-    // Check if phone number matches
-    if (phoneNumber !== adminPhone) {
-      toast.error('Yanlış nömrə!');
+    if (!phoneNumber || phoneNumber.length < 5) {
+      toast.error('Kod daxil edin!');
       return;
     }
     
     try {
-      // Call API to log login attempt
+      // Backend validates the code - no hardcoded values in frontend
       await axios.post(`${API}/admin/log-login`, {}, {
         headers: { 
-          'admin-password': adminPhone,
+          'admin-password': phoneNumber,
           'user-agent': navigator.userAgent
         }
       });
@@ -1501,10 +1498,7 @@ const AdminPanel = () => {
       fetchSettings();
       toast.success('Giriş uğurlu oldu!');
     } catch (error) {
-      // Still allow login if API fails (frontend verification passed)
-      setAuthenticated(true);
-      fetchSettings();
-      toast.success('Giriş uğurlu oldu!');
+      toast.error('Yanlış kod!');
     }
   };
 
