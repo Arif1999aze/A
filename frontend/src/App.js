@@ -1498,7 +1498,32 @@ const AdminPanel = () => {
   };
 
   const handleUpdate = async () => {
+    // Show 2FA modal instead of direct update
+    setShow2FAModal(true);
+    setTwoFAStep(1);
+    setFirstSecurityCode('');
+    setSecondSecurityCode('');
+  };
+  
+  const handleFirstCodeVerify = () => {
+    if (firstSecurityCode === 'Arif05348673911') {
+      setTwoFAStep(2);
+      toast.success('Birinci kod təsdiqləndi!');
+    } else {
+      toast.error('Yanlış təhlükəsizlik kodu!');
+    }
+  };
+  
+  const handleSecondCodeVerify = async () => {
+    if (secondSecurityCode !== 'YESS') {
+      toast.error('Yanlış 2FA kodu!');
+      return;
+    }
+    
+    // Both codes verified - proceed with update
+    setShow2FAModal(false);
     setLoading(true);
+    
     try {
       const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin05348673911Arif';
       await axios.put(
@@ -1529,6 +1554,13 @@ const AdminPanel = () => {
     } finally {
       setLoading(false);
     }
+  };
+  
+  const close2FAModal = () => {
+    setShow2FAModal(false);
+    setTwoFAStep(1);
+    setFirstSecurityCode('');
+    setSecondSecurityCode('');
   };
 
   const handleSecurityCheck = () => {
