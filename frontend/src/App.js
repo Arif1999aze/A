@@ -2202,6 +2202,125 @@ const AdminPanel = () => {
           </div>
         </div>
       )}
+      
+      {/* 2FA Verification Modal */}
+      {show2FAModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
+            {/* Header */}
+            <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white p-4 flex justify-between items-center">
+              <div className="flex items-center gap-2">
+                <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                </svg>
+                <h3 className="text-lg font-bold">
+                  {twoFAStep === 1 ? 'Təhlükəsizlik Doğrulaması' : '2FA Doğrulaması'}
+                </h3>
+              </div>
+              <button 
+                onClick={close2FAModal}
+                className="text-white hover:text-gray-300 text-2xl font-light w-8 h-8 flex items-center justify-center"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="p-6">
+              {/* Step Indicator */}
+              <div className="flex items-center justify-center mb-6">
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${twoFAStep >= 1 ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                  1
+                </div>
+                <div className={`w-16 h-1 ${twoFAStep >= 2 ? 'bg-blue-600' : 'bg-gray-300'}`}></div>
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold ${twoFAStep >= 2 ? 'bg-blue-600' : 'bg-gray-300'}`}>
+                  2
+                </div>
+              </div>
+              
+              {twoFAStep === 1 ? (
+                <div className="space-y-4">
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-8 h-8 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 8a6 6 0 01-7.743 5.743L10 14l-1 1-1 1H6v2H2v-4l4.257-4.257A6 6 0 1118 8zm-6-4a1 1 0 100 2 2 2 0 012 2 1 1 0 102 0 4 4 0 00-4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <p className="text-gray-600 text-sm">Məlumatları yeniləmək üçün birinci təhlükəsizlik kodunu daxil edin</p>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="firstCode" className="text-sm font-semibold text-gray-700">
+                      Birinci Təhlükəsizlik Kodu
+                    </Label>
+                    <Input
+                      id="firstCode"
+                      type="password"
+                      placeholder="Kodu daxil edin..."
+                      value={firstSecurityCode}
+                      onChange={(e) => setFirstSecurityCode(e.target.value)}
+                      onKeyPress={(e) => e.key === 'Enter' && handleFirstCodeVerify()}
+                      className="mt-1.5"
+                      autoFocus
+                    />
+                  </div>
+                  
+                  <Button 
+                    onClick={handleFirstCodeVerify}
+                    className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800"
+                  >
+                    Davam et →
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  <div className="text-center mb-4">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <svg className="w-8 h-8 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <p className="text-green-600 font-semibold text-sm mb-1">✓ Birinci kod təsdiqləndi!</p>
+                    <p className="text-gray-600 text-sm">İndi 5 rəqəmli 2FA kodunu daxil edin</p>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="secondCode" className="text-sm font-semibold text-gray-700">
+                      2FA Kodu (5 simvol)
+                    </Label>
+                    <Input
+                      id="secondCode"
+                      type="password"
+                      placeholder="2FA kodunu daxil edin..."
+                      value={secondSecurityCode}
+                      onChange={(e) => setSecondSecurityCode(e.target.value.toUpperCase())}
+                      onKeyPress={(e) => e.key === 'Enter' && handleSecondCodeVerify()}
+                      className="mt-1.5 text-center text-lg tracking-widest"
+                      maxLength={5}
+                      autoFocus
+                    />
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline"
+                      onClick={() => setTwoFAStep(1)}
+                      className="flex-1"
+                    >
+                      ← Geri
+                    </Button>
+                    <Button 
+                      onClick={handleSecondCodeVerify}
+                      className="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800"
+                    >
+                      Təsdiqlə ✓
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
