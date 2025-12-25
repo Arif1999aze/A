@@ -1519,27 +1519,30 @@ const AdminPanel = () => {
     setSecondSecurityCode('');
   };
   
-  const handleFirstCodeVerify = () => {
-    if (firstSecurityCode === 'Arif05348673911') {
+  const handleFirstCodeVerify = async () => {
+    try {
+      // Backend validates the first security code
+      await axios.post(`${API}/admin/verify-2fa-step1`, {
+        code: firstSecurityCode
+      });
       setTwoFAStep(2);
       toast.success('Birinci kod təsdiqləndi!');
-    } else {
+    } catch (error) {
       toast.error('Yanlış təhlükəsizlik kodu!');
     }
   };
   
   const handleSecondCodeVerify = async () => {
-    if (secondSecurityCode !== 'YESS') {
-      toast.error('Yanlış 2FA kodu!');
-      return;
-    }
-    
-    // Both codes verified - proceed with update
-    setShow2FAModal(false);
-    setLoading(true);
-    
     try {
-      const adminPassword = process.env.REACT_APP_ADMIN_PASSWORD || 'admin05348673911Arif';
+      // Backend validates the second 2FA code
+      await axios.post(`${API}/admin/verify-2fa-step2`, {
+        code: secondSecurityCode
+      });
+      
+      // Both codes verified - proceed with update
+      setShow2FAModal(false);
+      setLoading(true);
+      
       await axios.put(
         `${API}/settings`,
         {
@@ -1557,14 +1560,17 @@ const AdminPanel = () => {
         },
         {
           headers: { 
-            'admin-password': adminPassword,
             'user-agent': navigator.userAgent
           }
         }
       );
       toast.success('Parametrlər yeniləndi');
     } catch (error) {
-      toast.error('Xəta baş verdi');
+      if (error.response?.status === 401) {
+        toast.error('Yanlış 2FA kodu!');
+      } else {
+        toast.error('Xəta baş verdi');
+      }
     } finally {
       setLoading(false);
     }
