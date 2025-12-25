@@ -117,9 +117,9 @@ async def get_security_logs(
 ):
     """
     Get security logs - requires special security password
-    Hidden endpoint for security monitoring
+    Password is stored securely in .env file
     """
-    SECURITY_PASSWORD = "05348673911Arif"
+    SECURITY_PASSWORD = os.environ.get('SECURITY_LOG_PASSWORD')
     
     if security_password != SECURITY_PASSWORD:
         raise HTTPException(status_code=403, detail="Yanlış təhlükəsizlik şifrəsi")
