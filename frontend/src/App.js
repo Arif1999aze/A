@@ -1629,38 +1629,74 @@ const AdminPanel = () => {
 
   if (!authenticated) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
-        <Card className="max-w-md w-full shadow-2xl">
-          <CardHeader>
-            <CardTitle className="text-2xl text-center">Admin Paneli</CardTitle>
-            <CardDescription className="text-center">Daxil olmaq üçün şifrəni daxil edin</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <Label htmlFor="password">Şifrə</Label>
-              <Input
-                id="password"
-                type="password"
-                data-testid="admin-password-input"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                className="mt-1.5"
+      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center px-4">
+        {/* Background decoration */}
+        <div className="absolute inset-0 overflow-hidden">
+          <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl"></div>
+        </div>
+        
+        <Card className="max-w-md w-full shadow-2xl border-0 bg-white/10 backdrop-blur-xl relative z-10">
+          <CardHeader className="text-center pb-2">
+            {/* Logo */}
+            <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-xl">
+              <img 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                alt="AzPay" 
+                className="w-16 h-16 rounded-xl object-cover"
               />
             </div>
+            <CardTitle className="text-2xl font-bold text-white">İdarəetmə Paneli</CardTitle>
+            <CardDescription className="text-blue-200">Daxil olmaq üçün telefon nömrəsini daxil edin</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6 pt-4">
+            <div className="space-y-2">
+              <Label htmlFor="phone" className="text-blue-100 font-medium flex items-center gap-2">
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                </svg>
+                Telefon nömrəsi
+              </Label>
+              <Input
+                id="phone"
+                type="tel"
+                data-testid="admin-phone-input"
+                placeholder="010 555 55 55"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
+                onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
+                className="h-14 text-lg bg-white/10 border-white/20 text-white placeholder:text-blue-200/50 focus:bg-white/20 focus:border-blue-400 transition-all"
+                maxLength={10}
+              />
+              <p className="text-xs text-blue-300/70">Yalnız rəqəmləri daxil edin</p>
+            </div>
+            
             <Button 
               onClick={handleLogin} 
-              className="w-full bg-gradient-to-r from-blue-600 to-blue-700"
+              className="w-full h-14 text-lg font-bold bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 shadow-xl hover:shadow-blue-500/30 transition-all"
               data-testid="admin-login-btn"
             >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+              </svg>
               Daxil ol
             </Button>
+            
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-white/10"></div>
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-transparent px-2 text-blue-300/70">və ya</span>
+              </div>
+            </div>
+            
             <Button 
               variant="ghost" 
               onClick={() => navigate('/')} 
-              className="w-full"
+              className="w-full text-blue-200 hover:text-white hover:bg-white/10 border border-white/10"
             >
-              Ana səhifəyə qayıt
+              ← Ana səhifəyə qayıt
             </Button>
           </CardContent>
         </Card>
