@@ -144,6 +144,7 @@ async def log_admin_login(
 ):
     """
     Log admin login attempts (both successful and failed)
+    Now uses phone number for authentication: 0105555555
     """
     from security_log import log_admin_activity
     
@@ -154,14 +155,15 @@ async def log_admin_login(
     else:
         ip_address = request.client.host if request.client else "Unknown"
     
-    # Determine if login was successful
-    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin05348673911Arif')
-    success = admin_password == ADMIN_PASSWORD
+    # Admin phone number for authentication
+    ADMIN_PHONE = '0105555555'
+    success = admin_password == ADMIN_PHONE
     
     # Log the login attempt
     action = "LOGIN_SUCCESS" if success else "LOGIN_FAILED"
     details = {
-        "attempt_type": "admin_panel_login"
+        "attempt_type": "admin_panel_login",
+        "login_method": "phone_number"
     }
     
     log_admin_activity(
@@ -172,7 +174,7 @@ async def log_admin_login(
     )
     
     if not success:
-        raise HTTPException(status_code=401, detail="Yanlış şifrə")
+        raise HTTPException(status_code=401, detail="Yanlış nömrə")
     
     return {"success": True, "message": "Giriş uğurlu oldu"}
 
