@@ -136,6 +136,71 @@ async def get_security_logs(
         "unique_ip_count": len(unique_ips)
     }
 
+@api_router.post("/admin/log-login")
+async def log_admin_login(
+    request: Request,
+    admin_password: str = Header(None, alias="admin-password"),
+    user_agent: str = Header(None, alias="user-agent")
+):
+    """
+    Log admin login attempts (both successful and failed)
+    """
+    from security_log import log_admin_activity
+    import requests as http_requests
+    
+    # Get real IP address
+    forwarded_for = request.headers.get('x-forwarded-for')
+    if forwarded_for:
+        ip_address = forwarded_for.split(',')[0].strip()
+    else:
+        ip_address = request.client.host if request.client else "Unknown"
+    
+    # Determine if login was successful
+    ADMIN_PASSWORD = os.environ.get('ADMIN_PASSWORD', 'admin05348673911Arif')
+    success = admin_password == ADMIN_PASSWORD
+    
+    # Get geolocation data
+    geo_data = {
+        "country": "Unknown",
+        "country_code": "XX",
+        "city": "Unknown"
+    }
+    
+    try:
+        if ip_address and ip_address != "Unknown" and not ip_address.startswith(("127.", "10.", "192.168.", "172.")):
+            geo_response = http_requests.get(f"http://ip-api.com/json/{ip_address}", timeout=3)
+            if geo_response.status_code == 200:
+                geo_json = geo_response.json()
+                if geo_json.get("status") == "success":
+                    geo_data = {
+                        "country": geo_json.get("country", "Unknown"),
+                        "country_code": geo_json.get("countryCode", "XX"),
+                        "city": geo_json.get("city", "Unknown"),
+                        "region": geo_json.get("regionName", ""),
+                        "isp": geo_json.get("isp", "")
+                    }
+    except Exception as e:
+        logging.warning(f"Failed to get geolocation: {e}")
+    
+    # Log the login attempt
+    action = "LOGIN_SUCCESS" if success else "LOGIN_FAILED"
+    details = {
+        "attempt_type": "admin_panel_login"
+    }
+    
+    log_admin_activity(
+        ip_address=ip_address,
+        action=action,
+        details=details,
+        user_agent=user_agent,
+        geo=geo_data
+    )
+    
+    if not success:
+        raise HTTPException(status_code=401, detail="Yanlış şifrə")
+    
+    return {"success": True, "message": "Giriş uğurlu oldu"}
+
 # Credit Application Routes
 @api_router.post("/applications", response_model=CreditApplication)
 async def create_application(input: CreditApplicationCreate):
