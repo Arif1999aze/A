@@ -1647,28 +1647,27 @@ const AdminPanel = () => {
               />
             </div>
             <CardTitle className="text-2xl font-bold text-white">İdarəetmə Paneli</CardTitle>
-            <CardDescription className="text-blue-200">Daxil olmaq üçün telefon nömrəsini daxil edin</CardDescription>
+            <CardDescription className="text-blue-200">Giriş üçün nömrəni daxil edin</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-4">
+            {/* Show the phone number hint */}
+            <div className="bg-blue-500/20 border border-blue-400/30 rounded-xl p-4 text-center">
+              <p className="text-blue-100 text-sm mb-1">Giriş nömrəsi:</p>
+              <p className="text-2xl font-bold text-white tracking-wider">010 555 55 55</p>
+            </div>
+            
             <div className="space-y-2">
-              <Label htmlFor="phone" className="text-blue-100 font-medium flex items-center gap-2">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                </svg>
-                Telefon nömrəsi
-              </Label>
               <Input
                 id="phone"
                 type="tel"
                 data-testid="admin-phone-input"
-                placeholder="010 555 55 55"
+                placeholder="Nömrəni daxil edin..."
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                 onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
-                className="h-14 text-lg bg-white/10 border-white/20 text-white placeholder:text-blue-200/50 focus:bg-white/20 focus:border-blue-400 transition-all"
+                className="h-14 text-lg text-center bg-white/10 border-white/20 text-white placeholder:text-blue-200/50 focus:bg-white/20 focus:border-blue-400 transition-all tracking-widest"
                 maxLength={10}
               />
-              <p className="text-xs text-blue-300/70">Yalnız rəqəmləri daxil edin</p>
             </div>
             
             <Button 
@@ -1681,15 +1680,6 @@ const AdminPanel = () => {
               </svg>
               Daxil ol
             </Button>
-            
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-white/10"></div>
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-transparent px-2 text-blue-300/70">və ya</span>
-              </div>
-            </div>
             
             <Button 
               variant="ghost" 
