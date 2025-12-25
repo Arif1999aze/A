@@ -35,11 +35,9 @@
         <meta name="twitter:image" content="https://i.hizliresim.com/iydskgy.jpeg" />
         
         <!-- Favicon - Site logo for browser tab and Google Search -->
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" sizes="192x192" href="/logo192.png" />
-        <link rel="icon" type="image/png" sizes="512x512" href="/logo512.png" />
+        <link rel="icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" href="/logo192.png" sizes="192x192" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
         
         <!-- Structured Data for Google Search (Organization with Logo) -->
@@ -47,33 +45,56 @@
         {
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "AzPay",
+            "name": "AzPay Kredit",
+            "alternateName": "AzPay",
             "url": "https://kreditazpay.com",
-            "logo": "https://i.hizliresim.com/iydskgy.jpeg",
-            "description": "AzPay - Azərbaycanda sürətli və asan kredit xidməti. 15 dəqiqə ərzində 15,000 AZN-dək kredit.",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "https://kreditazpay.com/logo512.png",
+                "width": 512,
+                "height": 512
+            },
+            "image": "https://kreditazpay.com/logo512.png",
+            "description": "AzPay Kredit - Azərbaycanda sürətli və asan kredit xidməti. 15 dəqiqə ərzində 15,000 AZN-dək kredit.",
+            "foundingDate": "2024",
+            "areaServed": "Azerbaijan",
             "contactPoint": {
                 "@type": "ContactPoint",
                 "telephone": "+994-50-999-88-77",
                 "contactType": "customer service",
                 "areaServed": "AZ",
-                "availableLanguage": "Azerbaijani"
-            },
-            "sameAs": []
+                "availableLanguage": ["Azerbaijani", "Turkish", "Russian"]
+            }
         }
         </script>
         
-        <!-- Structured Data for WebSite (Search Box) -->
+        <!-- Structured Data for WebPage -->
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "AzPay Kredit - Sürətli Kredit Sistemi",
+            "description": "15 dəqiqə ərzində 15,000 AZN-dək kredit. Rəsmi gəlir arayışı tələb olunmur.",
+            "url": "https://kreditazpay.com",
+            "mainEntity": {
+                "@type": "FinancialService",
+                "name": "AzPay Kredit",
+                "serviceType": "Kredit xidməti",
+                "provider": {
+                    "@type": "Organization",
+                    "name": "AzPay"
+                }
+            }
+        }
+        </script>
+        
+        <!-- Structured Data for WebSite -->
         <script type="application/ld+json">
         {
             "@context": "https://schema.org",
             "@type": "WebSite",
-            "name": "AzPay",
-            "url": "https://kreditazpay.com",
-            "potentialAction": {
-                "@type": "SearchAction",
-                "target": "https://kreditazpay.com/?q={search_term_string}",
-                "query-input": "required name=search_term_string"
-            }
+            "name": "AzPay Kredit",
+            "url": "https://kreditazpay.com"
         }
         </script>
         <!--
