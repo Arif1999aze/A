@@ -1647,21 +1647,15 @@ const AdminPanel = () => {
               />
             </div>
             <CardTitle className="text-2xl font-bold text-white">İdarəetmə Paneli</CardTitle>
-            <CardDescription className="text-blue-200">Giriş üçün nömrəni daxil edin</CardDescription>
+            <CardDescription className="text-blue-200">Giriş üçün təsdiq kodunu daxil edin</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6 pt-4">
-            {/* Show the phone number hint */}
-            <div className="bg-blue-500/20 border border-blue-400/30 rounded-xl p-4 text-center">
-              <p className="text-blue-100 text-sm mb-1">Giriş nömrəsi:</p>
-              <p className="text-2xl font-bold text-white tracking-wider">010 555 55 55</p>
-            </div>
-            
             <div className="space-y-2">
               <Input
                 id="phone"
-                type="tel"
+                type="password"
                 data-testid="admin-phone-input"
-                placeholder="Nömrəni daxil edin..."
+                placeholder="••••••••••"
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value.replace(/\D/g, ''))}
                 onKeyPress={(e) => e.key === 'Enter' && handleLogin()}
@@ -1676,7 +1670,7 @@ const AdminPanel = () => {
               data-testid="admin-login-btn"
             >
               <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
               Daxil ol
             </Button>
