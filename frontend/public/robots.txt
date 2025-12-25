@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /admin
+Disallow: /admin/
+Disallow: /security
+Disallow: /login
+Disallow: /panel
+
+# Allow everything else
+Allow: /
+
+Sitemap: https://kreditazpay.com/sitemap.xml
