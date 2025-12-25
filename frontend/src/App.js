@@ -972,7 +972,7 @@ const ContractPage = () => {
                 alt="AzPay" 
                 className="h-12 w-auto mx-auto mb-2"
               />
-              <p className="text-xs text-gray-500">© 2025 AzPay. Bütün hüquqlar qorunur.</p>
+              <p className="text-xs text-gray-500">© 2026 AzPay. Bütün hüquqlar qorunur.</p>
             </div>
 
             <Button
@@ -1416,7 +1416,7 @@ Depoziti hara ödəyim?`;
                 alt="AzPay" 
                 className="h-12 w-auto mx-auto mb-2"
               />
-              <p className="text-sm text-gray-500">© 2025 AzPay. Bütün hüquqlar qorunur.</p>
+              <p className="text-sm text-gray-500">© 2026 AzPay. Bütün hüquqlar qorunur.</p>
             </div>
           </CardContent>
         </Card>
