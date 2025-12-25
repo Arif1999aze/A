@@ -2071,154 +2071,189 @@ const AdminPanel = () => {
                   <div className="max-h-[50vh] overflow-y-auto space-y-2">
                     {securityLogs.map((log, index) => {
                       const getBrowserIcon = (browser) => {
-                        if (browser.includes('Chrome')) return '🌐';
-                        if (browser.includes('Safari')) return '🧭';
-                        if (browser.includes('Firefox')) return '🦊';
-                        if (browser.includes('Edge')) return '🔷';
+                        if (browser?.includes('Chrome')) return '🌐';
+                        if (browser?.includes('Safari')) return '🧭';
+                        if (browser?.includes('Firefox')) return '🦊';
+                        if (browser?.includes('Edge')) return '🔷';
                         return '💻';
                       };
                       
                       const getDeviceIcon = (device) => {
-                        if (device.includes('iPhone')) return '📱';
-                        if (device.includes('iPad')) return '📱';
-                        if (device.includes('Android')) return '📱';
+                        if (device?.includes('iPhone')) return '📱';
+                        if (device?.includes('iPad')) return '📱';
+                        if (device?.includes('Android')) return '📱';
                         return '💻';
                       };
                       
                       const getOSIcon = (os) => {
-                        if (os.includes('Windows')) return '🪟';
-                        if (os.includes('Mac')) return '🍎';
-                        if (os.includes('iOS')) return '🍎';
-                        if (os.includes('Android')) return '🤖';
-                        if (os.includes('Linux')) return '🐧';
+                        if (os?.includes('Windows')) return '🪟';
+                        if (os?.includes('Mac')) return '🍎';
+                        if (os?.includes('iOS')) return '🍎';
+                        if (os?.includes('Android')) return '🤖';
+                        if (os?.includes('Linux')) return '🐧';
                         return '⚙️';
                       };
                       
-                      const isSuccess = !log.action.includes('FAILED');
+                      const isSuccess = !log.action?.includes('FAILED');
+                      const isLogin = log.action?.includes('LOGIN');
+                      const isUpdate = log.action?.includes('UPDATE');
+                      
+                      // Get action display info
+                      const getActionInfo = (action) => {
+                        if (action === 'LOGIN_SUCCESS') return { text: '✅ Uğurlu Giriş', color: 'text-green-600', bg: 'bg-green-50 border-green-300' };
+                        if (action === 'LOGIN_FAILED') return { text: '❌ Uğursuz Giriş Cəhdi', color: 'text-red-600', bg: 'bg-red-50 border-red-400' };
+                        if (action === 'UPDATE_SETTINGS') return { text: '⚙️ Parametr Yeniləndi', color: 'text-blue-600', bg: 'bg-blue-50 border-blue-300' };
+                        if (action === 'UPDATE_SETTINGS_FAILED') return { text: '⚠️ Yeniləmə Uğursuz', color: 'text-orange-600', bg: 'bg-orange-50 border-orange-300' };
+                        return { text: action, color: 'text-gray-600', bg: 'bg-gray-50 border-gray-300' };
+                      };
+                      
+                      const actionInfo = getActionInfo(log.action);
                       
                       return (
                         <div 
                           key={index} 
-                          className={`border rounded-lg p-3 sm:p-4 ${isSuccess ? 'bg-white border-gray-200' : 'bg-red-50 border-red-300'}`}
+                          className={`border-2 rounded-xl p-3 sm:p-4 ${actionInfo.bg} shadow-sm hover:shadow-md transition-shadow`}
                         >
                           {/* Mobile: Stack vertically */}
-                          <div className="flex flex-col space-y-2">
-                            {/* Row 1: Time + Action */}
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-center gap-2">
-                                <span className={`text-lg ${isSuccess ? '✅' : '❌'}`}>
-                                  {isSuccess ? '✅' : '❌'}
-                                </span>
-                                <div>
-                                  <p className="text-xs text-gray-500">
-                                    {new Date(log.timestamp).toLocaleString('az-AZ', {
-                                      day: '2-digit',
-                                      month: '2-digit',
-                                      year: 'numeric',
-                                      hour: '2-digit',
-                                      minute: '2-digit'
-                                    })}
-                                  </p>
-                                  <p className={`text-sm font-semibold ${isSuccess ? 'text-green-600' : 'text-red-600'}`}>
-                                    {log.action.replace('UPDATE_SETTINGS', 'Parametr Dəyişikliyi').replace('_FAILED', ' (Uğursuz)')}
-                                  </p>
-                                </div>
+                          <div className="flex flex-col space-y-3">
+                            {/* Row 1: Action Badge + Time */}
+                            <div className="flex flex-wrap justify-between items-center gap-2">
+                              {/* Action Badge */}
+                              <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-bold text-sm ${
+                                isLogin && isSuccess ? 'bg-green-600 text-white' :
+                                isLogin && !isSuccess ? 'bg-red-600 text-white' :
+                                isUpdate && isSuccess ? 'bg-blue-600 text-white' :
+                                'bg-gray-600 text-white'
+                              }`}>
+                                {isLogin && isSuccess && '🔓'}
+                                {isLogin && !isSuccess && '🚫'}
+                                {isUpdate && '⚙️'}
+                                <span>{actionInfo.text}</span>
+                              </div>
+                              
+                              {/* Time */}
+                              <div className="text-xs text-gray-500 bg-white/50 px-2 py-1 rounded">
+                                📅 {new Date(log.timestamp).toLocaleString('az-AZ', {
+                                  day: '2-digit',
+                                  month: '2-digit',
+                                  year: 'numeric',
+                                  hour: '2-digit',
+                                  minute: '2-digit',
+                                  second: '2-digit'
+                                })}
                               </div>
                             </div>
                             
-                            {/* Row 2: IP + Location with Flag Photo */}
-                            <div className="flex items-start gap-2">
+                            {/* Row 2: Location Info */}
+                            <div className="flex items-center gap-3 p-2 bg-white/70 rounded-lg">
                               {/* Flag Photo */}
                               <div className="flex-shrink-0">
                                 {log.geo?.country_code && log.geo?.country_code !== 'XX' ? (
                                   <img 
                                     src={`https://flagcdn.com/w80/${log.geo.country_code.toLowerCase()}.png`}
                                     alt={log.geo?.country}
-                                    className="w-12 h-8 object-cover rounded shadow-md border border-gray-300"
-                                    onError={(e) => {e.target.src = 'https://flagcdn.com/w80/xx.png'}}
+                                    className="w-14 h-10 object-cover rounded-lg shadow-md border-2 border-white"
+                                    onError={(e) => {e.target.style.display='none'}}
                                   />
                                 ) : (
-                                  <div className="w-12 h-8 bg-gray-300 rounded flex items-center justify-center text-xs">
+                                  <div className="w-14 h-10 bg-gray-300 rounded-lg flex items-center justify-center text-lg">
                                     🔒
                                   </div>
                                 )}
                               </div>
                               
-                              {/* IP Box + City */}
+                              {/* Location Details */}
                               <div className="flex-1 min-w-0">
-                                {/* IP in Box */}
-                                <div 
-                                  className="bg-blue-600 text-white px-2 py-1.5 rounded inline-block cursor-pointer hover:bg-blue-700 transition-colors"
-                                  onClick={() => {
-                                    navigator.clipboard.writeText(log.ip_address);
-                                    const toast = require('sonner').toast;
-                                    toast.success('IP kopyalandı!');
-                                  }}
-                                  title="Kopyalamaq üçün klikləyin"
-                                >
-                                  <div className="flex items-center gap-1.5">
-                                    <span className="font-mono text-xs sm:text-sm font-bold">
-                                      {log.ip_address}
+                                {/* City & Country */}
+                                <div className="flex items-center gap-1 mb-1">
+                                  <svg className="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
+                                  </svg>
+                                  {log.geo?.city && log.geo?.city !== 'Unknown' ? (
+                                    <span className="font-bold text-gray-800">
+                                      {log.geo?.city}
+                                      {log.geo?.region && `, ${log.geo?.region}`}
                                     </span>
-                                    <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                                      <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
-                                      <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
-                                    </svg>
-                                  </div>
+                                  ) : (
+                                    <span className="text-gray-400 italic">Naməlum Məkan</span>
+                                  )}
                                 </div>
                                 
-                                {/* City & Country Below */}
-                                <div className="mt-1.5 text-xs sm:text-sm text-gray-700">
-                                  {log.geo?.city && log.geo?.city !== 'Unknown' ? (
-                                    <div className="flex items-center gap-1">
-                                      <svg className="w-3 h-3 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd"/>
-                                      </svg>
-                                      <span className="font-semibold">{log.geo?.city}</span>
-                                      {log.geo?.country && log.geo?.country !== 'Unknown' && (
-                                        <span className="text-gray-500">• {log.geo?.country}</span>
-                                      )}
-                                    </div>
-                                  ) : (
-                                    <span className="text-gray-400 italic">Məkan məlumatı yoxdur</span>
-                                  )}
+                                {/* Country */}
+                                {log.geo?.country && log.geo?.country !== 'Unknown' && (
+                                  <div className="flex items-center gap-1 text-sm text-gray-600">
+                                    <span>🌍</span>
+                                    <span>{log.geo?.country}</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* IP Box */}
+                              <div 
+                                className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-3 py-2 rounded-lg cursor-pointer hover:from-blue-700 hover:to-blue-800 transition-all shadow-md"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(log.ip_address);
+                                  const toast = require('sonner').toast;
+                                  toast.success('IP kopyalandı: ' + log.ip_address);
+                                }}
+                                title="Kopyalamaq üçün klikləyin"
+                              >
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-mono text-xs sm:text-sm font-bold">
+                                    {log.ip_address}
+                                  </span>
+                                  <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z"/>
+                                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z"/>
+                                  </svg>
                                 </div>
                               </div>
                             </div>
                             
                             {/* Row 3: Device Info */}
                             <div className="grid grid-cols-3 gap-2 text-xs">
-                              <div className="flex items-center gap-1 bg-purple-50 rounded px-2 py-1.5">
-                                <span>{getDeviceIcon(log.device)}</span>
-                                <span className="text-gray-700 truncate">{log.device}</span>
+                              <div className="flex items-center gap-1.5 bg-white/80 rounded-lg px-2 py-2 border border-purple-200">
+                                <span className="text-lg">{getDeviceIcon(log.device)}</span>
+                                <span className="text-gray-700 font-medium truncate">{log.device || 'Naməlum'}</span>
                               </div>
-                              <div className="flex items-center gap-1 bg-blue-50 rounded px-2 py-1.5">
-                                <span>{getBrowserIcon(log.browser)}</span>
-                                <span className="text-gray-700 truncate">{log.browser}</span>
+                              <div className="flex items-center gap-1.5 bg-white/80 rounded-lg px-2 py-2 border border-blue-200">
+                                <span className="text-lg">{getBrowserIcon(log.browser)}</span>
+                                <span className="text-gray-700 font-medium truncate">{log.browser || 'Naməlum'}</span>
                               </div>
-                              <div className="flex items-center gap-1 bg-green-50 rounded px-2 py-1.5">
-                                <span>{getOSIcon(log.os)}</span>
-                                <span className="text-gray-700 truncate">{log.os}</span>
+                              <div className="flex items-center gap-1.5 bg-white/80 rounded-lg px-2 py-2 border border-green-200">
+                                <span className="text-lg">{getOSIcon(log.os)}</span>
+                                <span className="text-gray-700 font-medium truncate">{log.os || 'Naməlum'}</span>
                               </div>
                             </div>
                             
-                            {/* Row 4: Details (if any) */}
-                            {log.details && Object.keys(log.details).length > 0 && (
-                              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded p-2 sm:p-3">
-                                <p className="font-bold text-gray-800 text-xs sm:text-sm mb-1.5">📝 Dəyişdirilən Sahələr:</p>
-                                <div className="flex flex-wrap gap-1.5">
-                                  {log.details.fields_updated ? (
-                                    log.details.fields_updated.map((field, idx) => (
-                                      <span 
-                                        key={idx}
-                                        className="bg-white border border-yellow-300 text-gray-700 px-2 py-1 rounded text-xs font-medium"
-                                      >
-                                        {translateFieldName(field)}
-                                      </span>
-                                    ))
-                                  ) : (
-                                    <span className="text-xs text-gray-600">{JSON.stringify(log.details)}</span>
-                                  )}
+                            {/* Row 4: Changes Details (for updates) */}
+                            {log.details && log.details.fields_updated && log.details.fields_updated.length > 0 && (
+                              <div className="bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-300 rounded-xl p-3">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <span className="text-xl">📝</span>
+                                  <p className="font-bold text-amber-800 text-sm">Dəyişdirilən Sahələr:</p>
+                                </div>
+                                <div className="flex flex-wrap gap-2">
+                                  {log.details.fields_updated.map((field, idx) => (
+                                    <span 
+                                      key={idx}
+                                      className="bg-amber-100 border-2 border-amber-400 text-amber-800 px-3 py-1.5 rounded-full text-xs font-bold shadow-sm"
+                                    >
+                                      ✏️ {translateFieldName(field)}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            
+                            {/* Login attempt details */}
+                            {isLogin && log.details?.attempt_type && (
+                              <div className={`border-2 rounded-xl p-3 ${isSuccess ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xl">{isSuccess ? '🔑' : '⚠️'}</span>
+                                  <p className={`font-bold text-sm ${isSuccess ? 'text-green-700' : 'text-red-700'}`}>
+                                    {isSuccess ? 'Admin panelinə uğurlu giriş' : 'Yanlış kod ilə giriş cəhdi'}
+                                  </p>
                                 </div>
                               </div>
                             )}
