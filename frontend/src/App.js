@@ -213,12 +213,16 @@ const HomePage = () => {
           <Card className="border-blue-100 shadow-xl">
             <CardContent className="p-4 sm:p-8">
               <p className="text-sm sm:text-lg text-gray-700 leading-relaxed mb-4">
-                <strong className="text-blue-700">AzPay</strong> - Azərbaycanda rəqəmsal maliyyə xidmətləri sahəsində fəaliyyət göstərən innovativ şirkətdir. 
-                Biz müştərilərimizə ən sürətli və asan kredit xidmətlərini təqdim edirik.
+                <strong className="text-blue-700">AzPay Kredit</strong> müasir maliyyə həlləri təqdim edən etibarlı ödəniş və kredit platformasıdır. 
+                Məqsədimiz istifadəçilərimizə sürətli, şəffaf və rahat kredit imkanları yaratmaq, maliyyə ehtiyaclarını minimum vaxtda qarşılamaqdır.
               </p>
-              <p className="text-lg text-gray-700 leading-relaxed mb-4">
-                Missiyamız hər kəsə maliyyə imkanlarına əlçatanlığı təmin etməkdir. Rəsmi gəlir arayışı olmayan, 
-                kredit tarixində gecikmələr olan şəxslər belə bizdən kredit ala bilərlər.
+              <p className="text-sm sm:text-lg text-gray-700 leading-relaxed mb-4">
+                AzPay Kredit vasitəsilə siz asan müraciət, sürətli təsdiq və çevik ödəniş şərtlərindən yararlana bilərsiniz. 
+                Platformamız müasir texnologiyalar əsasında qurulub və məlumatlarınızın təhlükəsizliyi bizim üçün əsas prioritetdir.
+              </p>
+              <p className="text-sm sm:text-lg text-gray-700 leading-relaxed mb-6">
+                Biz müştəri məmnuniyyətini ön planda tutaraq, hər kəs üçün əlçatan və rahat maliyyə xidmətləri təqdim etməyə çalışırıq. 
+                <strong className="text-blue-700"> AzPay Kredit</strong> — etibarlı maliyyə tərəfdaşınız.
               </p>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mt-4 sm:mt-6">
                 <div className="flex items-start gap-3">
