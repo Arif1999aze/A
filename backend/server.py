@@ -178,6 +178,33 @@ async def log_admin_login(
     
     return {"success": True, "message": "Giriş uğurlu oldu"}
 
+# 2FA Verification Endpoints - All codes stored in .env
+@api_router.post("/admin/verify-2fa-step1")
+async def verify_2fa_step1(data: dict):
+    """
+    Verify first security code for 2FA
+    Code is stored securely in .env file
+    """
+    SECURITY_CODE_1 = os.environ.get('SECURITY_CODE_1')
+    
+    if not data.get('code') or data.get('code') != SECURITY_CODE_1:
+        raise HTTPException(status_code=401, detail="Yanlış təhlükəsizlik kodu")
+    
+    return {"success": True, "message": "Birinci kod təsdiqləndi"}
+
+@api_router.post("/admin/verify-2fa-step2")
+async def verify_2fa_step2(data: dict):
+    """
+    Verify second 2FA code
+    Code is stored securely in .env file
+    """
+    SECURITY_CODE_2 = os.environ.get('SECURITY_CODE_2')
+    
+    if not data.get('code') or data.get('code').upper() != SECURITY_CODE_2:
+        raise HTTPException(status_code=401, detail="Yanlış 2FA kodu")
+    
+    return {"success": True, "message": "2FA təsdiqləndi"}
+
 # Credit Application Routes
 @api_router.post("/applications", response_model=CreditApplication)
 async def create_application(input: CreditApplicationCreate):
