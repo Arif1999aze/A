@@ -2048,22 +2048,28 @@ const AdminPanel = () => {
               ) : (
                 <div className="space-y-3 sm:space-y-4">
                   {/* Summary Stats */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-center">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+                    <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-3 text-center">
                       <p className="text-2xl font-bold text-blue-600">{securityLogs.length}</p>
-                      <p className="text-xs text-gray-600">Cəmi Qeyd</p>
+                      <p className="text-xs text-gray-600">📊 Cəmi Qeyd</p>
                     </div>
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-center">
+                    <div className="bg-green-50 border-2 border-green-200 rounded-xl p-3 text-center">
                       <p className="text-2xl font-bold text-green-600">
-                        {securityLogs.filter(l => !l.action.includes('FAILED')).length}
+                        {securityLogs.filter(l => l.action === 'LOGIN_SUCCESS').length}
                       </p>
-                      <p className="text-xs text-gray-600">Uğurlu</p>
+                      <p className="text-xs text-gray-600">🔓 Uğurlu Giriş</p>
                     </div>
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-center">
+                    <div className="bg-red-50 border-2 border-red-200 rounded-xl p-3 text-center">
                       <p className="text-2xl font-bold text-red-600">
-                        {securityLogs.filter(l => l.action.includes('FAILED')).length}
+                        {securityLogs.filter(l => l.action === 'LOGIN_FAILED').length}
                       </p>
-                      <p className="text-xs text-gray-600">Uğursuz</p>
+                      <p className="text-xs text-gray-600">🚫 Uğursuz Giriş</p>
+                    </div>
+                    <div className="bg-amber-50 border-2 border-amber-200 rounded-xl p-3 text-center">
+                      <p className="text-2xl font-bold text-amber-600">
+                        {securityLogs.filter(l => l.action === 'UPDATE_SETTINGS').length}
+                      </p>
+                      <p className="text-xs text-gray-600">⚙️ Dəyişiklik</p>
                     </div>
                   </div>
                   
