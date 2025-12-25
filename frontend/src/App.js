@@ -323,7 +323,7 @@ const HomePage = () => {
 
           <div className="border-t border-blue-700 pt-6 text-center">
             <p className="text-blue-100">
-              © <span onClick={() => navigate('/admin')} className="cursor-pointer hover:text-white transition-colors">2025</span> AzPay. Bütün hüquqlar qorunur.
+              © <span onClick={() => navigate('/admin')} className="cursor-pointer hover:text-white transition-colors">2026</span> AzPay. Bütün hüquqlar qorunur.
             </p>
           </div>
         </div>
