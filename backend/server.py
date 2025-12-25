@@ -296,10 +296,13 @@ async def get_settings():
 @api_router.put("/settings", response_model=Settings)
 async def update_settings(
     update: SettingsUpdate, 
-    admin_password: str = Header(...),
     request: Request = None,
     user_agent: str = Header(None)
 ):
+    """
+    Update settings - 2FA verification is done before this endpoint is called
+    No password required here as frontend handles 2FA first
+    """
     from security_log import log_admin_activity
     
     # Get real client IP (extract from headers)
@@ -319,15 +322,6 @@ async def update_settings(
         return request.client.host if request and request.client else "unknown"
     
     client_ip = get_real_ip(request)
-    
-    if admin_password != ADMIN_PASSWORD:
-        log_admin_activity(
-            ip_address=client_ip,
-            action="UPDATE_SETTINGS_FAILED",
-            user_agent=user_agent,
-            details={"error": "Wrong password"}
-        )
-        raise HTTPException(status_code=403, detail="Yanlış admin şifrəsi")
     
     # Get current settings to compare
     current_settings = await db.settings.find_one({"id": "settings"}, {"_id": 0})
