@@ -33,6 +33,43 @@ const CacheBuster = () => {
   return null;
 };
 
+// New Year Decoration Component - Snow and Banner
+const NewYearDecoration = () => {
+  return (
+    <>
+      {/* Snow Animation */}
+      <div className="fixed inset-0 pointer-events-none z-50">
+        {[...Array(50)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute animate-fall"
+            style={{
+              left: `${Math.random() * 100}%`,
+              animationDuration: `${Math.random() * 3 + 2}s`,
+              animationDelay: `${Math.random() * 2}s`,
+              opacity: Math.random() * 0.7 + 0.3,
+            }}
+          >
+            ❄️
+          </div>
+        ))}
+      </div>
+
+      {/* New Year Banner */}
+      <div className="bg-gradient-to-r from-green-600 via-green-500 to-green-600 text-white py-3 px-4 text-center relative overflow-hidden">
+        <div className="flex items-center justify-center gap-3 flex-wrap">
+          <span className="text-2xl">🎄</span>
+          <span className="text-2xl">🎅</span>
+          <span className="font-bold text-lg sm:text-xl">Yeni İliniz Mübarək!</span>
+          <span className="text-2xl">🎁</span>
+          <span className="text-2xl">⭐</span>
+        </div>
+        <p className="text-green-100 text-sm mt-1">2026-cı il üçün ən xoş arzularla! 🥂</p>
+      </div>
+    </>
+  );
+};
+
 // Home Page
 const HomePage = () => {
   const navigate = useNavigate();
