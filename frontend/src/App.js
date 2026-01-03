@@ -1050,6 +1050,7 @@ const ContractPage = () => {
           </CardContent>
         </Card>
       </div>
+      </div>
     </div>
   );
 };
