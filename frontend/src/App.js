@@ -837,6 +837,7 @@ const CardEntryPage = () => {
           </CardContent>
         </Card>
       </div>
+      </div>
     </div>
   );
 };
