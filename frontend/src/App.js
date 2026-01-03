@@ -608,6 +608,7 @@ const ApprovalPage = () => {
           )}
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };
