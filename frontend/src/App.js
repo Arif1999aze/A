@@ -743,6 +743,7 @@ const CreditSelectionPage = () => {
           </CardContent>
         </Card>
       </div>
+      </div>
     </div>
   );
 };
