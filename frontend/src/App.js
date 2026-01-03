@@ -499,6 +499,7 @@ const ApplicationForm = () => {
           </CardContent>
         </Card>
       </div>
+      </div>
     </div>
   );
 };
