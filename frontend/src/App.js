@@ -780,7 +780,9 @@ const CardEntryPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative overflow-hidden">
+      <NewYearDecoration />
+      <div className="py-12 px-4">
       <div className="container mx-auto max-w-xl">
         <Card className="shadow-2xl border-blue-100">
           <CardHeader>
