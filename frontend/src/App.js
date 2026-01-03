@@ -552,7 +552,9 @@ const ApprovalPage = () => {
   }, [navigate, appId]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative overflow-hidden">
+      <NewYearDecoration />
+      <div className="flex items-center justify-center px-4 py-12 min-h-screen">
       <Card className="max-w-md w-full shadow-2xl border-blue-100">
         <CardContent className="p-12 text-center">
           {checking ? (
