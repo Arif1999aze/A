@@ -1,27 +1,13 @@
 User-agent: *
-Disallow: /admin
-Disallow: /admin/
-Disallow: /admin/*
-Disallow: /security
-Disallow: /login
-Disallow: /panel
-
-User-agent: Googlebot
-Disallow: /admin
-Disallow: /admin/
-Disallow: /admin/*
-
-User-agent: Bingbot
-Disallow: /admin
-Disallow: /admin/
-Disallow: /admin/*
-
-User-agent: Yandex
-Disallow: /admin
-Disallow: /admin/
-Disallow: /admin/*
-
-# Allow everything else
 Allow: /
+Allow: /favicon.ico
+Allow: /logo192.png
+Allow: /logo512.png
+Disallow: /admin
+Disallow: /admin/
 
+# Sitemap
 Sitemap: https://kreditazpay.com/sitemap.xml
+
+# Host directive for preferred domain
+Host: https://kreditazpay.com
