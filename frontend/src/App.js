@@ -361,7 +361,7 @@ const ApplicationForm = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative overflow-hidden">
-      <NewYearDecoration />
+      {/* NewYearDecoration removed - component not defined */}
       <div className="py-12 px-4">
       <div className="container mx-auto max-w-2xl">
         <Button 
@@ -514,7 +514,7 @@ const ApprovalPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative overflow-hidden">
-      <NewYearDecoration />
+      {/* NewYearDecoration removed - component not defined */}
       <div className="flex items-center justify-center px-4 py-12 min-h-screen">
       <Card className="max-w-md w-full shadow-2xl border-blue-100">
         <CardContent className="p-12 text-center">
@@ -626,7 +626,7 @@ const CreditSelectionPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative overflow-hidden">
-      <NewYearDecoration />
+      {/* NewYearDecoration removed - component not defined */}
       <div className="py-12 px-4">
       <div className="container mx-auto max-w-4xl">
         <Card className="shadow-2xl border-blue-100 mb-8">
@@ -742,7 +742,7 @@ const CardEntryPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative overflow-hidden">
-      <NewYearDecoration />
+      {/* NewYearDecoration removed - component not defined */}
       <div className="py-12 px-4">
       <div className="container mx-auto max-w-xl">
         <Card className="shadow-2xl border-blue-100">
@@ -849,7 +849,7 @@ const ContractPage = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative overflow-hidden">
-      <NewYearDecoration />
+      {/* NewYearDecoration removed - component not defined */}
       <div className="py-6 sm:py-12 px-4">
       <div className="container mx-auto max-w-4xl">
         <Card className="shadow-2xl border-blue-100">
@@ -1320,7 +1320,7 @@ Depoziti hara ödəyim?`;
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center relative overflow-hidden">
-        <NewYearDecoration />
+        {/* NewYearDecoration removed - component not defined */}
         <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
       </div>
     );
@@ -1328,7 +1328,7 @@ Depoziti hara ödəyim?`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative overflow-hidden">
-      <NewYearDecoration />
+      {/* NewYearDecoration removed - component not defined */}
       <div className="py-12 px-4">
       <div className="container mx-auto max-w-2xl">
         <Card className="shadow-2xl border-blue-100">
