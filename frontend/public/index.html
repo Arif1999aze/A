@@ -236,11 +236,11 @@
         </script>
         <!-- End Chat Widget -->
         
-        <!-- Hide SUPSIS launcher on mobile devices -->
+        <!-- Hide chat launcher on mobile devices -->
         <style>
-            /* Hide SUPSIS chat launcher on mobile (below 768px) */
+            /* Hide chat launcher on mobile (below 768px) */
             @media (max-width: 768px) {
-                /* Target all possible SUPSIS launcher selectors */
+                /* Target all possible chat launcher selectors */
                 body > div[style*="position: fixed"],
                 body > div[style*="position:fixed"],
                 div[id*="supsis"],
@@ -273,30 +273,31 @@
             }
         </style>
         
-        <!-- JavaScript to hide chat badges on mobile (optimized to not interfere with React) -->
+        <!-- JavaScript to hide chat badges on mobile -->
         <script>
             // Hide chat launchers on mobile without interfering with React hydration
             function hideMobileLauncher() {
                 if (window.innerWidth <= 768) {
-                    // Hide Emergent badge
-                    const lsButton = document.getElementById('ls-openButton');
+                    // Hide badge
+                    var lsButton = document.getElementById('ls-openButton');
                     if (lsButton) {
                         lsButton.style.setProperty('display', 'none', 'important');
                         lsButton.style.setProperty('visibility', 'hidden', 'important');
                     }
                     
-                    // Hide SUPSIS launcher elements only (not all SUPSIS elements)
-                    const supsisLauncherSelectors = [
+                    // Hide chat launcher elements
+                    var chatSelectors = [
                         '#supsis-launcher',
                         '#supsis-widget-launcher',
                         '.supsis-launcher'
                     ];
                     
-                    supsisLauncherSelectors.forEach(selector => {
-                        document.querySelectorAll(selector).forEach(el => {
+                    chatSelectors.forEach(function(selector) {
+                        document.querySelectorAll(selector).forEach(function(el) {
                             el.style.setProperty('display', 'none', 'important');
                         });
                     });
+                }
                 }
             }
             
