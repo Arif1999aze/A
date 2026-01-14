@@ -1191,9 +1191,9 @@ const ChatPage = () => {
   };
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-white" style={{ zIndex: 9999 }}>
+    <div className="chat-page-container fixed inset-0 w-full h-full bg-white" style={{ zIndex: 9999 }}>
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white">
+        <div className="absolute inset-0 flex items-center justify-center bg-white" style={{ zIndex: 10000 }}>
           <div className="text-center">
             <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
             <p className="text-gray-600">Operator ilə əlaqə qurulur...</p>
@@ -1207,7 +1207,11 @@ const ChatPage = () => {
           width: '100%', 
           height: '100%',
           border: 'none',
-          display: loading ? 'none' : 'block'
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0
         }}
         onLoad={() => setLoading(false)}
         title="Canlı Dəstək"
