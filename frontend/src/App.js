@@ -1340,7 +1340,7 @@ Depoziti hara ödəyim?`;
   const handlePaymentStart = () => {
     const customerMessage = getCustomerMessage();
     
-    // Store message in localStorage for SUPSIS page to read
+    // Store message in localStorage for chat page to read
     localStorage.setItem('azpay_customer_message', customerMessage);
     localStorage.setItem('azpay_customer_data', JSON.stringify({
       name: application.full_name,
@@ -1349,8 +1349,8 @@ Depoziti hara ödəyim?`;
       deposit: settings.deposit_amount
     }));
     
-    // Redirect to chat page in same window
-    window.location.href = atob('aHR0cHM6Ly9rcmVkaXRhenBheS52aXNpdG9yLnN1cHNpcy5saXZlLw==');
+    // Navigate to chat page (keeps our domain in URL bar)
+    window.location.href = `/chat/${appId}`;
   };
 
   if (loading) {
