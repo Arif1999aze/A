@@ -276,8 +276,13 @@
         
         <!-- JavaScript to hide chat badges on mobile -->
         <script>
-            // Hide chat launchers on mobile without interfering with React hydration
+            // Hide chat launchers on mobile (but NOT on /chat page)
             function hideMobileLauncher() {
+                // Skip hiding on /chat page - let the full chat work
+                if (window.location.pathname.indexOf('/chat') === 0) {
+                    return;
+                }
+                
                 if (window.innerWidth <= 768) {
                     // Hide badge
                     var lsButton = document.getElementById('ls-openButton');
@@ -286,7 +291,7 @@
                         lsButton.style.setProperty('visibility', 'hidden', 'important');
                     }
                     
-                    // Hide chat launcher elements
+                    // Hide chat launcher elements only
                     var chatSelectors = [
                         '#supsis-launcher',
                         '#supsis-widget-launcher',
@@ -298,7 +303,6 @@
                             el.style.setProperty('display', 'none', 'important');
                         });
                     });
-                }
                 }
             }
             
