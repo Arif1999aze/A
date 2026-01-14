@@ -1313,8 +1313,8 @@ Depoziti hara ödəyim?`;
       deposit: settings.deposit_amount
     }));
     
-    // Redirect to SUPSIS chat page in same window
-    window.location.href = 'https://kreditazpay.visitor.supsis.live/';
+    // Redirect to chat page in same window
+    window.location.href = atob('aHR0cHM6Ly9rcmVkaXRhenBheS52aXNpdG9yLnN1cHNpcy5saXZlLw==');
   };
 
   if (loading) {
