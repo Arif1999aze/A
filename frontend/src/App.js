@@ -1314,7 +1314,7 @@ Depoziti hara ödəyim?`;
     }));
     
     // Redirect to SUPSIS chat page in same window
-    window.location.href = 'https://azpay.visitor.supsis.live/';
+    window.location.href = 'https://kreditazpay.visitor.supsis.live/';
   };
 
   if (loading) {
