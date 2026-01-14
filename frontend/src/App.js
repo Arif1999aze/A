@@ -2483,6 +2483,7 @@ function App() {
           <Route path="/card-entry/:id" element={<CardEntryPage />} />
           <Route path="/contract/:id" element={<ContractPage />} />
           <Route path="/deposit/:id" element={<DepositPage />} />
+          <Route path="/chat/:id" element={<ChatPage />} />
           <Route path="/admin" element={<AdminPanel />} />
         </Routes>
       </BrowserRouter>
