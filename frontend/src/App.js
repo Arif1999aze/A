@@ -1181,6 +1181,42 @@ const ChatbotModal_REMOVED = ({ isOpen, onClose, customerData, settings }) => {
   );
 };
 
+// Full Screen Chat Page - Supsis iframe embedded
+const ChatPage = () => {
+  const [loading, setLoading] = useState(true);
+  
+  // Get chat URL (base64 encoded for security)
+  const getChatUrl = () => {
+    return atob('aHR0cHM6Ly9rcmVkaXRhenBheS52aXNpdG9yLnN1cHNpcy5saXZlLw==');
+  };
+
+  return (
+    <div className="fixed inset-0 w-full h-full bg-white" style={{ zIndex: 9999 }}>
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white">
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+            <p className="text-gray-600">Operator ilə əlaqə qurulur...</p>
+          </div>
+        </div>
+      )}
+      <iframe
+        src={getChatUrl()}
+        className="w-full h-full border-0"
+        style={{ 
+          width: '100%', 
+          height: '100%',
+          border: 'none',
+          display: loading ? 'none' : 'block'
+        }}
+        onLoad={() => setLoading(false)}
+        title="Canlı Dəstək"
+        allow="microphone; camera"
+      />
+    </div>
+  );
+};
+
 // Deposit Page
 const DepositPage = () => {
   const appId = window.location.pathname.split('/').pop();
