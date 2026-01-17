@@ -233,6 +233,11 @@
         
         <!-- Full screen chat page styles -->
         <style>
+            /* CSS variable for mobile viewport height */
+            :root {
+                --vh: 1vh;
+            }
+            
             /* Prevent scrolling on chat page */
             body.chat-open {
                 overflow: hidden !important;
@@ -247,24 +252,37 @@
                 left: 0 !important;
                 right: 0 !important;
                 bottom: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
+                width: 100% !important;
+                height: 100% !important;
+                height: calc(var(--vh, 1vh) * 100) !important;
                 overflow: hidden !important;
                 z-index: 9999 !important;
                 background: white !important;
             }
             
             .chat-page-container iframe {
-                position: fixed !important;
+                position: absolute !important;
                 top: 0 !important;
                 left: 0 !important;
-                width: 100vw !important;
-                height: 100vh !important;
+                width: 100% !important;
+                height: 100% !important;
                 border: none !important;
                 margin: 0 !important;
                 padding: 0 !important;
-                overflow: hidden !important;
                 -webkit-overflow-scrolling: touch !important;
+            }
+            
+            /* Mobile keyboard fix */
+            @media (max-width: 768px) {
+                .chat-page-container {
+                    height: 100% !important;
+                    min-height: -webkit-fill-available !important;
+                }
+                
+                .chat-page-container iframe {
+                    height: 100% !important;
+                    min-height: -webkit-fill-available !important;
+                }
             }
             
             /* Hide any floating chat widgets on all pages */
