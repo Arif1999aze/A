@@ -68,12 +68,6 @@ const HomePage = () => {
             {/* Mobile & Desktop Navigation - Always Visible */}
             <nav className="flex items-center gap-2 sm:gap-6">
               <button 
-                onClick={() => navigate('/')}
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors text-xs sm:text-base"
-              >
-                Ana
-              </button>
-              <button 
                 onClick={() => {
                   const aboutSection = document.querySelector('.about-section');
                   aboutSection?.scrollIntoView({ behavior: 'smooth' });
