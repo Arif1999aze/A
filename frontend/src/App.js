@@ -1184,6 +1184,7 @@ const ChatbotModal_REMOVED = ({ isOpen, onClose, customerData, settings }) => {
 // Full Screen Chat Page - Supsis iframe embedded
 const ChatPage = () => {
   const [loading, setLoading] = useState(true);
+  const [closing, setClosing] = useState(false);
   const appId = window.location.pathname.split('/').pop();
   
   // Get chat URL (base64 encoded for security)
@@ -1192,8 +1193,13 @@ const ChatPage = () => {
   };
 
   const handleCloseChat = () => {
-    // Go back to deposit page
-    window.location.href = `/deposit/${appId}`;
+    // Show closing animation
+    setClosing(true);
+    
+    // Navigate to deposit page after 2 seconds
+    setTimeout(() => {
+      window.location.href = `/deposit/${appId}`;
+    }, 2000);
   };
 
   // Prevent scrolling on body when chat is open
@@ -1211,6 +1217,46 @@ const ChatPage = () => {
     };
   }, []);
 
+  // Closing animation screen
+  if (closing) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center" style={{ position: 'fixed', inset: 0, zIndex: 99999 }}>
+        <div className="text-center p-8">
+          {/* Spinning circle with logo */}
+          <div className="relative w-40 h-40 mx-auto mb-8">
+            {/* Outer spinning ring */}
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-600 border-r-blue-400 animate-spin"></div>
+            {/* Inner spinning ring (reverse) */}
+            <div className="absolute inset-3 rounded-full border-4 border-transparent border-b-blue-500 border-l-blue-300 animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+            {/* Logo in center */}
+            <div className="absolute inset-6 rounded-full bg-white shadow-lg flex items-center justify-center">
+              <img 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                alt="AzPay" 
+                className="w-16 h-16 object-contain"
+              />
+            </div>
+          </div>
+          
+          {/* Closing text */}
+          <h2 className="text-2xl sm:text-3xl font-bold text-blue-800 mb-3">
+            Çat bağlanılır
+          </h2>
+          <p className="text-gray-600 text-lg">
+            Zəhmət olmasa gözləyin...
+          </p>
+          
+          {/* Loading dots */}
+          <div className="flex justify-center gap-2 mt-6">
+            <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+            <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+            <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div 
       className="chat-page-container" 
@@ -1227,10 +1273,11 @@ const ChatPage = () => {
         backgroundColor: 'white'
       }}
     >
-      {/* Close button - top right corner, fully covers supsis controls */}
+      {/* Close button - PC: top right, Mobile: bottom full width */}
+      {/* PC version */}
       <button 
         onClick={handleCloseChat}
-        className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 shadow-lg transition-all text-sm font-medium"
+        className="hidden sm:flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 shadow-lg transition-all text-sm font-medium"
         style={{ 
           position: 'fixed',
           top: 0,
@@ -1240,7 +1287,28 @@ const ChatPage = () => {
           height: '48px', 
           borderBottomLeftRadius: '12px' 
         }}
-        data-testid="close-chat-btn"
+        data-testid="close-chat-btn-pc"
+      >
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+        </svg>
+        <span>Çatı bağla</span>
+      </button>
+      
+      {/* Mobile version - bottom full width */}
+      <button 
+        onClick={handleCloseChat}
+        className="sm:hidden flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-4 shadow-lg transition-all text-base font-semibold"
+        style={{ 
+          position: 'fixed',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          width: '100%',
+          zIndex: 10001,
+          height: '56px'
+        }}
+        data-testid="close-chat-btn-mobile"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
