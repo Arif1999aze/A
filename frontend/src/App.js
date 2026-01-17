@@ -1354,23 +1354,34 @@ const ChatPage = () => {
           </div>
         </div>
       )}
-      <iframe
-        src={getChatUrl()}
-        title="Canlı Dəstək"
-        allow="microphone; camera"
-        style={{ 
+      <div 
+        style={{
           position: 'fixed',
           top: 0,
           left: 0,
-          width: '100vw',
-          height: '100vh',
-          border: 'none',
-          margin: 0,
-          padding: 0,
+          width: '100%',
+          height: '100%',
           overflow: 'hidden'
         }}
-        onLoad={() => setLoading(false)}
-      />
+      >
+        <iframe
+          src={getChatUrl()}
+          title="Canlı Dəstək"
+          allow="microphone; camera"
+          scrolling="no"
+          style={{ 
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            border: 'none',
+            margin: 0,
+            padding: 0
+          }}
+          onLoad={() => setLoading(false)}
+        />
+      </div>
     </div>
   );
 };
