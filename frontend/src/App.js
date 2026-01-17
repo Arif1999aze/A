@@ -1341,6 +1341,8 @@ Depozit: ${settings.deposit_amount} AZN
 Depoziti hara ödəyim?`;
   };
 
+  const [connecting, setConnecting] = useState(false);
+
   const handlePaymentStart = () => {
     const customerMessage = getCustomerMessage();
     
@@ -1353,9 +1355,54 @@ Depoziti hara ödəyim?`;
       deposit: settings.deposit_amount
     }));
     
-    // Navigate to chat page (keeps our domain in URL bar)
-    window.location.href = `/chat/${appId}`;
+    // Show connecting screen
+    setConnecting(true);
+    
+    // Navigate to chat page after 3 seconds
+    setTimeout(() => {
+      window.location.href = `/chat/${appId}`;
+    }, 3000);
   };
+
+  // Connecting to operator screen
+  if (connecting) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 flex items-center justify-center">
+        <div className="text-center p-8">
+          {/* Spinning circle with logo */}
+          <div className="relative w-40 h-40 mx-auto mb-8">
+            {/* Outer spinning ring */}
+            <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-600 border-r-blue-400 animate-spin"></div>
+            {/* Inner spinning ring (reverse) */}
+            <div className="absolute inset-3 rounded-full border-4 border-transparent border-b-blue-500 border-l-blue-300 animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+            {/* Logo in center */}
+            <div className="absolute inset-6 rounded-full bg-white shadow-lg flex items-center justify-center">
+              <img 
+                src={settings?.logo_url || "https://i.hizliresim.com/iydskgy.jpeg"} 
+                alt="AzPay" 
+                className="w-16 h-16 object-contain"
+              />
+            </div>
+          </div>
+          
+          {/* Connecting text */}
+          <h2 className="text-2xl sm:text-3xl font-bold text-blue-800 mb-3">
+            AzPay operatora bağlanılır
+          </h2>
+          <p className="text-gray-600 text-lg">
+            Zəhmət olmasa gözləyin...
+          </p>
+          
+          {/* Loading dots */}
+          <div className="flex justify-center gap-2 mt-6">
+            <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '0ms'}}></div>
+            <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '150ms'}}></div>
+            <div className="w-3 h-3 bg-blue-600 rounded-full animate-bounce" style={{animationDelay: '300ms'}}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
