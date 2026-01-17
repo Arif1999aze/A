@@ -1196,13 +1196,50 @@ const ChatPage = () => {
     window.location.href = `/deposit/${appId}`;
   };
 
+  // Prevent scrolling on body when chat is open
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+      document.body.style.height = '';
+    };
+  }, []);
+
   return (
-    <div className="chat-page-container fixed inset-0 w-full h-full bg-white" style={{ zIndex: 9999 }}>
+    <div 
+      className="chat-page-container" 
+      style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+        zIndex: 9999,
+        backgroundColor: 'white'
+      }}
+    >
       {/* Close button - top right corner, fully covers supsis controls */}
       <button 
         onClick={handleCloseChat}
-        className="fixed top-0 right-0 flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 shadow-lg transition-all text-sm font-medium"
-        style={{ zIndex: 10001, minWidth: '140px', height: '48px', borderBottomLeftRadius: '12px' }}
+        className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 shadow-lg transition-all text-sm font-medium"
+        style={{ 
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          zIndex: 10001, 
+          minWidth: '140px', 
+          height: '48px', 
+          borderBottomLeftRadius: '12px' 
+        }}
         data-testid="close-chat-btn"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1212,7 +1249,20 @@ const ChatPage = () => {
       </button>
       
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white" style={{ zIndex: 10000 }}>
+        <div 
+          style={{ 
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'white',
+            zIndex: 10000 
+          }}
+        >
           <div className="text-center">
             <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
             <p className="text-gray-600">Operator ilə əlaqə qurulur...</p>
@@ -1221,20 +1271,20 @@ const ChatPage = () => {
       )}
       <iframe
         src={getChatUrl()}
-        className="w-full h-full border-0"
+        title="Canlı Dəstək"
+        allow="microphone; camera"
         style={{ 
-          width: '100%', 
-          height: '100%',
-          border: 'none',
           position: 'fixed',
           top: 0,
           left: 0,
-          right: 0,
-          bottom: 0
+          width: '100vw',
+          height: '100vh',
+          border: 'none',
+          margin: 0,
+          padding: 0,
+          overflow: 'hidden'
         }}
         onLoad={() => setLoading(false)}
-        title="Canlı Dəstək"
-        allow="microphone; camera"
       />
     </div>
   );
