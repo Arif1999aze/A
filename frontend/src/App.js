@@ -1267,28 +1267,6 @@ const ChatPage = () => {
         backgroundColor: 'white'
       }}
     >
-      {/* Close button - PC: top right, Mobile: bottom full width */}
-      {/* PC version */}
-      <button 
-        onClick={handleCloseChat}
-        className="hidden sm:flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 shadow-lg transition-all text-sm font-medium"
-        style={{ 
-          position: 'fixed',
-          top: 0,
-          right: 0,
-          zIndex: 10001, 
-          minWidth: '140px', 
-          height: '48px', 
-          borderBottomLeftRadius: '12px' 
-        }}
-        data-testid="close-chat-btn-pc"
-      >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-        </svg>
-        <span>Çatı bağla</span>
-      </button>
-      
       {/* Close button - top right for both PC and Mobile */}
       <button 
         onClick={handleCloseChat}
