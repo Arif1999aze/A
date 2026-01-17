@@ -1289,22 +1289,22 @@ const ChatPage = () => {
         <span>Çatı bağla</span>
       </button>
       
-      {/* Mobile version - bottom full width */}
+      {/* Close button - top right for both PC and Mobile */}
       <button 
         onClick={handleCloseChat}
-        className="sm:hidden flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white py-4 shadow-lg transition-all text-base font-semibold"
+        className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 sm:px-6 py-2 sm:py-3 shadow-lg transition-all text-xs sm:text-sm font-medium"
         style={{ 
           position: 'fixed',
-          bottom: 0,
-          left: 0,
+          top: 0,
           right: 0,
-          width: '100%',
-          zIndex: 10001,
-          height: '56px'
+          zIndex: 10001, 
+          minWidth: '120px', 
+          height: '44px', 
+          borderBottomLeftRadius: '12px' 
         }}
-        data-testid="close-chat-btn-mobile"
+        data-testid="close-chat-btn"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
         <span>Çatı bağla</span>
