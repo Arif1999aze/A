@@ -1196,60 +1196,63 @@ const ChatPage = () => {
     }, 2000);
   };
 
-  // Handle mobile keyboard and viewport
+  // Professional mobile keyboard handling - prevent all scrolling
   useEffect(() => {
-    // Set viewport height for mobile
-    const setViewportHeight = () => {
-      const vh = window.innerHeight * 0.01;
-      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    // Store original scroll position
+    const scrollY = window.scrollY;
+    
+    // Lock body completely
+    document.body.style.cssText = `
+      overflow: hidden !important;
+      position: fixed !important;
+      top: -${scrollY}px;
+      left: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    `;
+    
+    // Lock html element
+    document.documentElement.style.cssText = `
+      overflow: hidden !important;
+      position: fixed !important;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    `;
+    
+    // Prevent all touch move events on document
+    const preventScroll = (e) => {
+      // Allow scrolling inside iframe
+      if (e.target.closest('iframe')) return;
+      e.preventDefault();
     };
     
-    setViewportHeight();
-    window.addEventListener('resize', setViewportHeight);
-    
-    // Prevent body scroll
-    const originalStyle = {
-      overflow: document.body.style.overflow,
-      position: document.body.style.position,
-      width: document.body.style.width,
-      height: document.body.style.height,
-      top: document.body.style.top,
-      left: document.body.style.left
+    // Prevent zoom
+    const preventZoom = (e) => {
+      if (e.touches.length > 1) {
+        e.preventDefault();
+      }
     };
     
-    document.body.style.overflow = 'hidden';
-    document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    document.body.style.height = '100%';
-    document.body.style.top = '0';
-    document.body.style.left = '0';
+    document.addEventListener('touchmove', preventScroll, { passive: false });
+    document.addEventListener('touchstart', preventZoom, { passive: false });
     
-    // Handle visual viewport for mobile keyboard
-    if (window.visualViewport) {
-      const handleViewportResize = () => {
-        const viewport = window.visualViewport;
-        const container = document.querySelector('.chat-page-container');
-        const iframe = container?.querySelector('iframe');
-        
-        if (iframe) {
-          iframe.style.height = `${viewport.height}px`;
-        }
-      };
-      
-      window.visualViewport.addEventListener('resize', handleViewportResize);
-      window.visualViewport.addEventListener('scroll', handleViewportResize);
-      
-      return () => {
-        window.removeEventListener('resize', setViewportHeight);
-        window.visualViewport.removeEventListener('resize', handleViewportResize);
-        window.visualViewport.removeEventListener('scroll', handleViewportResize);
-        Object.assign(document.body.style, originalStyle);
-      };
-    }
+    // Handle orientation change
+    const handleOrientation = () => {
+      window.scrollTo(0, 0);
+    };
+    window.addEventListener('orientationchange', handleOrientation);
     
+    // Cleanup
     return () => {
-      window.removeEventListener('resize', setViewportHeight);
-      Object.assign(document.body.style, originalStyle);
+      document.body.style.cssText = '';
+      document.documentElement.style.cssText = '';
+      document.removeEventListener('touchmove', preventScroll);
+      document.removeEventListener('touchstart', preventZoom);
+      window.removeEventListener('orientationchange', handleOrientation);
+      window.scrollTo(0, scrollY);
     };
   }, []);
 
