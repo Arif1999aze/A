@@ -238,12 +238,15 @@
                 --vh: 1vh;
             }
             
-            /* Prevent scrolling on chat page */
-            body.chat-open {
+            /* Prevent ALL scrolling on chat page */
+            html.chat-page-active,
+            body.chat-page-active {
                 overflow: hidden !important;
                 position: fixed !important;
                 width: 100% !important;
                 height: 100% !important;
+                touch-action: none !important;
+                overscroll-behavior: none !important;
             }
             
             .chat-page-container {
@@ -254,10 +257,12 @@
                 bottom: 0 !important;
                 width: 100% !important;
                 height: 100% !important;
-                height: calc(var(--vh, 1vh) * 100) !important;
                 overflow: hidden !important;
                 z-index: 9999 !important;
                 background: white !important;
+                touch-action: none !important;
+                overscroll-behavior: none !important;
+                -webkit-overflow-scrolling: auto !important;
             }
             
             .chat-page-container iframe {
@@ -269,19 +274,23 @@
                 border: none !important;
                 margin: 0 !important;
                 padding: 0 !important;
+                touch-action: pan-y !important;
                 -webkit-overflow-scrolling: touch !important;
             }
             
-            /* Mobile keyboard fix */
+            /* Mobile specific - prevent bounce and zoom */
             @media (max-width: 768px) {
                 .chat-page-container {
                     height: 100% !important;
-                    min-height: -webkit-fill-available !important;
+                    height: 100dvh !important;
+                    max-height: 100% !important;
+                    overscroll-behavior-y: contain !important;
                 }
                 
                 .chat-page-container iframe {
                     height: 100% !important;
-                    min-height: -webkit-fill-available !important;
+                    height: 100dvh !important;
+                    max-height: 100% !important;
                 }
             }
             
