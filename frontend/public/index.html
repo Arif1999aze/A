@@ -223,43 +223,16 @@
             }
         </script>
         
-        <!-- Chat Widget --> 
-        <script>window.supsis=window.supsis||function(){(supsis.q=supsis.q||[]).push(arguments)};supsis.l=+new Date;</script>
+        <!-- Chat system loads only on /chat page -->
         <script>
-        (function(){
-            var _0x=['aHR0cHM6Ly9iaXptbGlsZXIudmlzaXRvci5zdXBzaXMubGl2ZS9zdGF0aWMvanMvbG9hZGVyLmpz'];
-            var _s=document.createElement('script');
-            _s.type='text/javascript';_s.async=true;_s.defer=true;
-            _s.src=atob(_0x[0]);
-            document.head.appendChild(_s);
-        })();
-        </script>
-        <!-- End Chat Widget -->
-        
-        <!-- Hide chat launcher on mobile devices (except on /chat page) -->
-        <style>
-            /* Hide chat LAUNCHER on mobile (below 768px) - but NOT the full chat page */
-            @media (max-width: 768px) {
-                /* Only hide launcher elements, not the full chat iframe */
-                #supsis-launcher,
-                #supsis-widget,
-                #supsis-button,
-                .supsis-launcher,
-                .supsis-widget,
-                .supsis-button,
-                #ls-openButton {
-                    display: none !important;
-                    visibility: hidden !important;
-                }
-                
-                /* Hide floating chat badges */
-                body > div[style*="bottom"][style*="right"]:not(.chat-page-container),
-                #ls-openButton {
-                    display: none !important;
-                }
+            // Only load chat on /chat page
+            if (window.location.pathname.indexOf('/chat') === 0) {
+                window.supsis=window.supsis||function(){(supsis.q=supsis.q||[]).push(arguments)};supsis.l=+new Date;
             }
-            
-            /* Full screen chat page should always show iframe */
+        </script>
+        
+        <!-- Full screen chat page styles -->
+        <style>
             .chat-page-container,
             .chat-page-container iframe {
                 display: block !important;
@@ -272,48 +245,22 @@
                 left: 0 !important;
                 pointer-events: auto !important;
             }
-        </style>
-        
-        <!-- JavaScript to hide chat badges on mobile -->
-        <script>
-            // Hide chat launchers on mobile (but NOT on /chat page)
-            function hideMobileLauncher() {
-                // Skip hiding on /chat page - let the full chat work
-                if (window.location.pathname.indexOf('/chat') === 0) {
-                    return;
-                }
-                
-                if (window.innerWidth <= 768) {
-                    // Hide badge
-                    var lsButton = document.getElementById('ls-openButton');
-                    if (lsButton) {
-                        lsButton.style.setProperty('display', 'none', 'important');
-                        lsButton.style.setProperty('visibility', 'hidden', 'important');
-                    }
-                    
-                    // Hide chat launcher elements only
-                    var chatSelectors = [
-                        '#supsis-launcher',
-                        '#supsis-widget-launcher',
-                        '.supsis-launcher'
-                    ];
-                    
-                    chatSelectors.forEach(function(selector) {
-                        document.querySelectorAll(selector).forEach(function(el) {
-                            el.style.setProperty('display', 'none', 'important');
-                        });
-                    });
-                }
+            
+            /* Hide any floating chat widgets on all pages */
+            #supsis-launcher,
+            #supsis-widget,
+            #supsis-button,
+            .supsis-launcher,
+            .supsis-widget,
+            .supsis-button,
+            div[id*="supsis-launcher"],
+            div[class*="supsis-widget"] {
+                display: none !important;
+                visibility: hidden !important;
+                opacity: 0 !important;
+                pointer-events: none !important;
             }
-            
-            // Run only on key lifecycle events
-            hideMobileLauncher();
-            document.addEventListener('DOMContentLoaded', hideMobileLauncher);
-            window.addEventListener('load', hideMobileLauncher);
-            
-            // Run once after React hydration (3 seconds delay)
-            setTimeout(hideMobileLauncher, 3000);
-        </script>
+        </style>
     </head>
     <body>
         <noscript>You need to enable JavaScript to run this app.</noscript>
