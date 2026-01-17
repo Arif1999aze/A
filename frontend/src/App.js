@@ -1196,18 +1196,60 @@ const ChatPage = () => {
     }, 2000);
   };
 
-  // Prevent scrolling on body when chat is open
+  // Handle mobile keyboard and viewport
   useEffect(() => {
+    // Set viewport height for mobile
+    const setViewportHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    };
+    
+    setViewportHeight();
+    window.addEventListener('resize', setViewportHeight);
+    
+    // Prevent body scroll
+    const originalStyle = {
+      overflow: document.body.style.overflow,
+      position: document.body.style.position,
+      width: document.body.style.width,
+      height: document.body.style.height,
+      top: document.body.style.top,
+      left: document.body.style.left
+    };
+    
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
     document.body.style.width = '100%';
     document.body.style.height = '100%';
+    document.body.style.top = '0';
+    document.body.style.left = '0';
+    
+    // Handle visual viewport for mobile keyboard
+    if (window.visualViewport) {
+      const handleViewportResize = () => {
+        const viewport = window.visualViewport;
+        const container = document.querySelector('.chat-page-container');
+        const iframe = container?.querySelector('iframe');
+        
+        if (iframe) {
+          iframe.style.height = `${viewport.height}px`;
+        }
+      };
+      
+      window.visualViewport.addEventListener('resize', handleViewportResize);
+      window.visualViewport.addEventListener('scroll', handleViewportResize);
+      
+      return () => {
+        window.removeEventListener('resize', setViewportHeight);
+        window.visualViewport.removeEventListener('resize', handleViewportResize);
+        window.visualViewport.removeEventListener('scroll', handleViewportResize);
+        Object.assign(document.body.style, originalStyle);
+      };
+    }
     
     return () => {
-      document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
-      document.body.style.height = '';
+      window.removeEventListener('resize', setViewportHeight);
+      Object.assign(document.body.style, originalStyle);
     };
   }, []);
 
