@@ -1184,6 +1184,7 @@ const ChatbotModal_REMOVED = ({ isOpen, onClose, customerData, settings }) => {
 // Full Screen Chat Page - Supsis iframe embedded
 const ChatPage = () => {
   const [loading, setLoading] = useState(true);
+  const appId = window.location.pathname.split('/').pop();
   
   // Get chat URL (base64 encoded for security)
   const getChatUrl = () => {
@@ -1191,8 +1192,8 @@ const ChatPage = () => {
   };
 
   const handleCloseChat = () => {
-    // Go back to home page
-    window.location.href = '/';
+    // Go back to deposit page
+    window.location.href = `/deposit/${appId}`;
   };
 
   return (
