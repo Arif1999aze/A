@@ -1198,17 +1198,17 @@ const ChatPage = () => {
 
   return (
     <div className="chat-page-container fixed inset-0 w-full h-full bg-white" style={{ zIndex: 9999 }}>
-      {/* Small floating close button - bottom left corner */}
+      {/* Close button - top right corner */}
       <button 
         onClick={handleCloseChat}
-        className="fixed bottom-4 left-4 flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-full shadow-xl transition-all hover:scale-105"
+        className="fixed top-2 right-16 flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg shadow-lg transition-all text-sm font-medium"
         style={{ zIndex: 10001 }}
         data-testid="close-chat-btn"
       >
-        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
         </svg>
-        <span className="font-medium">Geri</span>
+        <span>Çatı bağla</span>
       </button>
       
       {loading && (
