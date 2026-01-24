@@ -1183,7 +1183,7 @@ const ChatPage = () => {
   
   // Get chat URL (base64 encoded for security)
   const getChatUrl = () => {
-    return atob('aHR0cHM6Ly9iaXptbGlsZXIudmlzaXRvci5zdXBzaXMubGl2ZS8=');
+    return atob('aHR0cHM6Ly9zZWJpbmUudmlzaXRvci5zdXBzaXMubGl2ZS8=');
   };
 
   const handleCloseChat = () => {
