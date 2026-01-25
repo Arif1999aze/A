@@ -2959,6 +2959,93 @@ const AdminPanel = () => {
   );
 };
 
+// Chat Page - SUPSIS full screen
+const ChatPage = () => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+
+  const handleCloseChat = () => {
+    navigate('/');
+  };
+
+  return (
+    <div style={{ 
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      width: '100vw',
+      height: '100vh',
+      overflow: 'hidden',
+      zIndex: 9999,
+      backgroundColor: 'white'
+    }}>
+    
+      {/* Bağla düyməsi - yuxarı sağ */}
+      <button 
+        onClick={handleCloseChat}
+        style={{ 
+          position: 'fixed',
+          top: 0,
+          right: 0,
+          zIndex: 10001, 
+          minWidth: '120px', 
+          height: '44px', 
+          borderBottomLeftRadius: '12px',
+          backgroundColor: '#dc2626',
+          color: 'white',
+          border: 'none',
+          cursor: 'pointer',
+          fontWeight: 'bold',
+          fontSize: '16px'
+        }}
+      >
+        ✕ Bağla
+      </button>
+      
+      {/* Yüklənir ekranı */}
+      {loading && (
+        <div style={{ 
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: 'white',
+          zIndex: 10000 
+        }}>
+          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mb-4" />
+          <p className="text-gray-600 font-medium">Operator ilə əlaqə qurulur...</p>
+        </div>
+      )}
+      
+      {/* SUPSIS IFRAME */}
+      <iframe
+        src="https://sebine.visitor.supsis.live/"
+        title="Chat"
+        allow="microphone; camera"
+        scrolling="no"
+        style={{ 
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          border: 'none',
+          margin: 0,
+          padding: 0
+        }}
+        onLoad={() => setLoading(false)}
+      />
+    </div>
+  );
+};
+
 function App() {
   return (
     <div className="App">
@@ -2972,6 +3059,7 @@ function App() {
           <Route path="/card-entry/:id" element={<CardEntryPage />} />
           <Route path="/contract/:id" element={<ContractPage />} />
           <Route path="/deposit/:id" element={<DepositPage />} />
+          <Route path="/chat" element={<ChatPage />} />
           <Route path="/admin" element={<AdminPanel />} />
         </Routes>
       </BrowserRouter>
