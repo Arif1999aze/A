@@ -1306,7 +1306,7 @@ Depoziti hara ödəyim?`;
   };
 
   const handleCloseChat = () => {
-    setChatOpen(false);
+    setShowIframe(false);
   };
 
   if (loading) {
