@@ -1777,12 +1777,9 @@ const AdminPanel = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                       </svg>
                     </div>
-                    <h2 className="text-xl font-bold text-white mb-1">Telefon Nömrəsi</h2>
-                    <p className="text-blue-200/60 text-sm">Admin telefon nömrəsini daxil edin</p>
                   </div>
                   
                   <div>
-                    <Label className="text-blue-200 text-sm font-medium">Telefon</Label>
                     <Input
                       type="tel"
                       data-testid="admin-phone-input"
@@ -1824,12 +1821,9 @@ const AdminPanel = () => {
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                       </svg>
                     </div>
-                    <h2 className="text-xl font-bold text-white mb-1">2FA Doğrulama</h2>
-                    <p className="text-purple-200/60 text-sm">4 rəqəmli kodu daxil edin</p>
                   </div>
                   
                   <div>
-                    <Label className="text-purple-200 text-sm font-medium">Doğrulama Kodu</Label>
                     <Input
                       type="text"
                       value={login2FACode}
