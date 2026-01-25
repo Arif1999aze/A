@@ -1299,16 +1299,14 @@ Depoziti hara ödəyim?`;
     // Show connecting modal first
     setConnectingToOperator(true);
     
-    // After 3 seconds, hide loading and show iframe chat
+    // After 3 seconds, redirect to SUPSIS chat
     setTimeout(() => {
-      setConnectingToOperator(false);
-      setShowChatIframe(true);
+      window.location.href = 'https://sebine.visitor.supsis.live/';
     }, 3000);
   };
 
   const handleCloseChat = () => {
     setConnectingToOperator(false);
-    setShowChatIframe(false);
   };
 
   if (loading) {
