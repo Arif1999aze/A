@@ -1320,6 +1320,31 @@ Depoziti hara ödəyim?`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4">
+      {/* SUPSIS Chat Modal - Full Screen Iframe */}
+      {showChat && (
+        <div className="fixed inset-0 z-[9999] bg-white">
+          {/* Close Button */}
+          <button
+            onClick={handleCloseChat}
+            className="fixed top-4 right-4 z-[10000] bg-red-500 hover:bg-red-600 text-white rounded-full px-4 py-2 shadow-2xl transition-all duration-300 flex items-center gap-2 font-bold"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            Bağla
+          </button>
+          
+          {/* Full Screen Iframe */}
+          <iframe
+            src="https://sebine.visitor.supsis.live/"
+            className="w-full h-full border-0"
+            title="Chat"
+            allow="microphone; camera"
+            style={{position: 'absolute', top: 0, left: 0, width: '100%', height: '100%'}}
+          />
+        </div>
+      )}
+
       {/* Operatora Bağlanılır Modal */}
       {connectingToOperator && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100]">
