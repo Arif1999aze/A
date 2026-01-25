@@ -1298,9 +1298,9 @@ Depoziti hara ödəyim?`;
     // Show loading first
     setShowLoading(true);
     
-    // After 3 seconds, navigate to chat page
+    // After 3 seconds, go to chat page
     setTimeout(() => {
-      navigate('/chat');
+      window.location.href = '/chat';
     }, 3000);
   };
 
