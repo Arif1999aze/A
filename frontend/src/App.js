@@ -1317,41 +1317,59 @@ Depoziti hara ödəyim?`;
     );
   }
 
-  // If chat is open, show full screen iframe
-  if (chatOpen) {
-    return (
-      <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,width:'100%',height:'100%',backgroundColor:'white',zIndex:99999}}>
-        {/* Close Button */}
-        <button
-          onClick={handleCloseChat}
-          style={{position:'fixed',top:'10px',right:'10px',zIndex:100000,backgroundColor:'#ef4444',color:'white',padding:'10px 20px',borderRadius:'8px',border:'none',cursor:'pointer',fontWeight:'bold',display:'flex',alignItems:'center',gap:'8px',fontSize:'14px'}}
-        >
-          ✕ Bağla
-        </button>
-        
-        {/* Full Screen Iframe */}
-        <iframe
-          src="https://sebine.visitor.supsis.live/"
-          style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',border:'none'}}
-          title="Chat"
-        />
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4">
-      {/* Operatora Bağlanılır Modal */}
-      {connectingToOperator && (
+    <>
+      {/* SUPSIS Chat Iframe - Full Screen */}
+      {showIframe && (
+        <div id="supsis-chat-container" style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: '#fff',
+          zIndex: 999999
+        }}>
+          <button
+            onClick={handleCloseChat}
+            style={{
+              position: 'fixed',
+              top: '15px',
+              right: '15px',
+              zIndex: 1000000,
+              backgroundColor: '#dc2626',
+              color: 'white',
+              padding: '12px 24px',
+              borderRadius: '10px',
+              border: 'none',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              fontSize: '16px',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+            }}
+          >
+            ✕ Bağla
+          </button>
+          <iframe
+            src="https://sebine.visitor.supsis.live/"
+            style={{
+              width: '100%',
+              height: '100%',
+              border: 'none'
+            }}
+            title="Operator Chat"
+            allow="camera; microphone"
+          />
+        </div>
+      )}
+
+      {/* Loading Modal */}
+      {showLoading && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100]">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl">
-            {/* Logo with spinning circle */}
             <div className="relative w-32 h-32 mx-auto mb-6">
-              {/* Spinning outer circle */}
               <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-600 border-r-blue-400 animate-spin"></div>
-              {/* Spinning inner circle (reverse) */}
               <div className="absolute inset-3 rounded-full border-4 border-transparent border-b-green-500 border-l-green-400 animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
-              {/* Logo in center */}
               <div className="absolute inset-6 rounded-full bg-white shadow-lg flex items-center justify-center overflow-hidden">
                 <img 
                   src={settings?.logo_url || "https://i.hizliresim.com/iydskgy.jpeg"} 
@@ -1360,14 +1378,14 @@ Depoziti hara ödəyim?`;
                 />
               </div>
             </div>
-            
-            {/* Text */}
             <h3 className="text-xl font-bold text-gray-800 mb-2">Operatora bağlanılır...</h3>
             <p className="text-gray-500 text-sm">Zəhmət olmasa gözləyin</p>
           </div>
         </div>
       )}
-      <div className="container mx-auto max-w-2xl">
+
+      {/* Main Content */}
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4">
         <Card className="shadow-2xl border-blue-100">
           <CardHeader>
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-bounce">
