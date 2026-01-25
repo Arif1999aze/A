@@ -1168,8 +1168,8 @@ const DepositPage = () => {
   const [settings, setSettings] = useState(null);
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [connectingToOperator, setConnectingToOperator] = useState(false);
-  const [chatOpen, setChatOpen] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
+  const [showIframe, setShowIframe] = useState(false);
 
   // Hide chat badge on mobile
   useEffect(() => {
