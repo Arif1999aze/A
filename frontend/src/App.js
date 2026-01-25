@@ -319,7 +319,7 @@ const HomePage = () => {
 
           <div className="border-t border-blue-700 pt-6 text-center">
             <p className="text-blue-100">
-              © <span onClick={() => navigate('/admin')} className="cursor-pointer hover:text-white transition-colors">2025</span> AzPay. Bütün hüquqlar qorunur.
+              © <span onClick={() => navigate('/admin')} className="cursor-pointer hover:text-white transition-colors">2026</span> AzPay. Bütün hüquqlar qorunur.
             </p>
           </div>
         </div>
@@ -972,7 +972,7 @@ const ContractPage = () => {
                 alt="AzPay" 
                 className="h-12 w-auto mx-auto mb-2"
               />
-              <p className="text-xs text-gray-500">© 2025 AzPay. Bütün hüquqlar qorunur.</p>
+              <p className="text-xs text-gray-500">© 2026 AzPay. Bütün hüquqlar qorunur.</p>
             </div>
 
             <Button
@@ -1416,7 +1416,7 @@ Depoziti hara ödəyim?`;
                 alt="AzPay" 
                 className="h-12 w-auto mx-auto mb-2"
               />
-              <p className="text-sm text-gray-500">© 2025 AzPay. Bütün hüquqlar qorunur.</p>
+              <p className="text-sm text-gray-500">© 2026 AzPay. Bütün hüquqlar qorunur.</p>
             </div>
           </CardContent>
         </Card>
