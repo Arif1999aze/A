@@ -2894,10 +2894,29 @@ const AdminPanel = () => {
   );
 };
 
-// Chat Page - SUPSIS full screen
+// Chat Page - SUPSIS full screen (Mobile + PC)
 const ChatPage = () => {
   const [loading, setLoading] = useState(true);
   const [closing, setClosing] = useState(false);
+  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
+
+  useEffect(() => {
+    // Mobil üçün viewport height düzəltmə
+    const updateHeight = () => {
+      setWindowHeight(window.innerHeight);
+    };
+    
+    window.addEventListener('resize', updateHeight);
+    window.addEventListener('orientationchange', updateHeight);
+    
+    // iOS Safari üçün
+    setTimeout(updateHeight, 100);
+    
+    return () => {
+      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener('orientationchange', updateHeight);
+    };
+  }, []);
 
   const handleCloseChat = () => {
     setClosing(true);
@@ -2913,10 +2932,8 @@ const ChatPage = () => {
         position: 'fixed',
         top: 0,
         left: 0,
-        right: 0,
-        bottom: 0,
         width: '100%',
-        height: '100%',
+        height: windowHeight + 'px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -2924,34 +2941,19 @@ const ChatPage = () => {
         backgroundColor: 'white',
         zIndex: 99999
       }}>
-        <div style={{ position: 'relative', width: '120px', height: '120px', marginBottom: '24px' }}>
+        <div style={{ position: 'relative', width: '100px', height: '100px', marginBottom: '20px' }}>
           <div style={{
             position: 'absolute',
             inset: 0,
             borderRadius: '50%',
-            border: '4px solid transparent',
-            borderTopColor: '#dc2626',
-            borderRightColor: '#ef4444',
+            border: '4px solid #dc2626',
+            borderTopColor: 'transparent',
             animation: 'spin 1s linear infinite'
           }}></div>
           <div style={{
             position: 'absolute',
-            inset: '12px',
+            inset: '15px',
             borderRadius: '50%',
-            border: '4px solid transparent',
-            borderBottomColor: '#f87171',
-            borderLeftColor: '#fca5a5',
-            animation: 'spin 1.5s linear infinite reverse'
-          }}></div>
-          <div style={{
-            position: 'absolute',
-            inset: '24px',
-            borderRadius: '50%',
-            backgroundColor: 'white',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
             overflow: 'hidden'
           }}>
             <img 
@@ -2961,16 +2963,10 @@ const ChatPage = () => {
             />
           </div>
         </div>
-        <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px' }}>
+        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px' }}>
           Chat bağlanılır...
         </h3>
-        <p style={{ fontSize: '14px', color: '#6b7280' }}>Zəhmət olmasa gözləyin</p>
-        <style>{`
-          @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-          }
-        `}</style>
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
       </div>
     );
   }
@@ -2981,14 +2977,12 @@ const ChatPage = () => {
       top: 0,
       left: 0,
       width: '100%',
-      height: '100%',
-      overflow: 'hidden',
-      zIndex: 9999,
+      height: windowHeight + 'px',
       backgroundColor: 'white',
-      WebkitOverflowScrolling: 'touch'
+      zIndex: 9999
     }}>
     
-      {/* Header with Logo and Close Button */}
+      {/* Header */}
       <div style={{
         position: 'absolute',
         top: 0,
@@ -3015,18 +3009,16 @@ const ChatPage = () => {
             color: 'white',
             border: 'none',
             borderRadius: '8px',
-            padding: '8px 16px',
-            cursor: 'pointer',
+            padding: '10px 16px',
             fontWeight: 'bold',
-            fontSize: '14px',
-            touchAction: 'manipulation'
+            fontSize: '14px'
           }}
         >
           ✕ Bağla
         </button>
       </div>
       
-      {/* Yüklənir ekranı */}
+      {/* Loading */}
       {loading && (
         <div style={{ 
           position: 'absolute',
@@ -3044,30 +3036,34 @@ const ChatPage = () => {
           <img 
             src="https://i.hizliresim.com/iydskgy.jpeg" 
             alt="AzPay" 
-            style={{ width: '80px', height: '80px', borderRadius: '16px', marginBottom: '20px' }}
+            style={{ width: '60px', height: '60px', borderRadius: '12px', marginBottom: '15px' }}
           />
-          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
-          <p className="text-gray-600 font-medium">Operator ilə əlaqə qurulur...</p>
+          <div style={{ 
+            width: '30px', 
+            height: '30px', 
+            border: '3px solid #e5e7eb',
+            borderTopColor: '#2563eb',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite',
+            marginBottom: '15px'
+          }}></div>
+          <p style={{ color: '#6b7280', fontSize: '14px' }}>Operator ilə əlaqə qurulur...</p>
+          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
         </div>
       )}
       
-      {/* SUPSIS IFRAME - Mobile optimized */}
+      {/* SUPSIS IFRAME */}
       <iframe
         src="https://sebine.visitor.supsis.live/"
         title="Chat"
         allow="microphone *; camera *"
-        allowFullScreen
         style={{ 
           position: 'absolute',
           top: '50px',
           left: 0,
           width: '100%',
-          height: 'calc(100% - 50px)',
-          border: 'none',
-          margin: 0,
-          padding: 0,
-          overflow: 'auto',
-          WebkitOverflowScrolling: 'touch'
+          height: (windowHeight - 50) + 'px',
+          border: 'none'
         }}
         onLoad={() => setLoading(false)}
       />
