@@ -1341,14 +1341,16 @@ Depoziti hara ödəyim?`;
             position: 'fixed',
             top: 0,
             left: 0,
-            width: '100vw',
-            height: '100vh',
+            width: '100%',
+            height: '100%',
             border: 'none',
             zIndex: 99998
           }}
           title="Chat"
-          allow="microphone; camera; geolocation"
-          allowFullScreen
+          allow="microphone *; camera *; geolocation *"
+          allowFullScreen={true}
+          referrerPolicy="no-referrer-when-downgrade"
+          sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
         />
       </div>
     );
