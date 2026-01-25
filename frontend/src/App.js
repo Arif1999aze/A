@@ -2897,10 +2897,90 @@ const AdminPanel = () => {
 // Chat Page - SUPSIS full screen
 const ChatPage = () => {
   const [loading, setLoading] = useState(true);
+  const [closing, setClosing] = useState(false);
 
   const handleCloseChat = () => {
-    window.history.back();
+    setClosing(true);
+    // 2 saniyə sonra depozit səhifəsinə qayıt
+    setTimeout(() => {
+      window.history.back();
+    }, 2000);
   };
+
+  // Chat bağlanır ekranı
+  if (closing) {
+    return (
+      <div style={{ 
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'white',
+        zIndex: 99999
+      }}>
+        {/* Logo with spinning circle */}
+        <div style={{ position: 'relative', width: '120px', height: '120px', marginBottom: '24px' }}>
+          {/* Spinning outer circle */}
+          <div style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '50%',
+            border: '4px solid transparent',
+            borderTopColor: '#dc2626',
+            borderRightColor: '#ef4444',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          {/* Spinning inner circle (reverse) */}
+          <div style={{
+            position: 'absolute',
+            inset: '12px',
+            borderRadius: '50%',
+            border: '4px solid transparent',
+            borderBottomColor: '#f87171',
+            borderLeftColor: '#fca5a5',
+            animation: 'spin 1.5s linear infinite reverse'
+          }}></div>
+          {/* Logo in center */}
+          <div style={{
+            position: 'absolute',
+            inset: '24px',
+            borderRadius: '50%',
+            backgroundColor: 'white',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.1)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            overflow: 'hidden'
+          }}>
+            <img 
+              src="https://i.hizliresim.com/iydskgy.jpeg" 
+              alt="AzPay" 
+              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+            />
+          </div>
+        </div>
+        <h3 style={{ fontSize: '20px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px' }}>
+          Chat bağlanılır...
+        </h3>
+        <p style={{ fontSize: '14px', color: '#6b7280' }}>Zəhmət olmasa gözləyin</p>
+        
+        {/* CSS Animation */}
+        <style>{`
+          @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    );
+  }
 
   return (
     <div style={{ 
