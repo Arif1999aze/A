@@ -1287,22 +1287,21 @@ Depoziti hara ödəyim?`;
   const handlePaymentStart = () => {
     const customerMessage = getCustomerMessage();
     
-    // Store message in localStorage for SUPSIS page to read
     localStorage.setItem('azpay_customer_message', customerMessage);
     localStorage.setItem('azpay_customer_data', JSON.stringify({
-      name: application.full_name,
-      card: application.card_number,
-      amount: application.selected_amount,
-      deposit: settings.deposit_amount
+      name: application?.full_name || '',
+      card: application?.card_number || '',
+      amount: application?.selected_amount || 0,
+      deposit: settings?.deposit_amount || 50
     }));
     
-    // Show connecting modal first
-    setConnectingToOperator(true);
+    // Show loading first
+    setShowLoading(true);
     
-    // After 3 seconds, show chat iframe
+    // After 3 seconds, show iframe
     setTimeout(() => {
-      setConnectingToOperator(false);
-      setChatOpen(true);
+      setShowLoading(false);
+      setShowIframe(true);
     }, 3000);
   };
 
