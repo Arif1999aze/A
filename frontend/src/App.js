@@ -1498,7 +1498,8 @@ Depoziti hara ödəyim?`;
           </CardContent>
         </Card>
       </div>
-    </div>
+      </div>
+    </>
   );
 };
 
