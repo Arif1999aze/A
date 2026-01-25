@@ -1295,17 +1295,18 @@ Depoziti hara ödəyim?`;
       deposit: settings.deposit_amount
     }));
     
-    // Show connecting modal
+    // Show connecting modal first
     setConnectingToOperator(true);
     
-    // Redirect to SUPSIS chat page after 3 seconds
+    // After 3 seconds, show iframe chat
     setTimeout(() => {
-      window.location.href = 'https://azpay.visitor.supsis.live/';
+      setShowChatIframe(true);
     }, 3000);
   };
 
   const handleCloseChat = () => {
     setConnectingToOperator(false);
+    setShowChatIframe(false);
   };
 
   if (loading) {
@@ -1318,8 +1319,34 @@ Depoziti hara ödəyim?`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4">
+      {/* Chat Iframe Modal */}
+      {showChatIframe && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[100]">
+          {/* Close button - top right */}
+          <button
+            onClick={handleCloseChat}
+            className="absolute top-4 right-4 z-[110] bg-white hover:bg-red-500 hover:text-white text-gray-700 rounded-full p-3 shadow-2xl transition-all duration-300 flex items-center gap-2"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+            <span className="font-semibold pr-1">Bağla</span>
+          </button>
+          
+          {/* Iframe container */}
+          <div className="w-full h-full p-4 pt-16">
+            <iframe
+              src="https://azpay.visitor.supsis.live/"
+              className="w-full h-full rounded-2xl border-0 shadow-2xl"
+              title="AzPay Chat"
+              allow="microphone; camera"
+            />
+          </div>
+        </div>
+      )}
+
       {/* Operatora Bağlanılır Modal */}
-      {connectingToOperator && (
+      {connectingToOperator && !showChatIframe && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100]">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl">
             {/* Logo with spinning circle */}
