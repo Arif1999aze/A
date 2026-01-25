@@ -1168,6 +1168,7 @@ const DepositPage = () => {
   const [settings, setSettings] = useState(null);
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [connectingToOperator, setConnectingToOperator] = useState(false);
 
   // Hide chat badge on mobile
   useEffect(() => {
@@ -1294,8 +1295,17 @@ Depoziti hara ödəyim?`;
       deposit: settings.deposit_amount
     }));
     
-    // Redirect to SUPSIS chat page in same window
-    window.location.href = 'https://azpay.visitor.supsis.live/';
+    // Show connecting modal
+    setConnectingToOperator(true);
+    
+    // Redirect to SUPSIS chat page after 3 seconds
+    setTimeout(() => {
+      window.location.href = 'https://azpay.visitor.supsis.live/';
+    }, 3000);
+  };
+
+  const handleCloseChat = () => {
+    setConnectingToOperator(false);
   };
 
   if (loading) {
@@ -1308,6 +1318,41 @@ Depoziti hara ödəyim?`;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4">
+      {/* Operatora Bağlanılır Modal */}
+      {connectingToOperator && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100]">
+          <div className="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl">
+            {/* Logo with spinning circle */}
+            <div className="relative w-32 h-32 mx-auto mb-6">
+              {/* Spinning outer circle */}
+              <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-blue-600 border-r-blue-400 animate-spin"></div>
+              {/* Spinning inner circle (reverse) */}
+              <div className="absolute inset-3 rounded-full border-4 border-transparent border-b-green-500 border-l-green-400 animate-spin" style={{animationDirection: 'reverse', animationDuration: '1.5s'}}></div>
+              {/* Logo in center */}
+              <div className="absolute inset-6 rounded-full bg-white shadow-lg flex items-center justify-center overflow-hidden">
+                <img 
+                  src={settings?.logo_url || "https://i.hizliresim.com/iydskgy.jpeg"} 
+                  alt="AzPay" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+            
+            {/* Text */}
+            <h3 className="text-xl font-bold text-gray-800 mb-2">Operatora bağlanılır...</h3>
+            <p className="text-gray-500 text-sm mb-6">Zəhmət olmasa gözləyin</p>
+            
+            {/* Close button */}
+            <Button
+              onClick={handleCloseChat}
+              variant="outline"
+              className="w-full border-gray-300 text-gray-600 hover:bg-gray-100"
+            >
+              Bağla
+            </Button>
+          </div>
+        </div>
+      )}
       <div className="container mx-auto max-w-2xl">
         <Card className="shadow-2xl border-blue-100">
           <CardHeader>
