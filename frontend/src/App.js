@@ -1348,7 +1348,7 @@ Depoziti hara ödəyim?`;
       )}
 
       {/* Operatora Bağlanılır Modal */}
-      {connectingToOperator && !showChatIframe && (
+      {connectingToOperator && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100]">
           <div className="bg-white rounded-3xl p-8 max-w-sm w-full mx-4 text-center shadow-2xl">
             {/* Logo with spinning circle */}
