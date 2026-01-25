@@ -1298,80 +1298,16 @@ Depoziti hara ödəyim?`;
     // Show loading first
     setShowLoading(true);
     
-    // After 3 seconds, show iframe
+    // After 3 seconds, navigate to chat page
     setTimeout(() => {
-      setShowLoading(false);
-      setShowIframe(true);
+      navigate('/chat');
     }, 3000);
-  };
-
-  const handleCloseChat = () => {
-    setShowIframe(false);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
-      </div>
-    );
-  }
-
-  // SUPSIS Chat - Full Screen iframe
-  if (showIframe) {
-    return (
-      <div style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        width: '100vw',
-        height: '100vh',
-        overflow: 'hidden',
-        zIndex: 9999,
-        backgroundColor: 'white'
-      }}>
-      
-        {/* Bağla düyməsi */}
-        <button 
-          onClick={handleCloseChat}
-          style={{ 
-            position: 'fixed',
-            top: 0,
-            right: 0,
-            zIndex: 10001, 
-            minWidth: '120px', 
-            height: '44px', 
-            borderBottomLeftRadius: '12px',
-            backgroundColor: '#dc2626',
-            color: 'white',
-            border: 'none',
-            cursor: 'pointer',
-            fontWeight: 'bold',
-            fontSize: '16px'
-          }}
-        >
-          ✕ Bağla
-        </button>
-        
-        {/* SUPSIS IFRAME - sebine.visitor.supsis.live */}
-        <iframe
-          src="https://sebine.visitor.supsis.live/"
-          title="Chat"
-          allow="microphone; camera"
-          scrolling="no"
-          style={{ 
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            border: 'none',
-            margin: 0,
-            padding: 0
-          }}
-        />
       </div>
     );
   }
