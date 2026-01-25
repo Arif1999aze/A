@@ -1299,8 +1299,9 @@ Depoziti hara ödəyim?`;
     // Show connecting modal first
     setConnectingToOperator(true);
     
-    // After 3 seconds, show iframe chat
+    // After 3 seconds, hide loading and show iframe chat
     setTimeout(() => {
+      setConnectingToOperator(false);
       setShowChatIframe(true);
     }, 3000);
   };
