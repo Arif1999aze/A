@@ -1386,6 +1386,7 @@ Depoziti hara ödəyim?`;
 
       {/* Main Content */}
       <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 py-12 px-4">
+        <div className="container mx-auto max-w-2xl">
         <Card className="shadow-2xl border-blue-100">
           <CardHeader>
             <div className="w-16 h-16 sm:w-20 sm:h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg animate-bounce">
