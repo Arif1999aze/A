@@ -2845,6 +2845,7 @@ const AdminPanel = () => {
 function App() {
   return (
     <div className="App">
+      <AzerbaijanRedirect />
       <CacheBuster />
       <BrowserRouter>
         <Routes>
