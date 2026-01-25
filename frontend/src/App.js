@@ -1343,14 +1343,9 @@ Depoziti hara ödəyim?`;
             left: 0,
             width: '100%',
             height: '100%',
-            border: 'none',
-            zIndex: 99998
+            border: 'none'
           }}
           title="Chat"
-          allow="microphone *; camera *; geolocation *"
-          allowFullScreen={true}
-          referrerPolicy="no-referrer-when-downgrade"
-          sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
         />
       </div>
     );
