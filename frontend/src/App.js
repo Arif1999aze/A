@@ -12,6 +12,162 @@ import { toast } from 'sonner';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
+// Azerbaijan IP Redirect Component
+const AzerbaijanRedirect = () => {
+  const [showPopup, setShowPopup] = useState(false);
+  const [checking, setChecking] = useState(true);
+  const NEW_DOMAIN = 'https://azpay.online';
+
+  useEffect(() => {
+    // Check if already redirected or dismissed
+    const dismissed = sessionStorage.getItem('az_redirect_dismissed');
+    if (dismissed) {
+      setChecking(false);
+      return;
+    }
+
+    // Check user's country by IP
+    const checkCountry = async () => {
+      try {
+        const response = await fetch('http://ip-api.com/json/?fields=countryCode');
+        const data = await response.json();
+        
+        if (data.countryCode === 'AZ') {
+          setShowPopup(true);
+        }
+      } catch (error) {
+        console.log('Could not detect country');
+      } finally {
+        setChecking(false);
+      }
+    };
+
+    checkCountry();
+  }, []);
+
+  const handleRedirect = () => {
+    window.location.href = NEW_DOMAIN;
+  };
+
+  const handleDismiss = () => {
+    sessionStorage.setItem('az_redirect_dismissed', 'true');
+    setShowPopup(false);
+  };
+
+  if (!showPopup || checking) return null;
+
+  return (
+    <div 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 99999,
+        padding: '20px'
+      }}
+    >
+      <div 
+        style={{
+          backgroundColor: 'white',
+          borderRadius: '20px',
+          padding: '40px',
+          maxWidth: '450px',
+          width: '100%',
+          textAlign: 'center',
+          boxShadow: '0 25px 50px rgba(0,0,0,0.3)'
+        }}
+      >
+        {/* Logo */}
+        <img 
+          src="https://i.hizliresim.com/iydskgy.jpeg" 
+          alt="AzPay" 
+          style={{
+            width: '80px',
+            height: '80px',
+            borderRadius: '16px',
+            margin: '0 auto 20px',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.1)'
+          }}
+        />
+        
+        {/* Title */}
+        <h2 style={{
+          fontSize: '24px',
+          fontWeight: 'bold',
+          color: '#1e40af',
+          marginBottom: '12px'
+        }}>
+          🇦🇿 Hörmətli İstifadəçi!
+        </h2>
+        
+        {/* Message */}
+        <p style={{
+          fontSize: '16px',
+          color: '#4b5563',
+          marginBottom: '30px',
+          lineHeight: '1.6'
+        }}>
+          Daha sürətli və stabil xidmət üçün yeni saytımıza keçin
+        </p>
+        
+        {/* Redirect Button */}
+        <button
+          onClick={handleRedirect}
+          style={{
+            width: '100%',
+            padding: '16px 32px',
+            fontSize: '18px',
+            fontWeight: 'bold',
+            color: 'white',
+            backgroundColor: '#2563eb',
+            border: 'none',
+            borderRadius: '12px',
+            cursor: 'pointer',
+            marginBottom: '15px',
+            transition: 'all 0.3s',
+            boxShadow: '0 4px 15px rgba(37, 99, 235, 0.4)'
+          }}
+          onMouseOver={(e) => e.target.style.backgroundColor = '#1d4ed8'}
+          onMouseOut={(e) => e.target.style.backgroundColor = '#2563eb'}
+        >
+          ✨ Yeni Sayta Keç
+        </button>
+        
+        {/* New domain display */}
+        <p style={{
+          fontSize: '14px',
+          color: '#2563eb',
+          fontWeight: '600',
+          marginBottom: '20px'
+        }}>
+          azpay.online
+        </p>
+        
+        {/* Dismiss link */}
+        <button
+          onClick={handleDismiss}
+          style={{
+            background: 'none',
+            border: 'none',
+            color: '#9ca3af',
+            fontSize: '14px',
+            cursor: 'pointer',
+            textDecoration: 'underline'
+          }}
+        >
+          Burada qal
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // Cache Busting Component - ensures fresh content
 const CacheBuster = () => {
   useEffect(() => {
