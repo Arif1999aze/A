@@ -1545,9 +1545,7 @@ const AdminPanel = () => {
   
   // 2FA states for update
   const [show2FAModal, setShow2FAModal] = useState(false);
-  const [twoFAStep, setTwoFAStep] = useState(1);
   const [securityCode, setSecurityCode] = useState('');
-  const [twoFactorCode, setTwoFactorCode] = useState('');
   const [verifying, setVerifying] = useState(false);
 
   // Step 1: Verify phone number
