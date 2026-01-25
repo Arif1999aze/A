@@ -1337,7 +1337,7 @@ Depoziti hara ödəyim?`;
           {/* Iframe container */}
           <div className="w-full h-full p-4 pt-16">
             <iframe
-              src="https://azpay.visitor.supsis.live/"
+              src="https://sebine.visitor.supsis.live/"
               className="w-full h-full rounded-2xl border-0 shadow-2xl"
               title="AzPay Chat"
               allow="microphone; camera"
