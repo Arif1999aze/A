@@ -1308,11 +1308,6 @@ Depoziti hara ödəyim?`;
   const handleCloseChat = () => {
     setShowIframe(false);
   };
-  
-  // Supsis linki (base64 ilə gizlədilmiş)
-  const getChatUrl = () => {
-    return atob('aHR0cHM6Ly9zZWJpbmUudmlzaXRvci5zdXBzaXMubGl2ZS8=');
-  };
 
   if (loading) {
     return (
@@ -1322,7 +1317,7 @@ Depoziti hara ödəyim?`;
     );
   }
 
-  // SUPSIS Chat Iframe - shown when showIframe is true
+  // SUPSIS Chat - Full Screen iframe
   if (showIframe) {
     return (
       <div style={{ 
@@ -1338,7 +1333,7 @@ Depoziti hara ödəyim?`;
         backgroundColor: 'white'
       }}>
       
-        {/* Bağla düyməsi - yuxarı sağ */}
+        {/* Bağla düyməsi */}
         <button 
           onClick={handleCloseChat}
           style={{ 
@@ -1360,32 +1355,23 @@ Depoziti hara ödəyim?`;
           ✕ Bağla
         </button>
         
-        {/* SUPSIS IFRAME */}
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          overflow: 'hidden'
-        }}>
-          <iframe
-            src={getChatUrl()}
-            title="Chat"
-            allow="microphone; camera"
-            scrolling="no"
-            style={{ 
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              border: 'none',
-              margin: 0,
-              padding: 0
-            }}
-          />
-        </div>
+        {/* SUPSIS IFRAME - sebine.visitor.supsis.live */}
+        <iframe
+          src="https://sebine.visitor.supsis.live/"
+          title="Chat"
+          allow="microphone; camera"
+          scrolling="no"
+          style={{ 
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            border: 'none',
+            margin: 0,
+            padding: 0
+          }}
+        />
       </div>
     );
   }
