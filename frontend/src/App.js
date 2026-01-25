@@ -1741,31 +1741,6 @@ const AdminPanel = () => {
 
           {/* Login Card */}
           <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
-            {/* Progress Steps */}
-            <div className="bg-gradient-to-r from-blue-600/50 to-purple-600/50 px-6 py-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${loginStep >= 1 ? 'bg-white text-blue-600' : 'bg-white/20 text-white/50'}`}>
-                    1
-                  </div>
-                  <div className="hidden sm:block">
-                    <p className={`font-semibold ${loginStep >= 1 ? 'text-white' : 'text-white/50'}`}>Telefon</p>
-                    <p className={`text-xs ${loginStep >= 1 ? 'text-blue-200' : 'text-white/30'}`}>Nömrə doğrulama</p>
-                  </div>
-                </div>
-                <div className={`w-16 h-1 rounded ${loginStep >= 2 ? 'bg-white' : 'bg-white/20'}`}></div>
-                <div className="flex items-center gap-3">
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${loginStep >= 2 ? 'bg-white text-purple-600' : 'bg-white/20 text-white/50'}`}>
-                    2
-                  </div>
-                  <div className="hidden sm:block">
-                    <p className={`font-semibold ${loginStep >= 2 ? 'text-white' : 'text-white/50'}`}>2FA</p>
-                    <p className={`text-xs ${loginStep >= 2 ? 'text-purple-200' : 'text-white/30'}`}>Doğrulama</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
             {/* Form Content */}
             <div className="p-6 sm:p-8">
               {loginStep === 1 ? (
