@@ -2896,106 +2896,29 @@ const AdminPanel = () => {
 
 // Chat Page - SUPSIS full screen (Mobile + PC)
 const ChatPage = () => {
-  const [loading, setLoading] = useState(true);
-  const [closing, setClosing] = useState(false);
-  const [windowHeight, setWindowHeight] = useState(window.innerHeight);
-
-  useEffect(() => {
-    // Mobil üçün viewport height düzəltmə
-    const updateHeight = () => {
-      setWindowHeight(window.innerHeight);
-    };
-    
-    window.addEventListener('resize', updateHeight);
-    window.addEventListener('orientationchange', updateHeight);
-    
-    // iOS Safari üçün
-    setTimeout(updateHeight, 100);
-    
-    return () => {
-      window.removeEventListener('resize', updateHeight);
-      window.removeEventListener('orientationchange', updateHeight);
-    };
-  }, []);
-
   const handleCloseChat = () => {
-    setClosing(true);
-    setTimeout(() => {
-      window.history.back();
-    }, 2000);
+    window.history.back();
   };
-
-  // Chat bağlanır ekranı
-  if (closing) {
-    return (
-      <div style={{ 
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        width: '100%',
-        height: windowHeight + 'px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        backgroundColor: 'white',
-        zIndex: 99999
-      }}>
-        <div style={{ position: 'relative', width: '100px', height: '100px', marginBottom: '20px' }}>
-          <div style={{
-            position: 'absolute',
-            inset: 0,
-            borderRadius: '50%',
-            border: '4px solid #dc2626',
-            borderTopColor: 'transparent',
-            animation: 'spin 1s linear infinite'
-          }}></div>
-          <div style={{
-            position: 'absolute',
-            inset: '15px',
-            borderRadius: '50%',
-            overflow: 'hidden'
-          }}>
-            <img 
-              src="https://i.hizliresim.com/iydskgy.jpeg" 
-              alt="AzPay" 
-              style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-            />
-          </div>
-        </div>
-        <h3 style={{ fontSize: '18px', fontWeight: 'bold', color: '#1f2937', marginBottom: '8px' }}>
-          Chat bağlanılır...
-        </h3>
-        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-      </div>
-    );
-  }
 
   return (
     <div style={{ 
       position: 'fixed',
       top: 0,
       left: 0,
-      width: '100%',
-      height: windowHeight + 'px',
+      right: 0,
+      bottom: 0,
       backgroundColor: 'white',
       zIndex: 9999
     }}>
-    
       {/* Header */}
       <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
         height: '50px',
         backgroundColor: '#ffffff',
-        borderBottom: '1px solid #e5e7eb',
+        borderBottom: '1px solid #ddd',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 10px',
-        zIndex: 10001
+        padding: '0 10px'
       }}>
         <img 
           src="https://i.hizliresim.com/iydskgy.jpeg" 
@@ -3009,7 +2932,7 @@ const ChatPage = () => {
             color: 'white',
             border: 'none',
             borderRadius: '8px',
-            padding: '10px 16px',
+            padding: '10px 20px',
             fontWeight: 'bold',
             fontSize: '14px'
           }}
@@ -3018,54 +2941,15 @@ const ChatPage = () => {
         </button>
       </div>
       
-      {/* Loading */}
-      {loading && (
-        <div style={{ 
-          position: 'absolute',
-          top: '50px',
-          left: 0,
-          right: 0,
-          bottom: 0,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: 'white',
-          zIndex: 10000 
-        }}>
-          <img 
-            src="https://i.hizliresim.com/iydskgy.jpeg" 
-            alt="AzPay" 
-            style={{ width: '60px', height: '60px', borderRadius: '12px', marginBottom: '15px' }}
-          />
-          <div style={{ 
-            width: '30px', 
-            height: '30px', 
-            border: '3px solid #e5e7eb',
-            borderTopColor: '#2563eb',
-            borderRadius: '50%',
-            animation: 'spin 1s linear infinite',
-            marginBottom: '15px'
-          }}></div>
-          <p style={{ color: '#6b7280', fontSize: '14px' }}>Operator ilə əlaqə qurulur...</p>
-          <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-        </div>
-      )}
-      
       {/* SUPSIS IFRAME */}
       <iframe
         src="https://sebine.visitor.supsis.live/"
         title="Chat"
-        allow="microphone *; camera *"
         style={{ 
-          position: 'absolute',
-          top: '50px',
-          left: 0,
           width: '100%',
-          height: (windowHeight - 50) + 'px',
+          height: 'calc(100vh - 50px)',
           border: 'none'
         }}
-        onLoad={() => setLoading(false)}
       />
     </div>
   );
