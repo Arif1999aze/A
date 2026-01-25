@@ -2896,11 +2896,10 @@ const AdminPanel = () => {
 
 // Chat Page - SUPSIS full screen
 const ChatPage = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   const handleCloseChat = () => {
-    navigate('/');
+    window.history.back();
   };
 
   return (
@@ -2917,33 +2916,54 @@ const ChatPage = () => {
       backgroundColor: 'white'
     }}>
     
-      {/* Bağla düyməsi - yuxarı sağ */}
-      <button 
-        onClick={handleCloseChat}
-        style={{ 
-          position: 'fixed',
-          top: 0,
-          right: 0,
-          zIndex: 10001, 
-          minWidth: '120px', 
-          height: '44px', 
-          borderBottomLeftRadius: '12px',
-          backgroundColor: '#dc2626',
-          color: 'white',
-          border: 'none',
-          cursor: 'pointer',
-          fontWeight: 'bold',
-          fontSize: '16px'
-        }}
-      >
-        ✕ Bağla
-      </button>
+      {/* Header with Logo and Close Button */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '50px',
+        backgroundColor: '#ffffff',
+        borderBottom: '1px solid #e5e7eb',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 15px',
+        zIndex: 10001
+      }}>
+        {/* Logo */}
+        <img 
+          src="https://i.hizliresim.com/iydskgy.jpeg" 
+          alt="AzPay" 
+          style={{ height: '35px', borderRadius: '8px' }}
+        />
+        
+        {/* Bağla düyməsi */}
+        <button 
+          onClick={handleCloseChat}
+          style={{ 
+            backgroundColor: '#dc2626',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '14px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '5px'
+          }}
+        >
+          ✕ Bağla
+        </button>
+      </div>
       
       {/* Yüklənir ekranı */}
       {loading && (
         <div style={{ 
           position: 'fixed',
-          top: 0,
+          top: '50px',
           left: 0,
           right: 0,
           bottom: 0,
@@ -2954,7 +2974,12 @@ const ChatPage = () => {
           backgroundColor: 'white',
           zIndex: 10000 
         }}>
-          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mb-4" />
+          <img 
+            src="https://i.hizliresim.com/iydskgy.jpeg" 
+            alt="AzPay" 
+            style={{ width: '80px', height: '80px', borderRadius: '16px', marginBottom: '20px' }}
+          />
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600 mb-4" />
           <p className="text-gray-600 font-medium">Operator ilə əlaqə qurulur...</p>
         </div>
       )}
@@ -2967,10 +2992,10 @@ const ChatPage = () => {
         scrolling="no"
         style={{ 
           position: 'absolute',
-          top: 0,
+          top: '50px',
           left: 0,
           width: '100%',
-          height: '100%',
+          height: 'calc(100% - 50px)',
           border: 'none',
           margin: 0,
           padding: 0
