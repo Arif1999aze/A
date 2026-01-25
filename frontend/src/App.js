@@ -1308,6 +1308,11 @@ Depoziti hara ödəyim?`;
   const handleCloseChat = () => {
     setShowIframe(false);
   };
+  
+  // Supsis linki (base64 ilə gizlədilmiş)
+  const getChatUrl = () => {
+    return atob('aHR0cHM6Ly9zZWJpbmUudmlzaXRvci5zdXBzaXMubGl2ZS8=');
+  };
 
   if (loading) {
     return (
@@ -1320,44 +1325,67 @@ Depoziti hara ödəyim?`;
   // SUPSIS Chat Iframe - shown when showIframe is true
   if (showIframe) {
     return (
-      <div style={{
+      <div style={{ 
         position: 'fixed',
         top: 0,
         left: 0,
-        width: '100%',
-        height: '100%',
-        backgroundColor: '#ffffff',
-        zIndex: 999999
+        right: 0,
+        bottom: 0,
+        width: '100vw',
+        height: '100vh',
+        overflow: 'hidden',
+        zIndex: 9999,
+        backgroundColor: 'white'
       }}>
-        <button
+      
+        {/* Bağla düyməsi - yuxarı sağ */}
+        <button 
           onClick={handleCloseChat}
-          style={{
+          style={{ 
             position: 'fixed',
-            top: '15px',
-            right: '15px',
-            zIndex: 1000000,
+            top: 0,
+            right: 0,
+            zIndex: 10001, 
+            minWidth: '120px', 
+            height: '44px', 
+            borderBottomLeftRadius: '12px',
             backgroundColor: '#dc2626',
             color: 'white',
-            padding: '12px 24px',
-            borderRadius: '10px',
             border: 'none',
             cursor: 'pointer',
             fontWeight: 'bold',
-            fontSize: '16px',
-            boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+            fontSize: '16px'
           }}
         >
           ✕ Bağla
         </button>
-        <iframe
-          src="https://sebine.visitor.supsis.live/"
-          style={{
-            width: '100%',
-            height: '100%',
-            border: 'none'
-          }}
-          title="Operator Chat"
-        />
+        
+        {/* SUPSIS IFRAME */}
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          overflow: 'hidden'
+        }}>
+          <iframe
+            src={getChatUrl()}
+            title="Chat"
+            allow="microphone; camera"
+            scrolling="no"
+            style={{ 
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              border: 'none',
+              margin: 0,
+              padding: 0
+            }}
+          />
+        </div>
       </div>
     );
   }
