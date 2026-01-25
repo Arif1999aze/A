@@ -1298,22 +1298,17 @@ Depoziti hara ödəyim?`;
     
     // Show connecting modal first
     setConnectingToOperator(true);
-    console.log('Starting payment, showing connecting modal');
     
     // After 3 seconds, show chat iframe
     setTimeout(() => {
-      console.log('Hiding connecting modal, showing chat');
       setConnectingToOperator(false);
       setChatOpen(true);
     }, 3000);
   };
 
   const handleCloseChat = () => {
-    console.log('Closing chat');
     setChatOpen(false);
   };
-
-  console.log('Render state:', { loading, chatOpen, connectingToOperator });
 
   if (loading) {
     return (
@@ -1325,18 +1320,14 @@ Depoziti hara ödəyim?`;
 
   // If chat is open, show full screen iframe
   if (chatOpen) {
-    console.log('Rendering chat iframe');
     return (
       <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,width:'100%',height:'100%',backgroundColor:'white',zIndex:99999}}>
         {/* Close Button */}
         <button
           onClick={handleCloseChat}
-          style={{position:'fixed',top:'10px',right:'10px',zIndex:100000,backgroundColor:'red',color:'white',padding:'10px 20px',borderRadius:'8px',border:'none',cursor:'pointer',fontWeight:'bold',display:'flex',alignItems:'center',gap:'8px'}}
+          style={{position:'fixed',top:'10px',right:'10px',zIndex:100000,backgroundColor:'#ef4444',color:'white',padding:'10px 20px',borderRadius:'8px',border:'none',cursor:'pointer',fontWeight:'bold',display:'flex',alignItems:'center',gap:'8px',fontSize:'14px'}}
         >
-          <svg style={{width:'16px',height:'16px'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-          Bağla
+          ✕ Bağla
         </button>
         
         {/* Full Screen Iframe */}
