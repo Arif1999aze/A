@@ -2901,7 +2901,6 @@ const ChatPage = () => {
 
   const handleCloseChat = () => {
     setClosing(true);
-    // 2 saniyə sonra depozit səhifəsinə qayıt
     setTimeout(() => {
       window.history.back();
     }, 2000);
@@ -2916,8 +2915,8 @@ const ChatPage = () => {
         left: 0,
         right: 0,
         bottom: 0,
-        width: '100vw',
-        height: '100vh',
+        width: '100%',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -2925,9 +2924,7 @@ const ChatPage = () => {
         backgroundColor: 'white',
         zIndex: 99999
       }}>
-        {/* Logo with spinning circle */}
         <div style={{ position: 'relative', width: '120px', height: '120px', marginBottom: '24px' }}>
-          {/* Spinning outer circle */}
           <div style={{
             position: 'absolute',
             inset: 0,
@@ -2937,7 +2934,6 @@ const ChatPage = () => {
             borderRightColor: '#ef4444',
             animation: 'spin 1s linear infinite'
           }}></div>
-          {/* Spinning inner circle (reverse) */}
           <div style={{
             position: 'absolute',
             inset: '12px',
@@ -2947,7 +2943,6 @@ const ChatPage = () => {
             borderLeftColor: '#fca5a5',
             animation: 'spin 1.5s linear infinite reverse'
           }}></div>
-          {/* Logo in center */}
           <div style={{
             position: 'absolute',
             inset: '24px',
@@ -2970,8 +2965,6 @@ const ChatPage = () => {
           Chat bağlanılır...
         </h3>
         <p style={{ fontSize: '14px', color: '#6b7280' }}>Zəhmət olmasa gözləyin</p>
-        
-        {/* CSS Animation */}
         <style>{`
           @keyframes spin {
             from { transform: rotate(0deg); }
@@ -2987,18 +2980,17 @@ const ChatPage = () => {
       position: 'fixed',
       top: 0,
       left: 0,
-      right: 0,
-      bottom: 0,
-      width: '100vw',
-      height: '100vh',
+      width: '100%',
+      height: '100%',
       overflow: 'hidden',
       zIndex: 9999,
-      backgroundColor: 'white'
+      backgroundColor: 'white',
+      WebkitOverflowScrolling: 'touch'
     }}>
     
       {/* Header with Logo and Close Button */}
       <div style={{
-        position: 'fixed',
+        position: 'absolute',
         top: 0,
         left: 0,
         right: 0,
@@ -3008,17 +3000,14 @@ const ChatPage = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '0 15px',
+        padding: '0 10px',
         zIndex: 10001
       }}>
-        {/* Logo */}
         <img 
           src="https://i.hizliresim.com/iydskgy.jpeg" 
           alt="AzPay" 
           style={{ height: '35px', borderRadius: '8px' }}
         />
-        
-        {/* Bağla düyməsi */}
         <button 
           onClick={handleCloseChat}
           style={{ 
@@ -3030,9 +3019,7 @@ const ChatPage = () => {
             cursor: 'pointer',
             fontWeight: 'bold',
             fontSize: '14px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '5px'
+            touchAction: 'manipulation'
           }}
         >
           ✕ Bağla
@@ -3042,7 +3029,7 @@ const ChatPage = () => {
       {/* Yüklənir ekranı */}
       {loading && (
         <div style={{ 
-          position: 'fixed',
+          position: 'absolute',
           top: '50px',
           left: 0,
           right: 0,
@@ -3064,12 +3051,12 @@ const ChatPage = () => {
         </div>
       )}
       
-      {/* SUPSIS IFRAME */}
+      {/* SUPSIS IFRAME - Mobile optimized */}
       <iframe
         src="https://sebine.visitor.supsis.live/"
         title="Chat"
-        allow="microphone; camera"
-        scrolling="no"
+        allow="microphone *; camera *"
+        allowFullScreen
         style={{ 
           position: 'absolute',
           top: '50px',
@@ -3078,7 +3065,9 @@ const ChatPage = () => {
           height: 'calc(100% - 50px)',
           border: 'none',
           margin: 0,
-          padding: 0
+          padding: 0,
+          overflow: 'auto',
+          WebkitOverflowScrolling: 'touch'
         }}
         onLoad={() => setLoading(false)}
       />
