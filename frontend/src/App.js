@@ -1317,52 +1317,53 @@ Depoziti hara ödəyim?`;
     );
   }
 
+  // SUPSIS Chat Iframe - shown when showIframe is true
+  if (showIframe) {
+    return (
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        backgroundColor: '#ffffff',
+        zIndex: 999999
+      }}>
+        <button
+          onClick={handleCloseChat}
+          style={{
+            position: 'fixed',
+            top: '15px',
+            right: '15px',
+            zIndex: 1000000,
+            backgroundColor: '#dc2626',
+            color: 'white',
+            padding: '12px 24px',
+            borderRadius: '10px',
+            border: 'none',
+            cursor: 'pointer',
+            fontWeight: 'bold',
+            fontSize: '16px',
+            boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+          }}
+        >
+          ✕ Bağla
+        </button>
+        <iframe
+          src="https://sebine.visitor.supsis.live/"
+          style={{
+            width: '100%',
+            height: '100%',
+            border: 'none'
+          }}
+          title="Operator Chat"
+        />
+      </div>
+    );
+  }
+
   return (
     <>
-      {/* SUPSIS Chat Iframe - Full Screen */}
-      {showIframe && (
-        <div id="supsis-chat-container" style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: '#fff',
-          zIndex: 999999
-        }}>
-          <button
-            onClick={handleCloseChat}
-            style={{
-              position: 'fixed',
-              top: '15px',
-              right: '15px',
-              zIndex: 1000000,
-              backgroundColor: '#dc2626',
-              color: 'white',
-              padding: '12px 24px',
-              borderRadius: '10px',
-              border: 'none',
-              cursor: 'pointer',
-              fontWeight: 'bold',
-              fontSize: '16px',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
-            }}
-          >
-            ✕ Bağla
-          </button>
-          <iframe
-            src="https://sebine.visitor.supsis.live/"
-            style={{
-              width: '100%',
-              height: '100%',
-              border: 'none'
-            }}
-            title="Operator Chat"
-            allow="camera; microphone"
-          />
-        </div>
-      )}
-
       {/* Loading Modal */}
       {showLoading && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-[100]">
