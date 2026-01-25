@@ -1299,30 +1299,57 @@ Depoziti hara ödəyim?`;
     // Show connecting modal first
     setConnectingToOperator(true);
     
-    // After 3 seconds, open chat in popup window (same size as screen)
+    // After 3 seconds, show chat iframe
     setTimeout(() => {
       setConnectingToOperator(false);
-      // Open in popup window - looks like part of the site
-      const width = window.innerWidth;
-      const height = window.innerHeight;
-      const left = 0;
-      const top = 0;
-      window.open(
-        'https://sebine.visitor.supsis.live/',
-        'AzPay_Chat',
-        `width=${width},height=${height},left=${left},top=${top},menubar=no,toolbar=no,location=no,status=no,scrollbars=yes`
-      );
+      setChatOpen(true);
     }, 3000);
   };
 
   const handleCloseChat = () => {
-    setShowChat(false);
+    setChatOpen(false);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-12 h-12 animate-spin text-blue-600" />
+      </div>
+    );
+  }
+
+  // If chat is open, show full screen iframe
+  if (chatOpen) {
+    return (
+      <div className="fixed inset-0 w-full h-full bg-white" style={{zIndex: 99999}}>
+        {/* Close Button */}
+        <button
+          onClick={handleCloseChat}
+          className="fixed top-3 right-3 z-[100000] bg-red-500 hover:bg-red-600 text-white rounded-full px-4 py-2 shadow-2xl flex items-center gap-2 font-bold text-sm"
+          style={{zIndex: 100000}}
+        >
+          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+          Bağla
+        </button>
+        
+        {/* Full Screen Iframe */}
+        <iframe
+          src="https://sebine.visitor.supsis.live/"
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100vw',
+            height: '100vh',
+            border: 'none',
+            zIndex: 99998
+          }}
+          title="Chat"
+          allow="microphone; camera; geolocation"
+          allowFullScreen
+        />
       </div>
     );
   }
