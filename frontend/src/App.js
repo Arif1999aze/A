@@ -1298,17 +1298,22 @@ Depoziti hara ödəyim?`;
     
     // Show connecting modal first
     setConnectingToOperator(true);
+    console.log('Starting payment, showing connecting modal');
     
     // After 3 seconds, show chat iframe
     setTimeout(() => {
+      console.log('Hiding connecting modal, showing chat');
       setConnectingToOperator(false);
       setChatOpen(true);
     }, 3000);
   };
 
   const handleCloseChat = () => {
+    console.log('Closing chat');
     setChatOpen(false);
   };
+
+  console.log('Render state:', { loading, chatOpen, connectingToOperator });
 
   if (loading) {
     return (
@@ -1320,15 +1325,15 @@ Depoziti hara ödəyim?`;
 
   // If chat is open, show full screen iframe
   if (chatOpen) {
+    console.log('Rendering chat iframe');
     return (
-      <div className="fixed inset-0 w-full h-full bg-white" style={{zIndex: 99999}}>
+      <div style={{position:'fixed',top:0,left:0,right:0,bottom:0,width:'100%',height:'100%',backgroundColor:'white',zIndex:99999}}>
         {/* Close Button */}
         <button
           onClick={handleCloseChat}
-          className="fixed top-3 right-3 z-[100000] bg-red-500 hover:bg-red-600 text-white rounded-full px-4 py-2 shadow-2xl flex items-center gap-2 font-bold text-sm"
-          style={{zIndex: 100000}}
+          style={{position:'fixed',top:'10px',right:'10px',zIndex:100000,backgroundColor:'red',color:'white',padding:'10px 20px',borderRadius:'8px',border:'none',cursor:'pointer',fontWeight:'bold',display:'flex',alignItems:'center',gap:'8px'}}
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg style={{width:'16px',height:'16px'}} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
           Bağla
@@ -1337,14 +1342,7 @@ Depoziti hara ödəyim?`;
         {/* Full Screen Iframe */}
         <iframe
           src="https://sebine.visitor.supsis.live/"
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            border: 'none'
-          }}
+          style={{position:'fixed',top:0,left:0,width:'100%',height:'100%',border:'none'}}
           title="Chat"
         />
       </div>
