@@ -1164,7 +1164,6 @@ const ChatbotModal_REMOVED = ({ isOpen, onClose, customerData, settings }) => {
 
 // Deposit Page
 const DepositPage = () => {
-  const navigate = useNavigate();
   const appId = window.location.pathname.split('/').pop();
   const [settings, setSettings] = useState(null);
   const [application, setApplication] = useState(null);
