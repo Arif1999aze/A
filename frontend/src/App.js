@@ -1368,16 +1368,7 @@ Depoziti hara ödəyim?`;
             
             {/* Text */}
             <h3 className="text-xl font-bold text-gray-800 mb-2">Operatora bağlanılır...</h3>
-            <p className="text-gray-500 text-sm mb-6">Zəhmət olmasa gözləyin</p>
-            
-            {/* Close button */}
-            <Button
-              onClick={handleCloseChat}
-              variant="outline"
-              className="w-full border-gray-300 text-gray-600 hover:bg-gray-100"
-            >
-              Bağla
-            </Button>
+            <p className="text-gray-500 text-sm">Zəhmət olmasa gözləyin</p>
           </div>
         </div>
       )}
