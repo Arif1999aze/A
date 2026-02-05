@@ -16,45 +16,6 @@ const API = `${BACKEND_URL}/api`;
 const AzerbaijanRedirect = () => {
   return null;
 };
-            cursor: 'pointer',
-            marginBottom: '15px',
-            transition: 'all 0.3s',
-            boxShadow: '0 4px 15px rgba(37, 99, 235, 0.4)'
-          }}
-          onMouseOver={(e) => e.target.style.backgroundColor = '#1d4ed8'}
-          onMouseOut={(e) => e.target.style.backgroundColor = '#2563eb'}
-        >
-          ✨ Yeni Sayta Keç
-        </button>
-        
-        {/* New domain display */}
-        <p style={{
-          fontSize: '14px',
-          color: '#2563eb',
-          fontWeight: '600',
-          marginBottom: '20px'
-        }}>
-          azpay.online
-        </p>
-        
-        {/* Dismiss link */}
-        <button
-          onClick={handleDismiss}
-          style={{
-            background: 'none',
-            border: 'none',
-            color: '#9ca3af',
-            fontSize: '14px',
-            cursor: 'pointer',
-            textDecoration: 'underline'
-          }}
-        >
-          Burada qal
-        </button>
-      </div>
-    </div>
-  );
-};
 
 // Cache Busting Component - ensures fresh content
 const CacheBuster = () => {
