@@ -151,12 +151,16 @@ const HomePage = () => {
             </div>
             
             {/* People pointing image */}
-            <div className="mt-6 sm:mt-8 flex justify-center">
+            <div className="mt-6 sm:mt-8 flex justify-center relative z-20">
               <img 
                 src="https://customer-assets.emergentagent.com/job_azeriloan/artifacts/lfj0a1lo_WhatsApp%20Image%202026-02-05%20at%2013.53.55.jpeg" 
                 alt="Müştərilər" 
                 className="max-w-xs sm:max-w-md md:max-w-lg w-full h-auto object-contain pointer-events-none select-none"
-                style={{ marginTop: '-20px' }}
+                style={{ 
+                  marginTop: '-20px',
+                  filter: 'contrast(1.1) saturate(1.1)',
+                  opacity: 1
+                }}
               />
             </div>
             
