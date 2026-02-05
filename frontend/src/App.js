@@ -150,7 +150,17 @@ const HomePage = () => {
               </div>
             </div>
             
-            <div className="mt-8 sm:mt-12 grid grid-cols-3 gap-3 sm:gap-8 max-w-2xl mx-auto px-2">
+            {/* People pointing image */}
+            <div className="mt-6 sm:mt-8 flex justify-center">
+              <img 
+                src="https://customer-assets.emergentagent.com/job_azeriloan/artifacts/lfj0a1lo_WhatsApp%20Image%202026-02-05%20at%2013.53.55.jpeg" 
+                alt="Müştərilər" 
+                className="max-w-xs sm:max-w-md md:max-w-lg w-full h-auto object-contain pointer-events-none select-none"
+                style={{ marginTop: '-20px' }}
+              />
+            </div>
+            
+            <div className="mt-4 sm:mt-8 grid grid-cols-3 gap-3 sm:gap-8 max-w-2xl mx-auto px-2">
               <div className="bg-white/80 backdrop-blur-sm p-3 sm:p-6 rounded-xl sm:rounded-2xl shadow-lg">
                 <div className="text-xl sm:text-3xl font-bold text-blue-700">15 dəq</div>
                 <div className="text-xs sm:text-sm text-gray-600 mt-1">Sürətli cavab</div>
