@@ -1551,6 +1551,8 @@ Depoziti hara ödəyim?`;
                 src="https://i.hizliresim.com/iydskgy.jpeg" 
                 alt="AzPay" 
                 className="w-16 h-16 object-contain"
+                onError={(e) => { e.target.style.display = 'none'; }}
+                crossOrigin="anonymous"
               />
             </div>
           </div>
