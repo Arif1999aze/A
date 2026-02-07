@@ -63,7 +63,7 @@ const HomePage = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <img 
-                src={settings?.logo_url || "https://i.hizliresim.com/iydskgy.jpeg"} 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
                 alt="AzPay" 
                 className="h-10 sm:h-12 w-auto cursor-pointer"
                 onClick={() => navigate('/')}
