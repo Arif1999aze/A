@@ -265,7 +265,7 @@ const HomePage = () => {
             {/* Logo and About */}
             <div className="text-center md:text-left">
               <img 
-                src={settings?.logo_url || "https://i.hizliresim.com/iydskgy.jpeg"} 
+                src="https://i.hizliresim.com/iydskgy.jpeg" 
                 alt="AzPay" 
                 className="h-14 w-auto mx-auto md:mx-0 mb-4"
               />
