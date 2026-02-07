@@ -1285,9 +1285,10 @@ const ChatPage = () => {
             {/* Logo in center */}
             <div className="absolute inset-6 rounded-full bg-white shadow-lg flex items-center justify-center">
               <img 
-                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                src={settings?.logo_url || "https://i.hizliresim.com/iydskgy.jpeg"} 
                 alt="AzPay" 
                 className="w-16 h-16 object-contain"
+                onError={(e) => { e.target.src = 'https://i.hizliresim.com/iydskgy.jpeg'; }}
               />
             </div>
           </div>
