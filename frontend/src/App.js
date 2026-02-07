@@ -1186,7 +1186,15 @@ const ChatbotModal_REMOVED = ({ isOpen, onClose, customerData, settings }) => {
 const ChatPage = () => {
   const [loading, setLoading] = useState(true);
   const [closing, setClosing] = useState(false);
+  const [settings, setSettings] = useState(null);
   const appId = window.location.pathname.split('/').pop();
+  
+  // Fetch settings for logo
+  useEffect(() => {
+    axios.get(`${API}/settings`)
+      .then(res => setSettings(res.data))
+      .catch(() => {});
+  }, []);
   
   // Get chat URL (base64 encoded for security)
   const getChatUrl = () => {
