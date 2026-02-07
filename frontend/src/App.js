@@ -266,10 +266,10 @@ const HomePage = () => {
             {/* Logo and About */}
             <div className="text-center md:text-left">
               <img 
-                src="https://i.hizliresim.com/iydskgy.jpeg" 
+                src={settings?.logo_url || "https://i.hizliresim.com/iydskgy.jpeg"} 
                 alt="AzPay" 
                 className="h-14 w-auto mx-auto md:mx-0 mb-4"
-                onError={(e) => { e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="56" height="56"><rect fill="%232563eb" width="56" height="56" rx="8"/><text x="50%" y="55%" font-size="16" fill="white" text-anchor="middle">AzPay</text></svg>'; }}
+                onError={(e) => { e.target.src = 'https://i.hizliresim.com/iydskgy.jpeg'; }}
               />
               <p className="text-blue-100 text-sm leading-relaxed">
                 {settings?.about_text || 'AzPay Kredit müasir maliyyə həlləri təqdim edən etibarlı ödəniş və kredit platformasıdır. Məqsədimiz istifadəçilərimizə sürətli, şəffaf və rahat kredit imkanları yaratmaq, maliyyə ehtiyaclarını minimum vaxtda qarşılamaqdır.'}
