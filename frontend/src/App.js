@@ -67,6 +67,7 @@ const HomePage = () => {
                 alt="AzPay" 
                 className="h-10 sm:h-12 w-auto cursor-pointer"
                 onClick={() => navigate('/')}
+                onError={(e) => { e.target.src = 'data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48"><rect fill="%232563eb" width="48" height="48" rx="8"/><text x="50%" y="55%" font-size="14" fill="white" text-anchor="middle">AzPay</text></svg>'; }}
               />
             </div>
             
