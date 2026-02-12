@@ -2717,12 +2717,30 @@ const AdminPanel = () => {
   );
 };
 
+// Hide URL path - show only domain on all pages
+const HideUrlPath = () => {
+  useEffect(() => {
+    // Don't hide URL on admin page
+    if (window.location.pathname.startsWith('/admin')) {
+      return;
+    }
+    
+    // Replace URL to show only domain
+    if (window.location.pathname !== '/') {
+      window.history.replaceState({}, '', '/');
+    }
+  }, []);
+  
+  return null;
+};
+
 function App() {
   return (
     <div className="App">
       <AzerbaijanRedirect />
       <CacheBuster />
       <BrowserRouter>
+        <HideUrlPath />
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/application" element={<ApplicationForm />} />
