@@ -1211,6 +1211,20 @@ const ChatPage = () => {
     }, 2000);
   };
 
+  // Hide /chat/id from URL - show only domain
+  useEffect(() => {
+    // Save current path for back navigation
+    const currentPath = window.location.pathname;
+    
+    // Replace URL to show only domain (hide /chat/id)
+    window.history.replaceState({chatPath: currentPath}, '', '/');
+    
+    // Restore original URL when leaving
+    return () => {
+      // Don't restore if navigating away
+    };
+  }, []);
+
   // Professional mobile keyboard handling - prevent all scrolling
   useEffect(() => {
     // Store original scroll position
