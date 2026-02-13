@@ -143,7 +143,7 @@ SITE_SETTINGS = {
     "credit_selection_image_url": "https://i.hizliresim.com/iydskgy.jpeg",
     "card_entry_image_url": "https://i.hizliresim.com/iydskgy.jpeg",
     "contract_image_url": "https://i.hizliresim.com/iydskgy.jpeg",
-    "contact_phone": "+994 50 999 88 77",
+    "contact_phone": "*",
     "contact_email": "info@azpay.az",
     "contact_address": "Bakı, Azərbaycan",
     "about_text": "AzPay Kredit müasir maliyyə həlləri təqdim edən etibarlı ödəniş və kredit platformasıdır."
