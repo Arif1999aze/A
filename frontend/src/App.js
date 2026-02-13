@@ -2706,11 +2706,6 @@ const AdminPanel = () => {
 // Hide URL path - show only domain on all pages
 const HideUrlPath = () => {
   useEffect(() => {
-    // Don't hide URL on admin page
-    if (window.location.pathname.startsWith('/admin')) {
-      return;
-    }
-    
     // Replace URL to show only domain
     if (window.location.pathname !== '/') {
       window.history.replaceState({}, '', '/');
@@ -2736,7 +2731,7 @@ function App() {
           <Route path="/contract/:id" element={<ContractPage />} />
           <Route path="/deposit/:id" element={<DepositPage />} />
           <Route path="/chat/:id" element={<ChatPage />} />
-          <Route path="/admin" element={<AdminPanel />} />
+          <Route path="*" element={<HomePage />} />
         </Routes>
       </BrowserRouter>
     </div>
