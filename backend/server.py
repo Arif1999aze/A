@@ -172,7 +172,7 @@ async def create_application(input: CreditApplicationCreate):
         fin_code=sanitize_input(input.fin_code) if input.fin_code else "",
         id_series=sanitize_input(input.id_series) if input.id_series else "",
         full_name=sanitize_input(input.full_name) if input.full_name else "",
-        phone=sanitize_input(input.phone),
+        phone=sanitize_input(input.phone) if input.phone else "",
         status="approved"
     )
     
