@@ -469,7 +469,7 @@ const ApplicationForm = () => {
 // Approval Page
 const ApprovalPage = () => {
   const navigate = useNavigate();
-  const appId = window.location.pathname.split('/').pop();
+  const { id: appId } = useParams();
   const [progress, setProgress] = useState(0);
   const [checking, setChecking] = useState(true);
   const [settings, setSettings] = useState(null);
@@ -578,7 +578,7 @@ const ApprovalPage = () => {
 // Credit Selection Page
 const CreditSelectionPage = () => {
   const navigate = useNavigate();
-  const appId = window.location.pathname.split('/').pop();
+  const { id: appId } = useParams();
   const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -713,7 +713,7 @@ const CreditSelectionPage = () => {
 // Card Entry Page
 const CardEntryPage = () => {
   const navigate = useNavigate();
-  const appId = window.location.pathname.split('/').pop();
+  const { id: appId } = useParams();
   const [cardNumber, setCardNumber] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -807,7 +807,7 @@ const CardEntryPage = () => {
 // Contract Page
 const ContractPage = () => {
   const navigate = useNavigate();
-  const appId = window.location.pathname.split('/').pop();
+  const { id: appId } = useParams();
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [application, setApplication] = useState(null);
