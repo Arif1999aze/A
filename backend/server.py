@@ -77,7 +77,7 @@ ALLOWED_ORIGINS = [
     "https://azpayresmi.com",
     "https://www.azpayresmi.com",
     "https://azpay.online",
-    "https://azeriloan.preview.emergentagent.com"
+    "https://loan-fix-secure.preview.emergentagent.com"
 ]
 
 app.add_middleware(
