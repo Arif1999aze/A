@@ -230,6 +230,11 @@ async def update_application(app_id: str, update: CreditApplicationUpdate):
 async def get_settings():
     return SITE_SETTINGS
 
+# Credit Offers Route - Read Only (IMMUTABLE)
+@api_router.get("/credit-offers")
+async def get_credit_offers():
+    return CREDIT_OFFERS
+
 # Block all other methods on settings
 @api_router.post("/settings")
 @api_router.put("/settings")
