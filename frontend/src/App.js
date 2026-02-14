@@ -1187,7 +1187,7 @@ const ChatPage = () => {
   const [loading, setLoading] = useState(true);
   const [closing, setClosing] = useState(false);
   const [settings, setSettings] = useState(null);
-  const appId = window.location.pathname.split('/').pop();
+  const { id: appId } = useParams();
   
   // Fetch settings for logo
   useEffect(() => {
@@ -1404,7 +1404,7 @@ const ChatPage = () => {
 
 // Deposit Page
 const DepositPage = () => {
-  const appId = window.location.pathname.split('/').pop();
+  const { id: appId } = useParams();
   const [settings, setSettings] = useState(null);
   const [application, setApplication] = useState(null);
   const [loading, setLoading] = useState(true);
