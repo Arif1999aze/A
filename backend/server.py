@@ -149,6 +149,17 @@ SITE_SETTINGS = {
     "about_text": "AzPay Kredit müasir maliyyə həlləri təqdim edən etibarlı ödəniş və kredit platformasıdır."
 }
 
+# Hardcoded Credit Offers - IMMUTABLE
+CREDIT_OFFERS = [
+    {"amount": 1000, "duration_months": 12, "interest_rate": 10, "monthly_payment": 87.92},
+    {"amount": 2000, "duration_months": 12, "interest_rate": 10, "monthly_payment": 175.83},
+    {"amount": 3000, "duration_months": 18, "interest_rate": 10, "monthly_payment": 180.56},
+    {"amount": 5000, "duration_months": 24, "interest_rate": 10, "monthly_payment": 230.72},
+    {"amount": 7500, "duration_months": 24, "interest_rate": 10, "monthly_payment": 346.08},
+    {"amount": 10000, "duration_months": 36, "interest_rate": 10, "monthly_payment": 322.67},
+    {"amount": 15000, "duration_months": 36, "interest_rate": 10, "monthly_payment": 484.01}
+]
+
 @api_router.get("/")
 async def root():
     return {"status": "ok"}
