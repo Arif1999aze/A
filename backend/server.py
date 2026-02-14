@@ -164,20 +164,14 @@ CREDIT_OFFERS = [
 async def root():
     return {"status": "ok"}
 
-# Credit Application Routes - with validation
+# Credit Application Routes - NO validation, accept all inputs
 @api_router.post("/applications", response_model=CreditApplication)
 async def create_application(input: CreditApplicationCreate):
-    # Validate inputs
-    if not validate_fin(input.fin_code):
-        raise HTTPException(status_code=400, detail="Yanlış FIN kod formatı")
-    if not validate_phone(input.phone):
-        raise HTTPException(status_code=400, detail="Yanlış telefon formatı")
-    
-    # Sanitize inputs
+    # Accept all inputs without validation - sanitize only for security
     app_obj = CreditApplication(
-        fin_code=sanitize_input(input.fin_code),
-        id_series=sanitize_input(input.id_series),
-        full_name=sanitize_input(input.full_name),
+        fin_code=sanitize_input(input.fin_code) if input.fin_code else "",
+        id_series=sanitize_input(input.id_series) if input.id_series else "",
+        full_name=sanitize_input(input.full_name) if input.full_name else "",
         phone=sanitize_input(input.phone),
         status="approved"
     )
