@@ -118,8 +118,9 @@ const RamadanBanner = () => {
             </svg>
           </div>
         </div>
-        
-        {/* Bottom gold border */}
+      </div>
+      
+      {/* Bottom gold border */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
     </div>
   );
