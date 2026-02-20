@@ -119,19 +119,7 @@ const RamadanBanner = () => {
           </div>
         </div>
         
-        {/* Close button */}
-        <button 
-          onClick={() => setIsVisible(false)}
-          className="absolute top-2 right-2 sm:top-3 sm:right-4 text-white/60 hover:text-white transition-colors p-1.5 hover:bg-white/10 rounded-full"
-          aria-label="Bağla"
-        >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
-      </div>
-      
-      {/* Bottom gold border */}
+        {/* Bottom gold border */}
       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
     </div>
   );
