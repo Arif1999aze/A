@@ -39,6 +39,72 @@ const CacheBuster = () => {
 };
 
 // Home Page
+// Ramazan Bayramı Banner Component
+const RamadanBanner = () => {
+  const [isVisible, setIsVisible] = useState(true);
+  
+  if (!isVisible) return null;
+  
+  return (
+    <div className="relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
+      {/* Decorative elements */}
+      <div className="absolute inset-0 overflow-hidden">
+        {/* Stars */}
+        <div className="absolute top-2 left-[10%] text-yellow-300 text-xl animate-pulse">✦</div>
+        <div className="absolute top-4 left-[25%] text-yellow-200 text-sm animate-pulse" style={{animationDelay: '0.3s'}}>✧</div>
+        <div className="absolute top-2 right-[15%] text-yellow-300 text-lg animate-pulse" style={{animationDelay: '0.5s'}}>✦</div>
+        <div className="absolute top-3 right-[30%] text-yellow-200 text-sm animate-pulse" style={{animationDelay: '0.7s'}}>✧</div>
+        <div className="absolute bottom-2 left-[20%] text-yellow-200 text-sm animate-pulse" style={{animationDelay: '0.2s'}}>✧</div>
+        <div className="absolute bottom-3 right-[25%] text-yellow-300 text-base animate-pulse" style={{animationDelay: '0.4s'}}>✦</div>
+        
+        {/* Crescent moons */}
+        <div className="absolute top-1 left-[5%] text-2xl sm:text-3xl text-yellow-300 animate-bounce" style={{animationDuration: '2s'}}>🌙</div>
+        <div className="absolute top-1 right-[5%] text-2xl sm:text-3xl text-yellow-300 animate-bounce" style={{animationDuration: '2s', animationDelay: '0.5s'}}>🌙</div>
+        
+        {/* Lanterns */}
+        <div className="absolute -bottom-1 left-[8%] text-xl sm:text-2xl animate-pulse">🏮</div>
+        <div className="absolute -bottom-1 right-[8%] text-xl sm:text-2xl animate-pulse" style={{animationDelay: '0.3s'}}>🏮</div>
+        
+        {/* Decorative pattern overlay */}
+        <div className="absolute inset-0 opacity-10" style={{
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30z' fill='%23fff' fill-opacity='0.4'/%3E%3C/svg%3E")`,
+          backgroundSize: '30px 30px'
+        }}></div>
+      </div>
+      
+      {/* Content */}
+      <div className="relative px-4 py-4 sm:py-5">
+        <div className="max-w-4xl mx-auto text-center">
+          {/* Main greeting */}
+          <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
+            <span className="text-2xl sm:text-3xl">🕌</span>
+            <div>
+              <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
+                Ramazan Bayramınız Mübarək!
+              </h2>
+              <p className="text-xs sm:text-sm text-emerald-100 mt-1">
+                AzPay ailəsi olaraq sizə və ailənizə xoşbəxtlik arzulayırıq! ✨
+              </p>
+            </div>
+            <span className="text-2xl sm:text-3xl">🕌</span>
+          </div>
+        </div>
+        
+        {/* Close button */}
+        <button 
+          onClick={() => setIsVisible(false)}
+          className="absolute top-2 right-2 sm:top-3 sm:right-4 text-white/70 hover:text-white transition-colors p-1"
+          aria-label="Bağla"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  );
+};
+
 const HomePage = () => {
   const navigate = useNavigate();
   const [settings, setSettings] = useState(null);
@@ -57,6 +123,9 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
+      {/* Ramazan Bayramı Banner */}
+      <RamadanBanner />
+      
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-blue-100 shadow-sm">
         <div className="container mx-auto px-4 py-4">
