@@ -39,68 +39,103 @@ const CacheBuster = () => {
 };
 
 // Home Page
-// Ramazan Bayramı Banner Component
+// Ramazan Bayramı Banner Component - Premium Design
 const RamadanBanner = () => {
   const [isVisible, setIsVisible] = useState(true);
   
   if (!isVisible) return null;
   
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700">
-      {/* Decorative elements */}
+    <div className="relative overflow-hidden bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800">
+      {/* Premium geometric pattern overlay */}
+      <div className="absolute inset-0 opacity-20">
+        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="islamic-pattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+              <path d="M30 0 L60 30 L30 60 L0 30 Z" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="0.5"/>
+              <circle cx="30" cy="30" r="8" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#islamic-pattern)"/>
+        </svg>
+      </div>
+      
+      {/* Elegant gold stars */}
       <div className="absolute inset-0 overflow-hidden">
-        {/* Stars */}
-        <div className="absolute top-2 left-[10%] text-yellow-300 text-xl animate-pulse">✦</div>
-        <div className="absolute top-4 left-[25%] text-yellow-200 text-sm animate-pulse" style={{animationDelay: '0.3s'}}>✧</div>
-        <div className="absolute top-2 right-[15%] text-yellow-300 text-lg animate-pulse" style={{animationDelay: '0.5s'}}>✦</div>
-        <div className="absolute top-3 right-[30%] text-yellow-200 text-sm animate-pulse" style={{animationDelay: '0.7s'}}>✧</div>
-        <div className="absolute bottom-2 left-[20%] text-yellow-200 text-sm animate-pulse" style={{animationDelay: '0.2s'}}>✧</div>
-        <div className="absolute bottom-3 right-[25%] text-yellow-300 text-base animate-pulse" style={{animationDelay: '0.4s'}}>✦</div>
+        <svg className="absolute top-3 left-[8%] w-3 h-3 text-amber-400 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+        <svg className="absolute top-5 left-[20%] w-2 h-2 text-amber-300 animate-pulse" style={{animationDelay: '0.3s'}} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+        <svg className="absolute top-2 right-[12%] w-3 h-3 text-amber-400 animate-pulse" style={{animationDelay: '0.5s'}} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
+        <svg className="absolute top-4 right-[25%] w-2 h-2 text-amber-300 animate-pulse" style={{animationDelay: '0.7s'}} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        </svg>
         
-        {/* Crescent moons */}
-        <div className="absolute top-1 left-[5%] text-2xl sm:text-3xl text-yellow-300 animate-bounce" style={{animationDuration: '2s'}}>🌙</div>
-        <div className="absolute top-1 right-[5%] text-2xl sm:text-3xl text-yellow-300 animate-bounce" style={{animationDuration: '2s', animationDelay: '0.5s'}}>🌙</div>
+        {/* Premium Crescent Moon - Left */}
+        <svg className="absolute top-2 left-[3%] w-8 h-8 sm:w-10 sm:h-10 text-amber-400 drop-shadow-lg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+        </svg>
         
-        {/* Lanterns */}
-        <div className="absolute -bottom-1 left-[8%] text-xl sm:text-2xl animate-pulse">🏮</div>
-        <div className="absolute -bottom-1 right-[8%] text-xl sm:text-2xl animate-pulse" style={{animationDelay: '0.3s'}}>🏮</div>
+        {/* Premium Crescent Moon - Right */}
+        <svg className="absolute top-2 right-[3%] w-8 h-8 sm:w-10 sm:h-10 text-amber-400 drop-shadow-lg" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+        </svg>
         
-        {/* Decorative pattern overlay */}
-        <div className="absolute inset-0 opacity-10" style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0L60 30L30 60L0 30z' fill='%23fff' fill-opacity='0.4'/%3E%3C/svg%3E")`,
-          backgroundSize: '30px 30px'
-        }}></div>
+        {/* Elegant Lantern - Left */}
+        <svg className="absolute bottom-1 left-[6%] w-6 h-6 sm:w-8 sm:h-8 text-amber-500 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 2h4v2h-4V2zm-1 4V4h6v2H9zm1 0h4v1h-4V6zM8 8h8c0 0 1 0 1 1v8c0 1-1 2-2 2h-1v2h-4v-2H9c-1 0-2-1-2-2V9c0-1 1-1 1-1zm1 2v6c0 .5.5 1 1 1h4c.5 0 1-.5 1-1v-6H9z"/>
+        </svg>
+        
+        {/* Elegant Lantern - Right */}
+        <svg className="absolute bottom-1 right-[6%] w-6 h-6 sm:w-8 sm:h-8 text-amber-500 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M10 2h4v2h-4V2zm-1 4V4h6v2H9zm1 0h4v1h-4V6zM8 8h8c0 0 1 0 1 1v8c0 1-1 2-2 2h-1v2h-4v-2H9c-1 0-2-1-2-2V9c0-1 1-1 1-1zm1 2v6c0 .5.5 1 1 1h4c.5 0 1-.5 1-1v-6H9z"/>
+        </svg>
       </div>
       
       {/* Content */}
-      <div className="relative px-4 py-4 sm:py-5">
+      <div className="relative px-4 py-5 sm:py-6">
         <div className="max-w-4xl mx-auto text-center">
           {/* Main greeting */}
-          <div className="flex items-center justify-center gap-2 sm:gap-4 flex-wrap">
-            <span className="text-2xl sm:text-3xl">🕌</span>
+          <div className="flex items-center justify-center gap-3 sm:gap-5">
+            {/* Premium Mosque Icon - Left */}
+            <svg className="w-8 h-8 sm:w-12 sm:h-12 text-amber-400 drop-shadow-lg flex-shrink-0" viewBox="0 0 64 64" fill="currentColor">
+              <path d="M32 4c-1 0-2 .5-2.5 1.5L24 16h-4l-3-6c-.5-1-1.5-1.5-2.5-1.5S12.5 9.5 12 10.5L8 18H4v4h4v34h8V40c0-2 2-4 4-4h24c2 0 4 2 4 4v16h8V22h4v-4h-4l-4-7.5c-.5-1-1.5-1.5-2.5-1.5s-2 .5-2.5 1.5l-3 6h-4l-5.5-10.5C34 4.5 33 4 32 4zm0 4l4 8H28l4-8zm-16 8l2 4h-4l2-4zm32 0l2 4h-4l2-4zM24 44h-4v12h4V44zm20 0h-4v12h4V44z"/>
+            </svg>
+            
             <div>
-              <h2 className="text-lg sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg tracking-wide">
                 Ramazan Bayramınız Mübarək!
               </h2>
-              <p className="text-xs sm:text-sm text-emerald-100 mt-1">
-                AzPay ailəsi olaraq sizə və ailənizə xoşbəxtlik arzulayırıq! ✨
+              <p className="text-xs sm:text-sm text-emerald-200 mt-1.5 font-light">
+                AzPay ailəsi olaraq sizə və ailənizə xoşbəxtlik arzulayırıq
               </p>
             </div>
-            <span className="text-2xl sm:text-3xl">🕌</span>
+            
+            {/* Premium Mosque Icon - Right */}
+            <svg className="w-8 h-8 sm:w-12 sm:h-12 text-amber-400 drop-shadow-lg flex-shrink-0" viewBox="0 0 64 64" fill="currentColor">
+              <path d="M32 4c-1 0-2 .5-2.5 1.5L24 16h-4l-3-6c-.5-1-1.5-1.5-2.5-1.5S12.5 9.5 12 10.5L8 18H4v4h4v34h8V40c0-2 2-4 4-4h24c2 0 4 2 4 4v16h8V22h4v-4h-4l-4-7.5c-.5-1-1.5-1.5-2.5-1.5s-2 .5-2.5 1.5l-3 6h-4l-5.5-10.5C34 4.5 33 4 32 4zm0 4l4 8H28l4-8zm-16 8l2 4h-4l2-4zm32 0l2 4h-4l2-4zM24 44h-4v12h4V44zm20 0h-4v12h4V44z"/>
+            </svg>
           </div>
         </div>
         
         {/* Close button */}
         <button 
           onClick={() => setIsVisible(false)}
-          className="absolute top-2 right-2 sm:top-3 sm:right-4 text-white/70 hover:text-white transition-colors p-1"
+          className="absolute top-2 right-2 sm:top-3 sm:right-4 text-white/60 hover:text-white transition-colors p-1.5 hover:bg-white/10 rounded-full"
           aria-label="Bağla"
         >
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
       </div>
+      
+      {/* Bottom gold border */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
     </div>
   );
 };
