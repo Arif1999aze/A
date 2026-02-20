@@ -110,9 +110,6 @@ const RamadanBanner = () => {
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg tracking-wide">
                 Ramazan Bayramınız Mübarək!
               </h2>
-              <p className="text-xs sm:text-sm text-emerald-200 mt-1.5 font-light">
-                AzPay ailəsi olaraq sizə və ailənizə xoşbəxtlik arzulayırıq
-              </p>
             </div>
             
             {/* Premium Mosque Icon - Right */}
