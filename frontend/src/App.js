@@ -371,10 +371,6 @@ const HomePage = () => {
               <h3 className="text-xl font-bold mb-4">Əlaqə</h3>
               <div className="space-y-3 text-blue-100">
                 <div className="flex items-center justify-center md:justify-start gap-2">
-                  <span className="text-lg">📞</span>
-                  <span className="text-sm">{settings?.contact_phone || '+994 50 123 45 67'}</span>
-                </div>
-                <div className="flex items-center justify-center md:justify-start gap-2">
                   <span className="text-lg">✉️</span>
                   <span className="text-sm">{settings?.contact_email || 'info@azpay.az'}</span>
                 </div>
