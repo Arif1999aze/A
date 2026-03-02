@@ -72,20 +72,13 @@ class SecurityMiddleware(BaseHTTPMiddleware):
 
 app.add_middleware(SecurityMiddleware)
 
-# CORS middleware - restricted
-ALLOWED_ORIGINS = [
-    "https://azpayresmi.com",
-    "https://www.azpayresmi.com",
-    "https://azpay.online",
-    "https://loan-fix-secure.preview.emergentagent.com"
-]
-
+# CORS middleware - OPEN for all countries
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=ALLOWED_ORIGINS,
+    allow_origins=["*"],  # Bütün ölkələrdən müraciət qəbul edilir
     allow_credentials=False,
-    allow_methods=["GET", "POST", "PUT"],
-    allow_headers=["Content-Type"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["*"],
 )
 
 # Define Models
