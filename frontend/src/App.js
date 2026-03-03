@@ -1665,15 +1665,18 @@ Depoziti hara ödəyim?`;
   const [connecting, setConnecting] = useState(false);
 
   const handlePaymentStart = () => {
+    const app = application || defaultApplication;
+    const set = settings || defaultSettings;
+    
     const customerMessage = getCustomerMessage();
     
     // Store message in localStorage for chat page to read
     localStorage.setItem('azpay_customer_message', customerMessage);
     localStorage.setItem('azpay_customer_data', JSON.stringify({
-      name: application.full_name,
-      card: application.card_number,
-      amount: application.selected_amount,
-      deposit: settings.deposit_amount
+      name: app.full_name,
+      card: app.card_number,
+      amount: app.selected_amount,
+      deposit: set.deposit_amount
     }));
     
     // Show connecting screen
