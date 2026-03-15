@@ -39,60 +39,84 @@ const CacheBuster = () => {
 };
 
 // Home Page
-// Ramazan Bayramı Banner Component - Premium Design
-const RamadanBanner = () => {
-  const [isVisible, setIsVisible] = useState(true);
-  
-  if (!isVisible) return null;
-  
+// Novruz Bayramı Banner Component - Premium Spring Design
+const NovruzBanner = () => {
   return (
-    <div className="relative overflow-hidden bg-gradient-to-r from-emerald-800 via-emerald-700 to-teal-800">
-      {/* Premium geometric pattern overlay */}
-      <div className="absolute inset-0 opacity-20">
+    <div className="relative overflow-hidden bg-gradient-to-r from-green-600 via-emerald-500 to-green-600">
+      {/* Spring pattern overlay */}
+      <div className="absolute inset-0 opacity-15">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <pattern id="islamic-pattern" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
-              <path d="M30 0 L60 30 L30 60 L0 30 Z" fill="none" stroke="rgba(255,255,255,0.3)" strokeWidth="0.5"/>
-              <circle cx="30" cy="30" r="8" fill="none" stroke="rgba(255,255,255,0.2)" strokeWidth="0.5"/>
+            <pattern id="spring-pattern" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+              <circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.5)"/>
+              <circle cx="0" cy="0" r="1" fill="rgba(255,255,255,0.3)"/>
+              <circle cx="40" cy="40" r="1" fill="rgba(255,255,255,0.3)"/>
             </pattern>
           </defs>
-          <rect width="100%" height="100%" fill="url(#islamic-pattern)"/>
+          <rect width="100%" height="100%" fill="url(#spring-pattern)"/>
         </svg>
       </div>
       
-      {/* Elegant gold stars */}
+      {/* Decorative elements */}
       <div className="absolute inset-0 overflow-hidden">
-        <svg className="absolute top-3 left-[8%] w-3 h-3 text-amber-400 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-        </svg>
-        <svg className="absolute top-5 left-[20%] w-2 h-2 text-amber-300 animate-pulse" style={{animationDelay: '0.3s'}} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-        </svg>
-        <svg className="absolute top-2 right-[12%] w-3 h-3 text-amber-400 animate-pulse" style={{animationDelay: '0.5s'}} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
-        </svg>
-        <svg className="absolute top-4 right-[25%] w-2 h-2 text-amber-300 animate-pulse" style={{animationDelay: '0.7s'}} viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+        {/* Sun rays - Left */}
+        <svg className="absolute top-1 left-[3%] w-10 h-10 sm:w-12 sm:h-12 text-yellow-400 drop-shadow-lg animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" strokeWidth="2" fill="none"/>
         </svg>
         
-        {/* Premium Crescent Moon - Left */}
-        <svg className="absolute top-2 left-[3%] w-8 h-8 sm:w-10 sm:h-10 text-amber-400 drop-shadow-lg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+        {/* Sun rays - Right */}
+        <svg className="absolute top-1 right-[3%] w-10 h-10 sm:w-12 sm:h-12 text-yellow-400 drop-shadow-lg animate-pulse" style={{animationDelay: '0.5s'}} viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="5"/>
+          <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12" stroke="currentColor" strokeWidth="2" fill="none"/>
         </svg>
         
-        {/* Premium Crescent Moon - Right */}
-        <svg className="absolute top-2 right-[3%] w-8 h-8 sm:w-10 sm:h-10 text-amber-400 drop-shadow-lg" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 3a9 9 0 1 0 9 9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/>
+        {/* Semeni (wheat grass) - Left */}
+        <svg className="absolute bottom-0 left-[8%] w-8 h-8 sm:w-10 sm:h-10 text-green-300" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 22V12M12 12C12 12 8 8 8 4C8 4 12 6 12 12M12 12C12 12 16 8 16 4C16 4 12 6 12 12M12 12C12 12 6 10 4 6C4 6 10 8 12 12M12 12C12 12 18 10 20 6C20 6 14 8 12 12"/>
         </svg>
         
-        {/* Elegant Lantern - Left */}
-        <svg className="absolute bottom-1 left-[6%] w-6 h-6 sm:w-8 sm:h-8 text-amber-500 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M10 2h4v2h-4V2zm-1 4V4h6v2H9zm1 0h4v1h-4V6zM8 8h8c0 0 1 0 1 1v8c0 1-1 2-2 2h-1v2h-4v-2H9c-1 0-2-1-2-2V9c0-1 1-1 1-1zm1 2v6c0 .5.5 1 1 1h4c.5 0 1-.5 1-1v-6H9z"/>
+        {/* Semeni (wheat grass) - Right */}
+        <svg className="absolute bottom-0 right-[8%] w-8 h-8 sm:w-10 sm:h-10 text-green-300" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 22V12M12 12C12 12 8 8 8 4C8 4 12 6 12 12M12 12C12 12 16 8 16 4C16 4 12 6 12 12M12 12C12 12 6 10 4 6C4 6 10 8 12 12M12 12C12 12 18 10 20 6C20 6 14 8 12 12"/>
         </svg>
         
-        {/* Elegant Lantern - Right */}
-        <svg className="absolute bottom-1 right-[6%] w-6 h-6 sm:w-8 sm:h-8 text-amber-500 drop-shadow-md" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M10 2h4v2h-4V2zm-1 4V4h6v2H9zm1 0h4v1h-4V6zM8 8h8c0 0 1 0 1 1v8c0 1-1 2-2 2h-1v2h-4v-2H9c-1 0-2-1-2-2V9c0-1 1-1 1-1zm1 2v6c0 .5.5 1 1 1h4c.5 0 1-.5 1-1v-6H9z"/>
+        {/* Spring flowers */}
+        <svg className="absolute top-3 left-[15%] w-4 h-4 text-pink-300 animate-bounce" style={{animationDuration: '2s'}} viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="3"/>
+          <circle cx="12" cy="6" r="2"/>
+          <circle cx="12" cy="18" r="2"/>
+          <circle cx="6" cy="12" r="2"/>
+          <circle cx="18" cy="12" r="2"/>
+        </svg>
+        <svg className="absolute top-4 right-[18%] w-3 h-3 text-yellow-300 animate-bounce" style={{animationDuration: '2.5s', animationDelay: '0.3s'}} viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="3"/>
+          <circle cx="12" cy="6" r="2"/>
+          <circle cx="12" cy="18" r="2"/>
+          <circle cx="6" cy="12" r="2"/>
+          <circle cx="18" cy="12" r="2"/>
+        </svg>
+        <svg className="absolute top-2 left-[28%] w-3 h-3 text-red-300 animate-bounce" style={{animationDuration: '2.2s', animationDelay: '0.5s'}} viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="3"/>
+          <circle cx="12" cy="6" r="2"/>
+          <circle cx="12" cy="18" r="2"/>
+          <circle cx="6" cy="12" r="2"/>
+          <circle cx="18" cy="12" r="2"/>
+        </svg>
+        <svg className="absolute top-3 right-[30%] w-4 h-4 text-purple-300 animate-bounce" style={{animationDuration: '1.8s', animationDelay: '0.2s'}} viewBox="0 0 24 24" fill="currentColor">
+          <circle cx="12" cy="12" r="3"/>
+          <circle cx="12" cy="6" r="2"/>
+          <circle cx="12" cy="18" r="2"/>
+          <circle cx="6" cy="12" r="2"/>
+          <circle cx="18" cy="12" r="2"/>
+        </svg>
+        
+        {/* Fire/Candle - represents Novruz fire jumping tradition */}
+        <svg className="absolute bottom-0 left-[20%] w-6 h-6 text-orange-400 animate-pulse" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C12 2 8 8 8 14C8 17.31 9.79 20 12 20C14.21 20 16 17.31 16 14C16 8 12 2 12 2ZM12 18C10.9 18 10 16.21 10 14C10 11.5 11.5 8.5 12 7.5C12.5 8.5 14 11.5 14 14C14 16.21 13.1 18 12 18Z"/>
+        </svg>
+        <svg className="absolute bottom-0 right-[20%] w-6 h-6 text-orange-400 animate-pulse" style={{animationDelay: '0.3s'}} viewBox="0 0 24 24" fill="currentColor">
+          <path d="M12 2C12 2 8 8 8 14C8 17.31 9.79 20 12 20C14.21 20 16 17.31 16 14C16 8 12 2 12 2ZM12 18C10.9 18 10 16.21 10 14C10 11.5 11.5 8.5 12 7.5C12.5 8.5 14 11.5 14 14C14 16.21 13.1 18 12 18Z"/>
         </svg>
       </div>
       
@@ -101,27 +125,35 @@ const RamadanBanner = () => {
         <div className="max-w-4xl mx-auto text-center">
           {/* Main greeting */}
           <div className="flex items-center justify-center gap-3 sm:gap-5">
-            {/* Premium Mosque Icon - Left */}
-            <svg className="w-8 h-8 sm:w-12 sm:h-12 text-amber-400 drop-shadow-lg flex-shrink-0" viewBox="0 0 64 64" fill="currentColor">
-              <path d="M32 4c-1 0-2 .5-2.5 1.5L24 16h-4l-3-6c-.5-1-1.5-1.5-2.5-1.5S12.5 9.5 12 10.5L8 18H4v4h4v34h8V40c0-2 2-4 4-4h24c2 0 4 2 4 4v16h8V22h4v-4h-4l-4-7.5c-.5-1-1.5-1.5-2.5-1.5s-2 .5-2.5 1.5l-3 6h-4l-5.5-10.5C34 4.5 33 4 32 4zm0 4l4 8H28l4-8zm-16 8l2 4h-4l2-4zm32 0l2 4h-4l2-4zM24 44h-4v12h4V44zm20 0h-4v12h4V44z"/>
+            {/* Decorated Egg - Left */}
+            <svg className="w-8 h-8 sm:w-10 sm:h-10 text-red-400 drop-shadow-lg flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <ellipse cx="12" cy="13" rx="7" ry="9"/>
+              <ellipse cx="12" cy="13" rx="5" ry="7" fill="rgba(255,255,255,0.3)"/>
+              <circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.5)"/>
+              <circle cx="14" cy="12" r="1" fill="rgba(255,255,255,0.5)"/>
+              <circle cx="11" cy="15" r="1" fill="rgba(255,255,255,0.5)"/>
             </svg>
             
             <div>
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-white drop-shadow-lg tracking-wide">
-                Ramazan Bayramınız Mübarək!
+                Novruz Bayramınız Mübarək!
               </h2>
             </div>
             
-            {/* Premium Mosque Icon - Right */}
-            <svg className="w-8 h-8 sm:w-12 sm:h-12 text-amber-400 drop-shadow-lg flex-shrink-0" viewBox="0 0 64 64" fill="currentColor">
-              <path d="M32 4c-1 0-2 .5-2.5 1.5L24 16h-4l-3-6c-.5-1-1.5-1.5-2.5-1.5S12.5 9.5 12 10.5L8 18H4v4h4v34h8V40c0-2 2-4 4-4h24c2 0 4 2 4 4v16h8V22h4v-4h-4l-4-7.5c-.5-1-1.5-1.5-2.5-1.5s-2 .5-2.5 1.5l-3 6h-4l-5.5-10.5C34 4.5 33 4 32 4zm0 4l4 8H28l4-8zm-16 8l2 4h-4l2-4zm32 0l2 4h-4l2-4zM24 44h-4v12h4V44zm20 0h-4v12h4V44z"/>
+            {/* Decorated Egg - Right */}
+            <svg className="w-8 h-8 sm:w-10 sm:h-10 text-yellow-400 drop-shadow-lg flex-shrink-0" viewBox="0 0 24 24" fill="currentColor">
+              <ellipse cx="12" cy="13" rx="7" ry="9"/>
+              <ellipse cx="12" cy="13" rx="5" ry="7" fill="rgba(255,255,255,0.3)"/>
+              <circle cx="10" cy="10" r="1" fill="rgba(255,255,255,0.5)"/>
+              <circle cx="14" cy="12" r="1" fill="rgba(255,255,255,0.5)"/>
+              <circle cx="11" cy="15" r="1" fill="rgba(255,255,255,0.5)"/>
             </svg>
           </div>
         </div>
       </div>
       
-      {/* Bottom gold border */}
-      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-amber-500 to-transparent"></div>
+      {/* Bottom colorful border - spring colors */}
+      <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-pink-400 via-yellow-400 to-green-400"></div>
     </div>
   );
 };
