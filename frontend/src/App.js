@@ -176,9 +176,6 @@ const HomePage = () => {
 
   return (
     <div className="min-h-screen relative overflow-hidden">
-      {/* Novruz Bayramı Banner */}
-      <NovruzBanner />
-      
       {/* Header */}
       <header className="sticky top-0 z-50 backdrop-blur-xl bg-white/80 border-b border-blue-100 shadow-sm">
         <div className="container mx-auto px-4 py-4">
