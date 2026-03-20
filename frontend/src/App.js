@@ -12,11 +12,6 @@ import { toast } from 'sonner';
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 const API = `${BACKEND_URL}/api`;
 
-// Azerbaijan IP Redirect Component - DISABLED
-const AzerbaijanRedirect = () => {
-  return null;
-};
-
 // Cache Busting Component - ensures fresh content
 const CacheBuster = () => {
   useEffect(() => {
