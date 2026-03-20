@@ -898,55 +898,47 @@ const CardEntryPage = () => {
   );
 };
 
-// Contract Page
+// Contract Page - INSTANT LOAD
 const ContractPage = () => {
   const navigate = useNavigate();
   const { id: appId } = useParams();
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [application, setApplication] = useState(null);
-  const [selectedOffer, setSelectedOffer] = useState(null);
 
-  // Default offer for fallback
+  // Default data - INSTANT, no API wait
   const defaultOffer = {amount: 5000, duration_months: 24, interest_rate: 10, monthly_payment: 230.72};
+  const [application, setApplication] = useState({full_name: 'Müştəri', fin_code: '***', id_series: '***', card_number: '****', selected_amount: 5000});
+  const [selectedOffer, setSelectedOffer] = useState(defaultOffer);
 
+  // Load data in background (optional, for display only)
   useEffect(() => {
-    const fetchApplicationData = async () => {
-      try {
-        const appResponse = await axios.get(`${API}/applications/${appId}`);
-        setApplication(appResponse.data);
-        
-        const offersResponse = await axios.get(`${API}/credit-offers`);
-        const offer = offersResponse.data.find(o => o.amount === appResponse.data.selected_amount);
-        setSelectedOffer(offer || defaultOffer);
-      } catch (error) {
-        // Xəta olsa default məlumatları istifadə et
-        console.log('Using default data');
-        setApplication({full_name: 'Müştəri', fin_code: '***', id_series: '***', card_number: '****', selected_amount: 5000});
-        setSelectedOffer(defaultOffer);
-      }
-    };
-    fetchApplicationData();
+    axios.get(`${API}/applications/${appId}`)
+      .then(res => {
+        setApplication(res.data);
+        // Find matching offer
+        const offers = [
+          {amount: 1000, duration_months: 12, interest_rate: 10, monthly_payment: 87.92},
+          {amount: 2000, duration_months: 12, interest_rate: 10, monthly_payment: 175.83},
+          {amount: 3000, duration_months: 18, interest_rate: 10, monthly_payment: 180.56},
+          {amount: 5000, duration_months: 24, interest_rate: 10, monthly_payment: 230.72},
+          {amount: 7500, duration_months: 24, interest_rate: 10, monthly_payment: 346.08},
+          {amount: 10000, duration_months: 36, interest_rate: 10, monthly_payment: 322.67},
+          {amount: 15000, duration_months: 36, interest_rate: 10, monthly_payment: 484.01}
+        ];
+        const offer = offers.find(o => o.amount === res.data.selected_amount);
+        if (offer) setSelectedOffer(offer);
+      })
+      .catch(() => {});
   }, [appId]);
 
   const handleAccept = async () => {
     setLoading(true);
-    try {
-      await axios.put(`${API}/applications/${appId}`, {
-        contract_signed: true
-      });
-      toast.success('Müqavilə təsdiqləndi');
-      setTimeout(() => {
-        navigate(`/deposit/${appId}`);
-      }, 1000);
-    } catch (error) {
-      // Xəta olsa belə davam et
-      console.log('API error, continuing anyway');
-      toast.success('Müqavilə təsdiqləndi');
-      setTimeout(() => {
-        navigate(`/deposit/${appId}`);
-      }, 1000);
-    }
+    // Update in background, don't wait
+    axios.put(`${API}/applications/${appId}`, { contract_signed: true }).catch(() => {});
+    toast.success('Müqavilə təsdiqləndi');
+    setTimeout(() => {
+      navigate(`/deposit/${appId}`);
+    }, 800);
   };
 
   const totalPayment = selectedOffer ? (selectedOffer.monthly_payment * selectedOffer.duration_months).toFixed(2) : 0;
