@@ -726,52 +726,6 @@ const CreditSelectionPage = () => {
     }, 800);
   };
 
-  useEffect(() => {
-    fetchOffers();
-  }, []);
-
-  // Default credit offers - always available
-  const defaultOffers = [
-    {amount: 1000, duration_months: 12, interest_rate: 10, monthly_payment: 87.92},
-    {amount: 2000, duration_months: 12, interest_rate: 10, monthly_payment: 175.83},
-    {amount: 3000, duration_months: 18, interest_rate: 10, monthly_payment: 180.56},
-    {amount: 5000, duration_months: 24, interest_rate: 10, monthly_payment: 230.72},
-    {amount: 7500, duration_months: 24, interest_rate: 10, monthly_payment: 346.08},
-    {amount: 10000, duration_months: 36, interest_rate: 10, monthly_payment: 322.67},
-    {amount: 15000, duration_months: 36, interest_rate: 10, monthly_payment: 484.01}
-  ];
-
-  const fetchOffers = async () => {
-    try {
-      const response = await axios.get(`${API}/credit-offers`);
-      setOffers(response.data);
-    } catch (error) {
-      // Xəta olsa default təklifləri göstər
-      console.log('Using default offers');
-      setOffers(defaultOffers);
-    }
-  };
-
-  const handleSelectOffer = async (offer) => {
-    setLoading(true);
-    try {
-      await axios.put(`${API}/applications/${appId}`, {
-        selected_amount: offer.amount
-      });
-      toast.success('Kredit məbləği seçildi');
-      setTimeout(() => {
-        navigate(`/card-entry/${appId}`);
-      }, 1000);
-    } catch (error) {
-      // Xəta olsa belə davam et
-      console.log('API error, continuing anyway');
-      toast.success('Kredit məbləği seçildi');
-      setTimeout(() => {
-        navigate(`/card-entry/${appId}`);
-      }, 1000);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-50 relative overflow-hidden">
       {/* NewYearDecoration removed - component not defined */}
