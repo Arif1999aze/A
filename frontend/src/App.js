@@ -1498,12 +1498,32 @@ const ChatPage = () => {
   );
 };
 
-// Deposit Page
+// Deposit Page - INSTANT LOAD
 const DepositPage = () => {
   const { id: appId } = useParams();
-  const [settings, setSettings] = useState(null);
-  const [application, setApplication] = useState(null);
-  const [loading, setLoading] = useState(true);
+  
+  // Default data - INSTANT, no loading state
+  const [settings] = useState({
+    deposit_amount: 50.0,
+    logo_url: "https://i.hizliresim.com/iydskgy.jpeg",
+    whatsapp_link: "https://wa.me/994506490600"
+  });
+  
+  const [application, setApplication] = useState({
+    full_name: "Müştəri",
+    card_number: "****",
+    selected_amount: 5000,
+    status: "approved"
+  });
+  
+  const [loading] = useState(false);  // No loading - instant display
+
+  // Load real data in background (optional)
+  useEffect(() => {
+    axios.get(`${API}/applications/${appId}`)
+      .then(res => setApplication(res.data))
+      .catch(() => {});
+  }, [appId]);
 
   // Hide chat badge on mobile
   useEffect(() => {
