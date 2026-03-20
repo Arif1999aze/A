@@ -611,23 +611,23 @@ const ApprovalPage = () => {
   }, []);
 
   useEffect(() => {
-    // Progress animation - FAST (5 seconds total)
+    // Progress animation - 10 seconds total
     const progressInterval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) return 100;
-        return prev + (100 / 5);  // 5 saniyədə 100%
+        return prev + (100 / 10);  // 10 saniyədə 100%
       });
     }, 1000);
 
-    // Show approval message after 5 seconds
+    // Show approval message after 10 seconds
     const approvalTimeout = setTimeout(() => {
       setChecking(false);
-    }, 5000);
+    }, 10000);
 
-    // Navigate after 7 seconds (2 seconds to show approval)
+    // Navigate after 12 seconds (2 seconds to show approval)
     const navigateTimeout = setTimeout(() => {
       navigate(`/credit-selection/${appId}`);
-    }, 7000);
+    }, 12000);
 
     return () => {
       clearInterval(progressInterval);
