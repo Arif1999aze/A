@@ -1561,8 +1561,6 @@ const DepositPage = () => {
   }, []);
 
   useEffect(() => {
-    fetchData();
-    
     // Hide SUPSIS launcher icon using JavaScript
     const hideLauncher = () => {
       // Try multiple selectors to catch the launcher
