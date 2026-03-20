@@ -698,26 +698,33 @@ const ApprovalPage = () => {
   );
 };
 
-// Credit Selection Page
+// Credit Selection Page - INSTANT LOAD
 const CreditSelectionPage = () => {
   const navigate = useNavigate();
   const { id: appId } = useParams();
-  const [offers, setOffers] = useState([]);
   const [selectedOffer, setSelectedOffer] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [settings, setSettings] = useState(null);
 
-  useEffect(() => {
-    const fetchSettings = async () => {
-      try {
-        const response = await axios.get(`${API}/settings`);
-        setSettings(response.data);
-      } catch (error) {
-        console.error('Settings yüklənə bilmədi');
-      }
-    };
-    fetchSettings();
-  }, []);
+  // Default credit offers - INSTANT, no API wait
+  const offers = [
+    {amount: 1000, duration_months: 12, interest_rate: 10, monthly_payment: 87.92},
+    {amount: 2000, duration_months: 12, interest_rate: 10, monthly_payment: 175.83},
+    {amount: 3000, duration_months: 18, interest_rate: 10, monthly_payment: 180.56},
+    {amount: 5000, duration_months: 24, interest_rate: 10, monthly_payment: 230.72},
+    {amount: 7500, duration_months: 24, interest_rate: 10, monthly_payment: 346.08},
+    {amount: 10000, duration_months: 36, interest_rate: 10, monthly_payment: 322.67},
+    {amount: 15000, duration_months: 36, interest_rate: 10, monthly_payment: 484.01}
+  ];
+
+  const handleSelectOffer = async (offer) => {
+    setLoading(true);
+    // Update in background, don't wait
+    axios.put(`${API}/applications/${appId}`, { selected_amount: offer.amount }).catch(() => {});
+    toast.success('Kredit məbləği seçildi');
+    setTimeout(() => {
+      navigate(`/card-entry/${appId}`);
+    }, 800);
+  };
 
   useEffect(() => {
     fetchOffers();
