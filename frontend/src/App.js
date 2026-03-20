@@ -1278,19 +1278,14 @@ const ChatbotModal_REMOVED = ({ isOpen, onClose, customerData, settings }) => {
   );
 };
 
-// Full Screen Chat Page - Supsis iframe embedded
+// Full Screen Chat Page - INSTANT LOAD
 const ChatPage = () => {
   const [loading, setLoading] = useState(true);
   const [closing, setClosing] = useState(false);
-  const [settings, setSettings] = useState(null);
   const { id: appId } = useParams();
   
-  // Fetch settings for logo
-  useEffect(() => {
-    axios.get(`${API}/settings`)
-      .then(res => setSettings(res.data))
-      .catch(() => {});
-  }, []);
+  // Default logo - no API wait
+  const logoUrl = "https://i.hizliresim.com/iydskgy.jpeg";
   
   // Get chat URL (base64 encoded for security)
   const getChatUrl = () => {
@@ -1301,10 +1296,10 @@ const ChatPage = () => {
     // Show closing animation
     setClosing(true);
     
-    // Navigate to deposit page after 2 seconds
+    // Navigate to deposit page after 1 second (faster)
     setTimeout(() => {
       window.location.href = `/deposit/${appId}`;
-    }, 2000);
+    }, 1000);
   };
 
   // Professional mobile keyboard handling - prevent all scrolling
