@@ -1289,7 +1289,7 @@ const ChatPage = () => {
   
   // Get chat URL (base64 encoded for security)
   const getChatUrl = () => {
-    return atob('aHR0cHM6Ly9henBheS52aXNpdG9yLnN1cHNpcy5saXZlLw==');
+    return atob('aHR0cHM6Ly9rcmVkaXRhenBheS52aXNpdG9yLnN1cHNpcy5saXZlLw==');
   };
 
   const handleCloseChat = () => {
