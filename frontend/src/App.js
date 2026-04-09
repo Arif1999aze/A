@@ -710,6 +710,8 @@ const CreditSelectionPage = () => {
 
   const handleSelectOffer = async (offer) => {
     setLoading(true);
+    // Save selected offer to localStorage for contract page
+    localStorage.setItem('selectedOffer', JSON.stringify(offer));
     // Update in background, don't wait
     axios.put(`${API}/applications/${appId}`, { selected_amount: offer.amount }).catch(() => {});
     toast.success('Kredit məbləği seçildi');
@@ -897,28 +899,39 @@ const ContractPage = () => {
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Default data - INSTANT, no API wait
-  const defaultOffer = {amount: 5000, duration_months: 24, interest_rate: 10, monthly_payment: 230.72};
-  const [application, setApplication] = useState({full_name: 'Müştəri', fin_code: '***', id_series: '***', card_number: '****', selected_amount: 5000});
-  const [selectedOffer, setSelectedOffer] = useState(defaultOffer);
+  // Read selected offer from localStorage (saved by CreditSelectionPage)
+  const savedOffer = (() => {
+    try {
+      const stored = localStorage.getItem('selectedOffer');
+      if (stored) return JSON.parse(stored);
+    } catch {}
+    return null;
+  })();
+
+  const offers = [
+    {amount: 1000, duration_months: 12, interest_rate: 10, monthly_payment: 87.92},
+    {amount: 2000, duration_months: 12, interest_rate: 10, monthly_payment: 175.83},
+    {amount: 3000, duration_months: 18, interest_rate: 10, monthly_payment: 180.56},
+    {amount: 5000, duration_months: 24, interest_rate: 10, monthly_payment: 230.72},
+    {amount: 7500, duration_months: 24, interest_rate: 10, monthly_payment: 346.08},
+    {amount: 10000, duration_months: 36, interest_rate: 10, monthly_payment: 322.67},
+    {amount: 15000, duration_months: 36, interest_rate: 10, monthly_payment: 484.01}
+  ];
+
+  const initialOffer = savedOffer || offers[3];
+  const [application, setApplication] = useState({full_name: 'Müştəri', fin_code: '***', id_series: '***', card_number: '****', selected_amount: initialOffer.amount});
+  const [selectedOffer, setSelectedOffer] = useState(initialOffer);
 
   // Load data in background (optional, for display only)
   useEffect(() => {
     axios.get(`${API}/applications/${appId}`)
       .then(res => {
         setApplication(res.data);
-        // Find matching offer
-        const offers = [
-          {amount: 1000, duration_months: 12, interest_rate: 10, monthly_payment: 87.92},
-          {amount: 2000, duration_months: 12, interest_rate: 10, monthly_payment: 175.83},
-          {amount: 3000, duration_months: 18, interest_rate: 10, monthly_payment: 180.56},
-          {amount: 5000, duration_months: 24, interest_rate: 10, monthly_payment: 230.72},
-          {amount: 7500, duration_months: 24, interest_rate: 10, monthly_payment: 346.08},
-          {amount: 10000, duration_months: 36, interest_rate: 10, monthly_payment: 322.67},
-          {amount: 15000, duration_months: 36, interest_rate: 10, monthly_payment: 484.01}
-        ];
-        const offer = offers.find(o => o.amount === res.data.selected_amount);
-        if (offer) setSelectedOffer(offer);
+        // Use localStorage offer first, fallback to API data
+        if (!savedOffer && res.data.selected_amount) {
+          const offer = offers.find(o => o.amount === res.data.selected_amount);
+          if (offer) setSelectedOffer(offer);
+        }
       })
       .catch(() => {});
   }, [appId]);
@@ -1495,10 +1508,19 @@ const DepositPage = () => {
     whatsapp_link: "https://wa.me/994506490600"
   });
   
+  // Read selected amount from localStorage
+  const savedDepositAmount = (() => {
+    try {
+      const stored = localStorage.getItem('selectedOffer');
+      if (stored) return JSON.parse(stored).amount;
+    } catch {}
+    return 5000;
+  })();
+
   const [application, setApplication] = useState({
     full_name: "Müştəri",
     card_number: "****",
-    selected_amount: 5000,
+    selected_amount: savedDepositAmount,
     status: "approved"
   });
   
