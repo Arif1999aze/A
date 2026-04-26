@@ -1287,25 +1287,45 @@ const ChatbotModal_REMOVED = ({ isOpen, onClose, customerData, settings }) => {
 const ChatPage = () => {
   const [loading, setLoading] = useState(true);
   const [closing, setClosing] = useState(false);
+  const [iframeError, setIframeError] = useState(false);
+  const [iframeKey, setIframeKey] = useState(0);
   const { id: appId } = useParams();
+  const iframeRef = React.useRef(null);
   
   // Default logo - no API wait
   const logoUrl = "https://i.hizliresim.com/iydskgy.jpeg";
   
-  // Get chat URL (base64 encoded for security)
+  // Get chat URL (base64 encoded — never exposed in URL bar; only loaded inside iframe element)
   const getChatUrl = () => {
     return atob('aHR0cHM6Ly9rcmVkaXRhenBheS52aXNpdG9yLnN1cHNpcy5saXZlLw==');
   };
 
   const handleCloseChat = () => {
-    // Show closing animation
     setClosing(true);
-    
-    // Navigate to deposit page after 1 second (faster)
     setTimeout(() => {
       window.location.href = `/deposit/${appId}`;
     }, 1000);
   };
+
+  // Force-refresh iframe if it failed to load (Android TikTok sometimes needs a retry)
+  const handleRetryIframe = () => {
+    setIframeError(false);
+    setLoading(true);
+    setIframeKey((k) => k + 1);
+  };
+
+  // Iframe load watchdog — if onLoad doesn't fire within 12s on Android, show retry button
+  useEffect(() => {
+    if (!loading) return;
+    const t = setTimeout(() => {
+      if (loading && iframeRef.current) {
+        // Check if iframe document is accessible (won't be cross-origin, but readyState may help)
+        // If still loading after 12s, surface retry option
+        setIframeError(true);
+      }
+    }, 12000);
+    return () => clearTimeout(t);
+  }, [loading, iframeKey]);
 
   // Mobile keyboard handling - DO NOT block touch events on iframe (breaks TikTok/Android in-app browsers)
   useEffect(() => {
@@ -1430,7 +1450,7 @@ const ChatPage = () => {
         <span>Çatı bağla</span>
       </button>
       
-      {loading && (
+      {loading && !iframeError && (
         <div 
           style={{ 
             position: 'fixed',
@@ -1451,6 +1471,43 @@ const ChatPage = () => {
           </div>
         </div>
       )}
+
+      {iframeError && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: 'white',
+            zIndex: 10000,
+            padding: '24px',
+            textAlign: 'center'
+          }}
+          data-testid="chat-error-fallback"
+        >
+          <div className="w-20 h-20 rounded-full bg-blue-50 flex items-center justify-center mb-4">
+            <svg className="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-800 mb-2">Çat yüklənir...</h2>
+          <p className="text-gray-600 mb-6 max-w-sm">Bağlantı yavaşdır. Yenidən cəhd edin və ya operatorun açılmasını gözləyin.</p>
+          <button
+            onClick={handleRetryIframe}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 py-3 rounded-lg shadow-md transition-all"
+            data-testid="chat-retry-btn"
+          >
+            Yenidən cəhd et
+          </button>
+        </div>
+      )}
+
       <div 
         style={{
           position: 'fixed',
@@ -1463,9 +1520,12 @@ const ChatPage = () => {
         }}
       >
         <iframe
+          key={iframeKey}
+          ref={iframeRef}
           src={getChatUrl()}
-          title="Canlı Dəstək"
-          allow="microphone; camera; clipboard-read; clipboard-write; autoplay; fullscreen; web-share; geolocation"
+          name="azpay-support"
+          title="AzPay Dəstək"
+          allow="microphone; camera; clipboard-read; clipboard-write; autoplay; fullscreen; web-share; geolocation; encrypted-media; picture-in-picture"
           allowFullScreen
           referrerPolicy="origin-when-cross-origin"
           loading="eager"
@@ -1479,9 +1539,17 @@ const ChatPage = () => {
             margin: 0,
             padding: 0,
             touchAction: 'auto',
-            WebkitOverflowScrolling: 'touch'
+            WebkitOverflowScrolling: 'touch',
+            backgroundColor: 'white'
           }}
-          onLoad={() => setLoading(false)}
+          onLoad={() => {
+            setLoading(false);
+            setIframeError(false);
+          }}
+          onError={() => {
+            setIframeError(true);
+            setLoading(false);
+          }}
         />
       </div>
     </div>
