@@ -1307,47 +1307,33 @@ const ChatPage = () => {
     }, 1000);
   };
 
-  // Professional mobile keyboard handling - prevent all scrolling
+  // Mobile keyboard handling - DO NOT block touch events on iframe (breaks TikTok/Android in-app browsers)
   useEffect(() => {
     // Store original scroll position
     const scrollY = window.scrollY;
+    const originalBody = document.body.style.cssText;
+    const originalHtml = document.documentElement.style.cssText;
     
-    // Lock body completely
+    // Light body lock (no touch-action:none, no position:fixed) so iframe can receive touch events on Android/TikTok WebView
     document.body.style.cssText = `
-      overflow: hidden !important;
-      position: fixed !important;
-      top: -${scrollY}px;
-      left: 0;
-      right: 0;
+      overflow: hidden;
       width: 100%;
       height: 100%;
-      touch-action: none;
+      margin: 0;
+      padding: 0;
     `;
-    
-    // Lock html element
     document.documentElement.style.cssText = `
-      overflow: hidden !important;
-      position: fixed !important;
+      overflow: hidden;
       width: 100%;
       height: 100%;
-      touch-action: none;
     `;
     
-    // Prevent all touch move events on document
-    const preventScroll = (e) => {
-      // Allow scrolling inside iframe
-      if (e.target.closest('iframe')) return;
-      e.preventDefault();
-    };
-    
-    // Prevent zoom
+    // Prevent pinch zoom only (do NOT preventDefault on touchmove – breaks iframe scrolling in TikTok/IG/FB WebView)
     const preventZoom = (e) => {
-      if (e.touches.length > 1) {
+      if (e.touches && e.touches.length > 1) {
         e.preventDefault();
       }
     };
-    
-    document.addEventListener('touchmove', preventScroll, { passive: false });
     document.addEventListener('touchstart', preventZoom, { passive: false });
     
     // Handle orientation change
@@ -1358,9 +1344,8 @@ const ChatPage = () => {
     
     // Cleanup
     return () => {
-      document.body.style.cssText = '';
-      document.documentElement.style.cssText = '';
-      document.removeEventListener('touchmove', preventScroll);
+      document.body.style.cssText = originalBody;
+      document.documentElement.style.cssText = originalHtml;
       document.removeEventListener('touchstart', preventZoom);
       window.removeEventListener('orientationchange', handleOrientation);
       window.scrollTo(0, scrollY);
@@ -1420,7 +1405,8 @@ const ChatPage = () => {
         height: '100vh',
         overflow: 'hidden',
         zIndex: 9999,
-        backgroundColor: 'white'
+        backgroundColor: 'white',
+        touchAction: 'auto'
       }}
     >
       {/* Close button - top right for both PC and Mobile */}
@@ -1472,14 +1458,17 @@ const ChatPage = () => {
           left: 0,
           width: '100%',
           height: '100%',
-          overflow: 'hidden'
+          overflow: 'hidden',
+          touchAction: 'auto'
         }}
       >
         <iframe
           src={getChatUrl()}
           title="Canlı Dəstək"
-          allow="microphone; camera"
-          scrolling="no"
+          allow="microphone; camera; clipboard-read; clipboard-write; autoplay; fullscreen; web-share; geolocation"
+          allowFullScreen
+          referrerPolicy="origin-when-cross-origin"
+          loading="eager"
           style={{ 
             position: 'absolute',
             top: 0,
@@ -1488,7 +1477,9 @@ const ChatPage = () => {
             height: '100%',
             border: 'none',
             margin: 0,
-            padding: 0
+            padding: 0,
+            touchAction: 'auto',
+            WebkitOverflowScrolling: 'touch'
           }}
           onLoad={() => setLoading(false)}
         />
