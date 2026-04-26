@@ -60,13 +60,10 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         # Process request
         response = await call_next(request)
         
-        # Add security headers
+        # Mobile-friendly security headers (X-Frame-Options DENY and restrictive CSP REMOVED — they break TikTok/Android in-app WebView iframe rendering)
         response.headers["X-Content-Type-Options"] = "nosniff"
-        response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        response.headers["Content-Security-Policy"] = "default-src 'self' https: data: 'unsafe-inline' 'unsafe-eval'"
-        response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
         
         return response
 
